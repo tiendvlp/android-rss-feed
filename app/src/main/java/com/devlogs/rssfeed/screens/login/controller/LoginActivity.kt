@@ -1,5 +1,6 @@
 package com.devlogs.rssfeed.screens.login.controller
 
+import android.R.attr
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.facebook.appevents.AppEventsLogger
@@ -12,24 +13,48 @@ import android.widget.ImageView
 import android.widget.TextView
 import com.bumptech.glide.Glide
 import com.facebook.*
+import com.google.android.gms.common.SignInButton
 import org.json.JSONException
 import java.util.*
+import androidx.core.app.ActivityCompat.startActivityForResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import android.R.attr.data
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.common.api.ApiException
+
+
+
+
 
 class LoginActivity : AppCompatActivity() {
 
     private lateinit var callbackManager : CallbackManager
     private lateinit var loginButton : LoginButton
+    private lateinit var signInButton : SignInButton
     private lateinit var imgAvatar : ImageView
     private lateinit var txtName : TextView
+    private lateinit var  mGoogleSignInClient : GoogleSignInClient
+    private var RC_SIGN_IN = 333
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_login)
         FacebookSdk.sdkInitialize(applicationContext);
         AppEventsLogger.activateApp(application);
-
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .build()
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        val account = GoogleSignIn.getLastSignedInAccount(this)
         callbackManager = CallbackManager.Factory.create();
-
+        signInButton = findViewById(R.id.sign_in_button);
+        signInButton.setOnClickListener {v ->
+            val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
+            startActivityForResult(signInIntent, RC_SIGN_IN)
+        }
         imgAvatar = findViewById(R.id.imgAvatar)
         txtName = findViewById(R.id.txtName)
         loginButton = findViewById<LoginButton>(R.id.login_button) as LoginButton
@@ -67,9 +92,31 @@ class LoginActivity : AppCompatActivity() {
                 Log.d("LoginFacebook", "Error: ${exception.message}")
             }
         })
+
     }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
+        if (requestCode === RC_SIGN_IN) {
+            // The Task returned from this call is always completed, no need to attach
+            // a listener.
+            val task: Task<GoogleSignInAccount> =
+                GoogleSignIn.getSignedInAccountFromIntent(data)
+            try {
+                val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
+                Log.d("LoginGoogle", account.email)
+                Log.d("LoginGoogle", account.displayName)
+                Glide
+                    .with(imgAvatar.context)
+                    .load(account.photoUrl)
+                    .centerCrop()
+                    .into(imgAvatar);
+                // Signed in successfully, show authenticated UI.
+            } catch (e: ApiException) {
+                // The ApiException status code indicates the detailed failure reason.
+                // Please refer to the GoogleSignInStatusCodes class reference for more information.
+                Log.w("LoginGoogle", "signInResult:failed code=" + e.statusCode)
+            }
+        }
         super.onActivityResult(requestCode, resultCode, data)
     }
 }
