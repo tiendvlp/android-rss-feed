@@ -22,20 +22,22 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import android.R.attr.data
+import android.content.Context
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.api.ApiException
 
 
-
-
-
 class LoginActivity : AppCompatActivity() {
+    companion object {
+        fun start (context: Context) {
+            val intent = Intent(context, LoginActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
 
     private lateinit var callbackManager : CallbackManager
     private lateinit var loginButton : LoginButton
     private lateinit var signInButton : SignInButton
-    private lateinit var imgAvatar : ImageView
-    private lateinit var txtName : TextView
     private lateinit var  mGoogleSignInClient : GoogleSignInClient
     private var RC_SIGN_IN = 333
 
@@ -55,8 +57,6 @@ class LoginActivity : AppCompatActivity() {
             val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
             startActivityForResult(signInIntent, RC_SIGN_IN)
         }
-        imgAvatar = findViewById(R.id.imgAvatar)
-        txtName = findViewById(R.id.txtName)
         loginButton = findViewById<LoginButton>(R.id.login_button) as LoginButton
         loginButton.setReadPermissions(Arrays.asList("email", "user_birthday"))
 
@@ -66,7 +66,6 @@ class LoginActivity : AppCompatActivity() {
                 var request = GraphRequest.newMeRequest(loginResult!!.accessToken) { o, r ->
                     try {
                         val email = o!!.getString("email")
-                        txtName.text = o!!.getString("name")
                         Log.d("LoginFacebook", email)
                     } catch (e : JSONException) {
                         e.message?.let { Log.d("LoginFacebook", it) }
@@ -77,11 +76,11 @@ class LoginActivity : AppCompatActivity() {
                 param.putString("fields", "email, name, id")
                 request.parameters = param
                 request.executeAsync()
-                Glide
-                    .with(imgAvatar.context)
-                    .load("https://graph.facebook.com/" + loginResult!!.accessToken.userId + "/picture?return_ssl_resource=1")
-                    .centerCrop()
-                    .into(imgAvatar);
+//                Glide
+//                    .with(imgAvatar.context)
+//                    .load("https://graph.facebook.com/" + loginResult!!.accessToken.userId + "/picture?return_ssl_resource=1")
+//                    .centerCrop()
+//                    .into(imgAvatar);
             }
 
             override fun onCancel() {
@@ -105,11 +104,7 @@ class LoginActivity : AppCompatActivity() {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 Log.d("LoginGoogle", account.email)
                 Log.d("LoginGoogle", account.displayName)
-                Glide
-                    .with(imgAvatar.context)
-                    .load(account.photoUrl)
-                    .centerCrop()
-                    .into(imgAvatar);
+
                 // Signed in successfully, show authenticated UI.
             } catch (e: ApiException) {
                 // The ApiException status code indicates the detailed failure reason.

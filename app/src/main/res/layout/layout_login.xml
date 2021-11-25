@@ -4,48 +4,86 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/black"
     tools:context=".screens.login.controller.LoginActivity">
-
-    <com.facebook.login.widget.LoginButton
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:lottie_rawRes="@raw/news_app_preloader"
+        app:lottie_autoPlay="true"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginBottom="-60dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintRight_toRightOf="parent"
-        android:id="@+id/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
+        app:layout_constraintBottom_toTopOf="@id/lnMain"
+        app:lottie_loop="true"/>
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="540dp"
-        app:layout_constraintHorizontal_bias="0.45"
+    <com.airbnb.lottie.LottieAnimationView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:lottie_rawRes="@raw/global_mobile_news_network"
+        app:lottie_autoPlay="true"
+        app:lottie_scale="1"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="@id/lnMain"
+        android:layout_marginLeft="-80dp"
+        android:layout_marginRight="-80dp"
+        android:layout_marginBottom="-80dp"
+        app:lottie_loop="true"/>
 
-    <ImageView
-        android:id="@+id/imgAvatar"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="40dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/login_button"
-        tools:srcCompat="@tools:sample/avatars" />
-
-    <TextView
-        android:id="@+id/txtName"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:id="@+id/lnMain"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="TextView"
-        app:layout_constraintEnd_toEndOf="@+id/imgAvatar"
-        app:layout_constraintStart_toStartOf="@+id/imgAvatar"
-        app:layout_constraintTop_toBottomOf="@+id/imgAvatar" />
+        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        android:gravity="bottom"
+        android:orientation="vertical"
+        android:alpha="0.96"
+        android:paddingTop="25dp"
+        android:paddingBottom="30dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/publicsans"
+            android:textColor="@color/white"
+            android:layout_gravity="center_horizontal"
+            android:text="Keep your self up to date"
+            android:textSize="21sp"
+            />
+        <TextView
+            android:layout_marginTop="14dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/publicsans"
+            android:textColor="@color/grey60"
+            android:layout_gravity="center_horizontal"
+            android:text="FeedDaily help you summarize everything"
+            android:textSize="14sp"
+            />
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/login_button"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="30dp" />
 
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button"
+            android:layout_width="250dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_height="50dp" />
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
