@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var loginButton : LoginButton
     private lateinit var signInButton : SignInButton
     private lateinit var  mGoogleSignInClient : GoogleSignInClient
-    private var RC_SIGN_IN = 333
+    private val RC_SIGN_IN = 333
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,14 +50,13 @@ class LoginActivity : AppCompatActivity() {
             .requestEmail()
             .build()
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        val account = GoogleSignIn.getLastSignedInAccount(this)
         callbackManager = CallbackManager.Factory.create();
         signInButton = findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener {v ->
             val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
             startActivityForResult(signInIntent, RC_SIGN_IN)
         }
-        loginButton = findViewById<LoginButton>(R.id.login_button) as LoginButton
+        loginButton = findViewById(R.id.login_button) as LoginButton
         loginButton.setReadPermissions(Arrays.asList("email", "user_birthday"))
 
         // Callback registration
@@ -76,11 +75,6 @@ class LoginActivity : AppCompatActivity() {
                 param.putString("fields", "email, name, id")
                 request.parameters = param
                 request.executeAsync()
-//                Glide
-//                    .with(imgAvatar.context)
-//                    .load("https://graph.facebook.com/" + loginResult!!.accessToken.userId + "/picture?return_ssl_resource=1")
-//                    .centerCrop()
-//                    .into(imgAvatar);
             }
 
             override fun onCancel() {
@@ -96,8 +90,6 @@ class LoginActivity : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
         if (requestCode === RC_SIGN_IN) {
-            // The Task returned from this call is always completed, no need to attach
-            // a listener.
             val task: Task<GoogleSignInAccount> =
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -105,10 +97,7 @@ class LoginActivity : AppCompatActivity() {
                 Log.d("LoginGoogle", account.email)
                 Log.d("LoginGoogle", account.displayName)
 
-                // Signed in successfully, show authenticated UI.
             } catch (e: ApiException) {
-                // The ApiException status code indicates the detailed failure reason.
-                // Please refer to the GoogleSignInStatusCodes class reference for more information.
                 Log.w("LoginGoogle", "signInResult:failed code=" + e.statusCode)
             }
         }
