@@ -7,7 +7,6 @@ import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_EMAIL
 import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_NAME
-import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_PASSWORD
 import com.devlogs.rssfeed.screens.login.controller.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
@@ -25,12 +24,8 @@ class SplashActivity : AppCompatActivity() {
         CoroutineScope(BackgroundDispatcher).launch {
             delay(3000)
             withContext(Dispatchers.Main.immediate) {
-                if (sharedPreferences.contains(USER_NAME) && sharedPreferences.contains(USER_EMAIL) && sharedPreferences.contains(USER_PASSWORD)) {
-
-                } else {
                     LoginActivity.start(this@SplashActivity)
                     finish()
-                }
             }
         }
         // if contains user data

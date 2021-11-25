@@ -1,6 +1,5 @@
 package com.devlogs.rssfeed.screens.login.controller
 
-import android.R.attr
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.facebook.appevents.AppEventsLogger
@@ -9,25 +8,26 @@ import com.devlogs.rssfeed.R
 import com.facebook.login.widget.LoginButton
 import android.content.Intent
 import android.util.Log
-import android.widget.ImageView
-import android.widget.TextView
-import com.bumptech.glide.Glide
 import com.facebook.*
 import com.google.android.gms.common.SignInButton
 import org.json.JSONException
 import java.util.*
-import androidx.core.app.ActivityCompat.startActivityForResult
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
-import android.R.attr.data
 import android.content.Context
+import android.widget.Toast
+import com.devlogs.rssfeed.authentication.SSOLoginUseCaseSync
+import com.facebook.login.LoginManager
+import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.api.ApiException
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
-
-class LoginActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class LoginActivity : AppCompatActivity(), LoginController.Listener{
     companion object {
         fun start (context: Context) {
             val intent = Intent(context, LoginActivity::class.java)
@@ -35,6 +35,8 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    @Inject
+    protected lateinit var loginController: LoginController
     private lateinit var callbackManager : CallbackManager
     private lateinit var loginButton : LoginButton
     private lateinit var signInButton : SignInButton
@@ -44,28 +46,45 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_login)
+        setupFacebookLogin()
+        setupGoogleLogin ()
+
+    }
+
+    private fun setupFacebookLogin () {
         FacebookSdk.sdkInitialize(applicationContext);
         AppEventsLogger.activateApp(application);
+        callbackManager = CallbackManager.Factory.create();
+        loginButton = findViewById(R.id.login_button)
+        loginButton.setReadPermissions(Arrays.asList("email", "user_birthday"))
+        loginButton.registerCallback(callbackManager, facebookCallbackHandler())
+    }
+
+    private fun setupGoogleLogin () {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        callbackManager = CallbackManager.Factory.create();
         signInButton = findViewById(R.id.sign_in_button);
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         signInButton.setOnClickListener {v ->
             val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
             startActivityForResult(signInIntent, RC_SIGN_IN)
         }
-        loginButton = findViewById(R.id.login_button) as LoginButton
-        loginButton.setReadPermissions(Arrays.asList("email", "user_birthday"))
+    }
 
-        // Callback registration
-        loginButton.registerCallback(callbackManager, object : FacebookCallback<LoginResult?> {
+
+    private fun facebookCallbackHandler () = object: FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) {
                 var request = GraphRequest.newMeRequest(loginResult!!.accessToken) { o, r ->
                     try {
                         val email = o!!.getString("email")
+                        val avatarUrl = "https://graph.facebook.com/\" + loginResult!!.accessToken.userId + \"/picture?return_ssl_resource=1"
+                        val name = o!!.getString("name")
+                        login(email,name, avatarUrl)
                         Log.d("LoginFacebook", email)
+                        Log.d("LoginFacebook", name)
+                        Log.d("LoginFacebook", avatarUrl)
+                        LoginManager.getInstance().logOut()
                     } catch (e : JSONException) {
                         e.message?.let { Log.d("LoginFacebook", it) }
                     }
@@ -84,11 +103,11 @@ class LoginActivity : AppCompatActivity() {
             override fun onError(exception: FacebookException) {
                 Log.d("LoginFacebook", "Error: ${exception.message}")
             }
-        })
+        }
 
-    }
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         callbackManager.onActivityResult(requestCode, resultCode, data)
+
         if (requestCode === RC_SIGN_IN) {
             val task: Task<GoogleSignInAccount> =
                 GoogleSignIn.getSignedInAccountFromIntent(data)
@@ -96,11 +115,27 @@ class LoginActivity : AppCompatActivity() {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
                 Log.d("LoginGoogle", account.email)
                 Log.d("LoginGoogle", account.displayName)
-
+                Log.d("LoginGoogle", account.photoUrl.toString())
+                login(account.email, account.displayName, account.photoUrl.toString())
+                mGoogleSignInClient.signInIntent
             } catch (e: ApiException) {
                 Log.w("LoginGoogle", "signInResult:failed code=" + e.statusCode)
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun login (email: String, name: String, avatarUrl: String) {
+        loginController.register(this)
+        loginController.login(email,name, avatarUrl)
+
+    }
+
+    override fun loginSuccess() {
+        Toast.makeText(this, "Login success", Toast.LENGTH_LONG).show()
+    }
+
+    override fun loginFailed(errorMessage: String) {
+        Toast.makeText(this, "Login failed", Toast.LENGTH_LONG).show()
     }
 }
