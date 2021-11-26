@@ -12,6 +12,7 @@ import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.
 import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_NAME
 import com.devlogs.rssfeed.rss_channels.AddNewRssChannelByRssUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.FindRssChannelByUrlUseCaseSync
+import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.login.controller.LoginActivity
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -30,6 +31,8 @@ class SplashActivity : AppCompatActivity() {
     protected lateinit var findRssChannelByUrlUseCaseSync: FindRssChannelByUrlUseCaseSync
     @Inject
     protected lateinit var addNewRssChannelByRssUrlUseCaseSync: AddNewRssChannelByRssUrlUseCaseSync
+    @Inject
+    protected lateinit var getUserRssChannelUseCaseSync: GetUserRssChannelsUseCaseSync
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,7 +40,8 @@ class SplashActivity : AppCompatActivity() {
         CoroutineScope(BackgroundDispatcher).launch {
             withContext(Dispatchers.Main.immediate) {
                 delay(3000)
-                val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed/")
+
+                val result = findRssChannelByUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
                 Log.d("Add Rss result", result.javaClass.simpleName)
                 if (validateLoginUseCaseSync.executes() is ValidateLoginUseCaseSync.Result.InValid) {
                     LoginActivity.start(this@SplashActivity)

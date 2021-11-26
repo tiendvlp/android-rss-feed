@@ -9,7 +9,6 @@ class RssUrlFinder constructor(private val client: OkHttpClient) {
     sealed class Result {
         data class Success (val rssUrl: String) : Result ()
         class RssNotFound : Result ()
-        class NetworkError : Result ()
     }
 
     suspend fun find (url: String) : Result {
@@ -18,7 +17,7 @@ class RssUrlFinder constructor(private val client: OkHttpClient) {
             .get()
             .build()
         val response = client.newCall(request).await()
-            if (!response.isSuccessful) return Result.NetworkError()
+            if (!response.isSuccessful) return Result.RssNotFound()
             val htmlBody = response.body!!.string()
             val index = htmlBody.indexOf("application/rss+xml")
 

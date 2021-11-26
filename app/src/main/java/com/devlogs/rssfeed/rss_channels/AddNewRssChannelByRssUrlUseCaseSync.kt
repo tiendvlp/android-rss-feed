@@ -9,7 +9,6 @@ import com.devlogs.rssfeed.rss_parser.RSSObject
 import com.devlogs.rssfeed.rss_parser.RssFeed
 import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.RuntimeException

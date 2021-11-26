@@ -1,5 +1,6 @@
 package com.devlogs.rssfeed.rss_channels
 
+import android.util.Log
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.rss.RssUrlFinder
@@ -16,52 +17,69 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
     private val rssParser: RssParser
 ) {
     sealed class Result {
-        data class Found (val url: String, val rssUrl:String, val title: String, val description: String, val imageUrl: String): Result()
-        data class AlreadyAdded (val channel: RssChannelEntity) : Result()
-        class NotFound () : Result()
-        class NetworkError () : Result()
-        data class GeneralError (val errorMessage: String?) : Result()
+        data class Found(
+            val url: String,
+            val rssUrl: String,
+            val title: String,
+            val description: String,
+            val imageUrl: String
+        ) : Result()
+
+        data class AlreadyAdded(val channel: RssChannelEntity) : Result()
+        class NotFound() : Result()
+        class NetworkError() : Result()
+        data class GeneralError(val errorMessage: String?) : Result()
     }
 
-    suspend fun executes (url: String) : Result = withContext(BackgroundDispatcher) {
+    suspend fun executes(url: String): Result = withContext(BackgroundDispatcher) {
 
         val findResult = rssUrlFinder.find(url)
 
         if (findResult is RssUrlFinder.Result.RssNotFound) {
-            return@withContext Result.NotFound()
-        }
-        if (findResult is RssUrlFinder.Result.NetworkError) {
-            return@withContext Result.NetworkError()
+            // check maybe it's self is a rss url
+            return@withContext parseXml(url)
         }
         if (findResult is RssUrlFinder.Result.Success) {
-            val getRssChannelResult = rssParser.parse(findResult.rssUrl)
-
-            if (getRssChannelResult is RssParser.Result.GeneralError) {
-                return@withContext Result.GeneralError("Found rss url (${findResult.rssUrl} but can not parse the rss channel")
-            }
-
-            if (getRssChannelResult is RssParser.Result.Success) {
-                val rssObject = getRssChannelResult.rssObject
-                val channel = rssObject.channel
-
-                val snapshot = fireStore.collection("RssChannels").whereEqualTo("rssUrl", channel.link).get().await()
-                if (!snapshot.isEmpty) {
-                   val document = snapshot.documents.first()
-                   val addedChannel = RssChannelEntity(
-                       document["id"].toString(),
-                       document["url"].toString(),
-                       document["rssUrl"].toString(),
-                       document["title"].toString(),
-                       document["description"].toString(),
-                       document["image"].toString(),
-                       )
-                    return@withContext Result.AlreadyAdded(addedChannel)
-                }
-                return@withContext Result.Found(channel.link, channel.url,channel.title, channel.description, channel.image)
-            }
+            return@withContext parseXml(findResult.rssUrl)
         }
 
-        Result.GeneralError("")
+        return@withContext Result.GeneralError("")
     }
 
+    private suspend fun parseXml(rssUrl: String): Result {
+        val getRssChannelResult = rssParser.parse(rssUrl)
+
+        if (getRssChannelResult is RssParser.Result.GeneralError) {
+            return Result.GeneralError("Found rss url (${rssUrl} but can not parse the rss channel")
+        }
+
+        if (getRssChannelResult is RssParser.Result.Success) {
+            val rssObject = getRssChannelResult.rssObject
+            val channel = rssObject.channel
+
+            val snapshot =
+                fireStore.collection("RssChannels").whereEqualTo("rssUrl", channel.link).get()
+                    .await()
+            if (!snapshot.isEmpty) {
+                val document = snapshot.documents.first()
+                val addedChannel = RssChannelEntity(
+                    document["id"].toString(),
+                    document["url"].toString(),
+                    document["rssUrl"].toString(),
+                    document["title"].toString(),
+                    document["description"].toString(),
+                    document["image"].toString(),
+                )
+                return Result.AlreadyAdded(addedChannel)
+            }
+            return Result.Found(
+                channel.link,
+                channel.url,
+                channel.title,
+                channel.description,
+                channel.image
+            )
+        }
+            return Result.NotFound()
+    }
 }
