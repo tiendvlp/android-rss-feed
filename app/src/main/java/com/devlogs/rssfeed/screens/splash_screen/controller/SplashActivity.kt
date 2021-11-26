@@ -43,7 +43,6 @@ class SplashActivity : AppCompatActivity() {
                     LoginActivity.start(this@SplashActivity)
                     finish()
                 } else {
-
                     Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
                 }
             }
