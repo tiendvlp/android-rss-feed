@@ -3,15 +3,17 @@ package com.devlogs.rssfeed.rss_channels
 import android.util.Log
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
+import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.rss_parser.RSSObject
-import com.devlogs.rssfeed.rss_parser.RssChannel
+import com.devlogs.rssfeed.rss_parser.RssFeed
 import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.RuntimeException
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -66,16 +68,18 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     }
 
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
-        val channel = rssObject.channel
+        val rssChannel = rssObject.channel
         try {
-            val snapshot =
-                fireStore.collection("RssChannels").whereEqualTo("rssUrl", channel.url).get()
-                    .await()
-            if (snapshot.isEmpty) {
-                return createNewChannel(channel)
-            } else {
-                return updateCurrent(channel, snapshot)
-            }
+            val channelEntity = RssChannelEntity(
+                rssChannel.url.replace("/", "\\"),
+                rssChannel.link,
+                rssChannel.url,
+                rssChannel.title,
+                rssChannel.description,
+                rssChannel.image
+            )
+            fireStore.collection("RssChannels").document(channelEntity.id).set(channelEntity).await()
+                return saveChannelFeeds(channelEntity, rssObject.feeds)
         } catch (ex: Exception) {
             Log.e("AddNewRssUseCase", "GeneralError due to exception when check the duplication of channel: ${ex.message}")
             return Result.GeneralError(ex.message)
@@ -83,39 +87,23 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
     }
 
-    private suspend fun updateCurrent (channel:RssChannel, snapshot: QuerySnapshot) : Result {
-        try{
-            val updatedChannel = RssChannelEntity(
-                snapshot.first()["id"].toString(),
-                channel.link,
-                channel.url,
-                channel.title,
-                channel.description,
-                channel.image
-            )
-            fireStore.collection("RssChannels").document(updatedChannel.id)
-                .set(updatedChannel).await()
-            return addToUserCollection(updatedChannel)
-        } catch (e: Exception) {
-            e.message?.let { Log.e("AddNewRssUseCase", it) }
-            return Result.GeneralError(e.message)
-        }
-    }
-
-    private suspend fun createNewChannel (channel: RssChannel) : Result {
-        val addedChannel = RssChannelEntity(
-            UUID.randomUUID().toString().substring(0,8),
-            channel.link,
-            channel.url,
-            channel.title,
-            channel.description,
-            channel.image
-        )
+    private suspend fun saveChannelFeeds (channel: RssChannelEntity, feeds: List<RssFeed>) : Result {
         try {
-            fireStore.collection("RssChannels").document(addedChannel.id).set(addedChannel).await()
-            return addToUserCollection(addedChannel)
+            feeds.forEach {
+                Log.d("AddNewRssUseCase", "run ne: " + it.guid)
+                val pubDate: Date = SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(it.pubDate)
+                val entity = FeedEntity(it.guid.replace("/", "\\"), channel.rssUrl, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content)
+                fireStore
+                    .collection("RssChannels")
+                    .document(channel.id)
+                    .collection("Feeds")
+                    .document(entity.id)
+                    .set(entity)
+                    .await()
+            }
+            return addToUserCollection(channel)
         } catch (e: Exception) {
-            e.message?.let { Log.e("AddNewRssUseCase", it) }
+            e.message?.let { m -> Log.e("AddNewRssUseCase", m) }
             return Result.GeneralError(e.message)
         }
     }
