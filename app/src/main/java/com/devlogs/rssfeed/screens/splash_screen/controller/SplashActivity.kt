@@ -3,6 +3,7 @@ package com.devlogs.rssfeed.screens.splash_screen.controller
 import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.authentication.ValidateLoginUseCaseSync
@@ -33,7 +34,14 @@ class SplashActivity : AppCompatActivity() {
         CoroutineScope(BackgroundDispatcher).launch {
             withContext(Dispatchers.Main.immediate) {
                 delay(3000)
-                findRssChannelByUrlUseCaseSync.executes("")
+                Log.d("FindRss",findRssChannelByUrlUseCaseSync.executes("https://vatvostudio.vn/feed/").javaClass.simpleName)
+
+                val findResult = findRssChannelByUrlUseCaseSync.executes("https://vatvostudio.vn/feed/")
+
+                if (findResult is FindRssChannelByUrlUseCaseSync.Result.Found) {
+                    Log.d("FindRss result", "${findResult.title} ${findResult.description} ${findResult.rssUrl} ${findResult.title}, ${findResult.url}, ${findResult.imageUrl}")
+                }
+
                 if (validateLoginUseCaseSync.executes() is ValidateLoginUseCaseSync.Result.InValid) {
                     LoginActivity.start(this@SplashActivity)
                     finish()

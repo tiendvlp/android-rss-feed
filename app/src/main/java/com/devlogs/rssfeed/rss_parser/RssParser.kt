@@ -2,15 +2,11 @@ package com.devlogs.rssfeed.rss_parser
 
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
-import kotlinx.coroutines.suspendCancellableCoroutine
-import okhttp3.Call
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import okhttp3.Response
 import ru.gildor.coroutines.okhttp.await
-import java.lang.Exception
 
-class RssParser(val client: OkHttpClient) {
+class RssParser(private val client: OkHttpClient) {
     sealed class Result {
         data class Success (val rssObject: RSSObject) : Result ()
         class InvalidFormat : Result ()
