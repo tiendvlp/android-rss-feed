@@ -5,6 +5,7 @@ import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.rss.RssUrlFinder
 import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -24,7 +25,6 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
 
     suspend fun executes (url: String) : Result = withContext(BackgroundDispatcher) {
 
-        // check on firestore
         val findResult = rssUrlFinder.find(url)
 
         if (findResult is RssUrlFinder.Result.RssNotFound) {
@@ -43,6 +43,20 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
             if (getRssChannelResult is RssParser.Result.Success) {
                 val rssObject = getRssChannelResult.rssObject
                 val channel = rssObject.channel
+
+                val snapshot = fireStore.collection("RssChannels").whereEqualTo("rssUrl", channel.link).get().await()
+                if (!snapshot.isEmpty) {
+                   val document = snapshot.documents.first()
+                   val addedChannel = RssChannelEntity(
+                       document["id"].toString(),
+                       document["url"].toString(),
+                       document["rssUrl"].toString(),
+                       document["title"].toString(),
+                       document["description"].toString(),
+                       document["image"].toString(),
+                       )
+                    return@withContext Result.AlreadyAdded(addedChannel)
+                }
                 return@withContext Result.Found(channel.link, channel.url,channel.title, channel.description, channel.image)
             }
         }
