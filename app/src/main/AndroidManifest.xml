@@ -5,14 +5,19 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".MyApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:name=".MyApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RSSFeed">
-        <service android:name=".android_services.RssChannelTrackingService"/>
+        <activity
+            android:name=".screens.main.MainActivity"
+            android:exported="false" />
+
+        <service android:name=".android_services.RssChannelTrackingService" />
+
         <activity
             android:name=".screens.splash_screen.controller.SplashActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
@@ -24,9 +29,7 @@
         </activity>
         <activity
             android:name=".screens.login.controller.LoginActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-
-        </activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"></activity>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
