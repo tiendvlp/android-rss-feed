@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/grey80"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/txtAuthor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="author"
+        android:fontFamily="@font/publicsans_bold"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/txtTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:textSize="17sp"
+        android:textColor="@color/white"
+        android:layout_marginTop="15dp"
+        app:layout_constraintTop_toBottomOf="@id/txtAuthor"
+        app:layout_constraintRight_toLeftOf="@id/img"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginRight="10dp"
+        android:fontFamily="@font/publicsans_bold"
+        android:text="OnePlus 10 Pro full specs leaked, Snapdragon 8 Gen1 promised"
+        />
+
+    <TextView
+        android:id="@+id/txtPubDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2 days ago"
+        android:fontFamily="@font/publicsans"
+        android:textSize="14sp"
+        android:textColor="@color/white"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/txtTitle"
+        />
+
+    <com.devlogs.rssfeed.screens.common.customview.ImageButton
+        android:layout_width="20dp"
+        android:layout_height="18dp"
+        android:src="@drawable/ic_favorite"
+        android:background="@null"
+        app:layout_constraintTop_toTopOf="@id/txtPubDate"
+        app:layout_constraintBottom_toBottomOf="@id/txtPubDate"
+        android:scaleType="centerInside"
+        android:tint="@color/white"
+        app:layout_constraintRight_toRightOf="@id/txtTitle"
+        />
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtAuthor"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

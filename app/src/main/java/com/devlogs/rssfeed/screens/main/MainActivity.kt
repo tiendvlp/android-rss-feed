@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     }
 
     override fun onBackPressed() {
-        var isBackPressConsumed: Boolean = false
+        var isBackPressConsumed = false
 
         backPressListeners.forEach { listener ->
             if (listener.onBackPress()) {
