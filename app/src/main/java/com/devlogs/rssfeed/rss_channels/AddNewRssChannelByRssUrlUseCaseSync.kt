@@ -101,8 +101,8 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 val pubDate: Date = SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(it.pubDate)
                 val id = UrlEncrypt.encode(it.guid)
                 Log.d("AddNewRssUseCase", "save id: ${id}")
-
-                val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content)
+                val imgUrl: String = getImageUrlInContent(it.content)
+                val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content, imgUrl)
                 fireStore
                     .collection("Feeds")
                     .document(entity.id)
@@ -114,6 +114,30 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
             e.message?.let { m -> Log.e("AddNewRssUseCase", m) }
             return Result.GeneralError(e.message)
         }
+    }
+
+    private fun getImageUrlInContent(content: String): String {
+        val searchTarget = content.replace("\\s+","")
+        val imageTagIndex = searchTarget.indexOf("<img")
+        Log.d("AddNewRssUseCase", imageTagIndex.toString())
+        if (imageTagIndex == -1) {
+            return ""
+        }
+
+        val srcPropIndex = searchTarget.indexOf("src", imageTagIndex)
+        Log.d("AddNewRssUseCase", srcPropIndex.toString())
+
+        if (srcPropIndex == -1 ) {
+            return ""
+        }
+
+        val quoteIndex = srcPropIndex+3+1
+        val quoteChar = searchTarget[quoteIndex]
+        // make sure it find the right quote
+        Log.d("AddNewRssUseCase", "quote: ${quoteChar}")
+        Log.d("AddNewRssUseCase", "hello: ${searchTarget.indexOf(quoteChar, quoteIndex + 1)}")
+
+        return searchTarget.substring(quoteIndex + 1, searchTarget.indexOf(quoteChar, quoteIndex + 1))
     }
 
 }

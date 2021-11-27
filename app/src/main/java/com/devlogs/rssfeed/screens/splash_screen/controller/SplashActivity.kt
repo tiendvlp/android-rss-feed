@@ -52,14 +52,14 @@ class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackin
         CoroutineScope(BackgroundDispatcher).launch {
 
             withContext(Dispatchers.Main.immediate) {
-                val gResult = getFeedsByRssChannelUseCaseSync.executes(UrlEncrypt.encode("https://vnexpress.net/rss/tin-noi-bat.rss"), System.currentTimeMillis(), 20) as GetFeedsByRssChannelUseCaseSync.Result.Success
+//                val gResult = getFeedsByRssChannelUseCaseSync.executes(UrlEncrypt.encode("https://vnexpress.net/rss/tin-noi-bat.rss"), System.currentTimeMillis(), 20) as GetFeedsByRssChannelUseCaseSync.Result.Success
 
 //                gResult.rssChannel.forEach {
 //                    Log.d("SplashActivity", "GetFeed: " + it.title)
 //                }
 //
-//                addNewRssChannelByRssUrlUseCaseSync.executes("https://vnexpress.net/rss/tin-noi-bat.rss")
-//                val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
+                addNewRssChannelByRssUrlUseCaseSync.executes("https://vnexpress.net/rss/tin-noi-bat.rss")
+                val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
 //                RssChannelTrackingService.bind(this@SplashActivity, this@SplashActivity)
 //                Log.d("Add Rss result", result.javaClass.simpleName)
                 if (validateLoginUseCaseSync.executes() is ValidateLoginUseCaseSync.Result.InValid) {

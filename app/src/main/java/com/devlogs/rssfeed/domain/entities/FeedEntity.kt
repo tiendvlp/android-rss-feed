@@ -10,4 +10,5 @@ data class FeedEntity
                 val pubDate: Long,
                 val url: String,
                 val author: String,
-                val content: String, )
+                val content: String,
+                val imageUrl: String, )

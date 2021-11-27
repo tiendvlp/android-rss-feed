@@ -94,7 +94,9 @@ class RssChannelTrackingService : Service() {
             doc.getLong("pubDate")!!,
             doc.getString("url")!!,
             doc.getString("author")!!,
-            doc.getString("content")!!
+            doc.getString("content")!!,
+            doc.getString("imageUrl")!!
+
         )
     }
 

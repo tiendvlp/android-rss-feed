@@ -45,7 +45,8 @@ class GetFeedsByRssChannelUseCaseSync @Inject constructor(private val fireStore:
                         doc.getLong("pubDate")!!,
                         doc.getString("author")!!,
                         doc.getString("url")!!,
-                        doc.getString("content")!!
+                        doc.getString("content")!!,
+                        doc.getString("imageUrl")!!
                     )
                 )
             }
