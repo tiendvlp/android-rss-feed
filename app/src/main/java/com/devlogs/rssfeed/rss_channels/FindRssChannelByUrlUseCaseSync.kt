@@ -27,7 +27,6 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
 
         data class AlreadyAdded(val channel: RssChannelEntity) : Result()
         class NotFound() : Result()
-        class NetworkError() : Result()
         data class GeneralError(val errorMessage: String?) : Result()
     }
 

@@ -69,8 +69,17 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
         val rssChannel = rssObject.channel
         try {
+            var id = rssChannel.url
+
+            // www.url.com/ => www.url.com
+            if (id.last().equals('/')) {
+                id = id.substring(0, id.length-1)
+            }
+
+            id = id.replace("/", "\\")
+
             val channelEntity = RssChannelEntity(
-                rssChannel.url.replace("/", "\\"),
+                id,
                 rssChannel.link,
                 rssChannel.url,
                 rssChannel.title,
@@ -89,12 +98,9 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     private suspend fun saveChannelFeeds (channel: RssChannelEntity, feeds: List<RssFeed>) : Result {
         try {
             feeds.forEach {
-                Log.d("AddNewRssUseCase", "run ne: " + it.guid)
                 val pubDate: Date = SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(it.pubDate)
-                val entity = FeedEntity(it.guid.replace("/", "\\"), channel.rssUrl, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content)
+                val entity = FeedEntity(it.guid.replace("/", "\\"), channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content)
                 fireStore
-                    .collection("RssChannels")
-                    .document(channel.id)
                     .collection("Feeds")
                     .document(entity.id)
                     .set(entity)

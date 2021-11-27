@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RSSFeed">
+        <service android:name=".android_services.RssChannelTrackingService"/>
         <activity
             android:name=".screens.splash_screen.controller.SplashActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">

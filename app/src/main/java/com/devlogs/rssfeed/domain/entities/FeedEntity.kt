@@ -3,7 +3,7 @@ package com.devlogs.rssfeed.domain.entities
 data class FeedEntity
                 (
                 val id: String,
-                val rssChannelUrl: String,
+                val rssChannelId: String,
                 val channelTitle: String,
                 val title: String,
                 val description: String,

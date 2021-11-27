@@ -11,7 +11,7 @@ import javax.inject.Inject
 
 class GetUserRssChannelsUseCaseSync @Inject constructor(private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync, private val fireStore: FirebaseFirestore) {
     sealed class Result {
-        data class Success (val channels: List<RssChannelEntity>) : Result()
+        data class Success (val channels: Set<RssChannelEntity>) : Result()
         data class GeneralError (val errorMessage: String? = null) : Result()
         class UnAuthorized : Result()
     }
@@ -27,7 +27,7 @@ class GetUserRssChannelsUseCaseSync @Inject constructor(private val getLoggedInU
 
         if (getLoggedInUserResult is GetLoggedInUserUseCaseSync.Result.Success) {
            val querySnapshot = fireStore.collection("Users").document(getLoggedInUserResult.user.email).collection("AddedChannels").get().await()
-            val addedChannels: ArrayList<RssChannelEntity>  = ArrayList()
+            val addedChannels: HashSet<RssChannelEntity>  = HashSet()
             try {
                 querySnapshot.forEach {
                     Log.d("GetUserRssChannel", "add: " + it["channelId"].toString())
