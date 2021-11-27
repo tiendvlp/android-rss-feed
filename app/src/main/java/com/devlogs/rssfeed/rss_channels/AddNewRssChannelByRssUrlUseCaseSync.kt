@@ -1,10 +1,14 @@
 package com.devlogs.rssfeed.rss_channels
 
+import android.annotation.SuppressLint
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
+import com.devlogs.rssfeed.encrypt.UrlEncrypt
 import com.devlogs.rssfeed.rss_parser.RSSObject
 import com.devlogs.rssfeed.rss_parser.RssFeed
 import com.devlogs.rssfeed.rss_parser.RssParser
@@ -66,17 +70,11 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         throw RuntimeException("UnHandle result")
     }
 
+    @SuppressLint("NewApi")
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
         val rssChannel = rssObject.channel
         try {
-            var id = rssChannel.url
-
-            // www.url.com/ => www.url.com
-            if (id.last().equals('/')) {
-                id = id.substring(0, id.length-1)
-            }
-
-            id = id.replace("/", "\\")
+            var id = UrlEncrypt.encode(rssChannel.url)
 
             val channelEntity = RssChannelEntity(
                 id,
@@ -95,11 +93,16 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
     }
 
+    @SuppressLint("NewApi")
     private suspend fun saveChannelFeeds (channel: RssChannelEntity, feeds: List<RssFeed>) : Result {
         try {
             feeds.forEach {
+                Log.d("AddNewRssUseCase", "save: ${it.title}")
                 val pubDate: Date = SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(it.pubDate)
-                val entity = FeedEntity(it.guid.replace("/", "\\"), channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content)
+                val id = UrlEncrypt.encode(it.guid)
+                Log.d("AddNewRssUseCase", "save id: ${id}")
+
+                val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content)
                 fireStore
                     .collection("Feeds")
                     .document(entity.id)

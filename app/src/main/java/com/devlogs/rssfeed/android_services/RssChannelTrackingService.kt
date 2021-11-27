@@ -49,6 +49,10 @@ class RssChannelTrackingService : Service() {
                 .whereIn("rssChannelId", channelIds.toList())
                 .orderBy("pubDate", Query.Direction.DESCENDING)
                 .addSnapshotListener (this)
+
+            channelIds.forEach {
+                Log.d("RssChannelTracking", "Query: rssChannelId = ${it}")
+            }
         }
 
         override fun register (listener: Listener) {
