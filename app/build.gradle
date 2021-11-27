@@ -38,6 +38,7 @@ android {
 dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.2'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.7'
     implementation 'com.ncapdevi:frag-nav:3.2.0'
     implementation 'de.hdodenhof:circleimageview:3.1.0'

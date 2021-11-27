@@ -4,8 +4,11 @@ import android.app.Activity
 import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
+import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
+import com.devlogs.rssfeed.screens.main.MainScreenNavigator
+import com.ncapdevi.fragnav.FragNavController
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +35,14 @@ class ActivityModule {
     @Provides
     fun provideMvcViewFactory (toolKit: UIToolkit): MvcViewFactory {
         return MvcViewFactory(toolKit)
+    }
+
+    private fun getMainFragNavController (fragmentManager: FragmentManager) : FragNavController {
+        return FragNavController(fragmentManager, R.id.mainLayoutContainer)
+    }
+
+    @Provides
+    fun provideMainScreenNavigator (fragmentManager: FragmentManager) : MainScreenNavigator {
+        return MainScreenNavigator(getMainFragNavController(fragmentManager))
     }
 }

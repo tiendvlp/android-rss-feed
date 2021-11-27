@@ -21,6 +21,7 @@ import com.devlogs.rssfeed.rss_channels.AddNewRssChannelByRssUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.FindRssChannelByUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.login.controller.LoginActivity
+import com.devlogs.rssfeed.screens.main.MainActivity
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,20 +54,21 @@ class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackin
             withContext(Dispatchers.Main.immediate) {
                 val gResult = getFeedsByRssChannelUseCaseSync.executes(UrlEncrypt.encode("https://vnexpress.net/rss/tin-noi-bat.rss"), System.currentTimeMillis(), 20) as GetFeedsByRssChannelUseCaseSync.Result.Success
 
-                gResult.rssChannel.forEach {
-                    Log.d("SplashActivity", "GetFeed: " + it.title)
-                }
-
-                addNewRssChannelByRssUrlUseCaseSync.executes("https://vnexpress.net/rss/tin-noi-bat.rss")
-                val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
-                RssChannelTrackingService.bind(this@SplashActivity, this@SplashActivity)
-                Log.d("Add Rss result", result.javaClass.simpleName)
+//                gResult.rssChannel.forEach {
+//                    Log.d("SplashActivity", "GetFeed: " + it.title)
+//                }
+//
+//                addNewRssChannelByRssUrlUseCaseSync.executes("https://vnexpress.net/rss/tin-noi-bat.rss")
+//                val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
+//                RssChannelTrackingService.bind(this@SplashActivity, this@SplashActivity)
+//                Log.d("Add Rss result", result.javaClass.simpleName)
                 if (validateLoginUseCaseSync.executes() is ValidateLoginUseCaseSync.Result.InValid) {
                     LoginActivity.start(this@SplashActivity)
-                    finish()
                 } else {
                     Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
+                    MainActivity.start(this@SplashActivity)
                 }
+                finish()
             }
         }
 
