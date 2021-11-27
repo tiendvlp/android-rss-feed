@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import android.content.Context
 import android.widget.Toast
 import com.devlogs.rssfeed.authentication.SSOLoginUseCaseSync
+import com.devlogs.rssfeed.screens.main.MainActivity
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.tasks.Task
@@ -133,6 +134,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
 
     override fun loginSuccess() {
         Toast.makeText(this, "Login success", Toast.LENGTH_LONG).show()
+        MainActivity.start(this)
     }
 
     override fun loginFailed(errorMessage: String) {
