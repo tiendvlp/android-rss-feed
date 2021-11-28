@@ -6,6 +6,7 @@ import android.widget.TextView
 import android.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.read_feeds.controller.FeedsRcvAdapter
@@ -25,6 +26,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     private val feeds = TreeSet<FeedPresentableModel> ()
     private val uiToolkit: UIToolkit
     private lateinit var feedsRcvAdapter : FeedsRcvAdapter
+    private lateinit var refreshLayout: SwipeRefreshLayout
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
         setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_read_feeds, viewGroup, false))
@@ -46,6 +48,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     private fun addControls() {
+        refreshLayout = findViewById(R.id.refresh)
         lvFeeds = findViewById(R.id.lvFeeds)
         toolbar = findViewById(R.id.toolbar)
         feedsRcvAdapter = FeedsRcvAdapter(feeds)
@@ -54,6 +57,22 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         lvFeeds.setHasFixedSize(true)
         feedsRcvAdapter.setRecyclerView(lvFeeds)
         lvFeeds.adapter = feedsRcvAdapter
+
+        feedsRcvAdapter.onFeedClicked = { type, selectedFeeds ->
+            getListener().forEach { listener ->
+                if (type == FeedsRcvAdapter.FeedInteractionType.Clicked) {
+                    listener.onFeedClicked (selectedFeeds)
+                } else if (type == FeedsRcvAdapter.FeedInteractionType.Favorite) {
+                    listener.onFeedSavedClicked(selectedFeeds)
+                }
+            }
+        }
+
+        feedsRcvAdapter.onLoadMore = {
+            getListener().forEach { listener ->
+                listener.onLoadMoreFeeds()
+            }
+        }
 
     }
 
@@ -68,13 +87,15 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
         this.feeds.addAll(feeds)
-        feedsRcvAdapter.notifyDataSetChanged()
+        feedsRcvAdapter.notifyItemRangeInserted(this.feeds.size,feeds.size)
     }
 
     override fun addNewFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Add new feeds: ${feeds.size}")
+        refreshLayout.isRefreshing = false
+        feedsRcvAdapter.isLoading = false
         this.feeds.addAll(feeds)
-        feedsRcvAdapter.notifyDataSetChanged()
+        feedsRcvAdapter.notifyItemRangeInserted(0,feeds.size)
     }
 
 }

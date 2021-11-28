@@ -9,6 +9,9 @@ import java.util.*
 
 interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
     interface Listener {
+        fun onFeedClicked(selectedFeeds: FeedPresentableModel)
+        fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel)
+        fun onLoadMoreFeeds()
 
     }
 
