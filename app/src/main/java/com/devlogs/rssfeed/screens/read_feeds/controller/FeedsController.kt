@@ -1,16 +1,22 @@
 package com.devlogs.rssfeed.screens.read_feeds.controller
 
+import android.text.format.DateUtils
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
+import com.devlogs.rssfeed.common.helper.isSameDate
+import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
 import com.devlogs.rssfeed.rss_channels.GetRssChannelByIdUseCaseSync
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.RssChannelPresentableModel
-import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.InitialLoadFailedAction
-import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.InitialLoadSuccessAction
+import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction
+import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.*
+import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState
+import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.DisplayState
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.InitialLoadingState
 import kotlinx.coroutines.*
 import java.lang.RuntimeException
+import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 
@@ -54,16 +60,7 @@ class FeedsController @Inject constructor(private val stateManager: Presentation
             }
 
             if (getFeedsResult is GetFeedsByRssChannelUseCaseSync.Result.Success) {
-                feeds.addAll(getFeedsResult.rssChannel.map { FeedPresentableModel(
-                    it.id,
-                    it.rssChannelId,
-                    it.channelTitle,
-                    it.title,
-                    it.pubDate, it.pubDate.toString(),
-                    it.url,
-                    it.author,
-                    it.imageUrl
-                )})
+                feeds.addAll(getFeedsResult.rssChannel.map { feedEntityToPresentableModel(it) })
             } else {
                 throw RuntimeException("UnExpected result from getFeedsUseCase ${getFeedsResult.javaClass.simpleName}")
             }
@@ -101,5 +98,77 @@ class FeedsController @Inject constructor(private val stateManager: Presentation
             stateManager.consumeAction(InitialLoadSuccessAction(feeds, channel, avatarUrl!!))
 
         }
+    }
+
+    fun loadMore() {
+        if (stateManager.currentState !is DisplayState) {
+            throw RuntimeException("Invalid state, loadMore only run with DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")
+        }
+        val displayState = stateManager.currentState as DisplayState
+        val channelId = displayState.channelPresentableModel.id
+        val oldest = displayState.feeds.last().pubDate
+        coroutine.launch {
+            val getFeedsResult = getFeedsByRssChannelUseCaseSync.executes(channelId
+            , oldest, 20)
+
+            if (getFeedsResult is GetFeedsByRssChannelUseCaseSync.Result.GeneralError) {
+                stateManager.consumeAction(LoadMoreFailedAction(getFeedsResult.errorMessage ?: "Internal error"))
+            }
+
+            val feeds = TreeSet<FeedPresentableModel>()
+            if (getFeedsResult is GetFeedsByRssChannelUseCaseSync.Result.Success) {
+                feeds.addAll(getFeedsResult.rssChannel.map { feedEntityToPresentableModel(it) })
+                stateManager.consumeAction(LoadMoreSuccessAction(feeds))
+            } else {
+                throw RuntimeException("UnExpected result from getFeedsUseCase ${getFeedsResult.javaClass.simpleName}")
+            }
+        }
+    }
+
+    private fun feedEntityToPresentableModel (feedEntity: FeedEntity): FeedPresentableModel {
+
+        val oneDay : Long = 24 * 60 * 60 * 1000
+        val twoDay = oneDay * 2
+        val threeDay = oneDay * 3
+
+        val delta =  System.currentTimeMillis() - feedEntity.pubDate
+
+        val pubDate = Date(feedEntity.pubDate)
+        val isToday = pubDate.isSameDate(Date())
+        val isTwoDayAgo = delta in twoDay..threeDay
+        val isYesterday = delta in oneDay..twoDay
+
+        val formater = SimpleDateFormat("dd/MM/yy")
+        val hourFormater = SimpleDateFormat("HH:mm")
+        var pubDateInString : String
+
+        when {
+            isToday -> {
+                pubDateInString = "Today"
+            }
+            isTwoDayAgo -> {
+                pubDateInString = "Two days ago"
+            }
+            isYesterday -> {
+                pubDateInString = "Yesterday"
+            }
+            else -> {
+                pubDateInString = formater.format(pubDate)
+            }
+        }
+
+        pubDateInString += " at ${hourFormater.format(pubDate)}"
+
+        return FeedPresentableModel(
+            feedEntity.id,
+            feedEntity.rssChannelId,
+            feedEntity.channelTitle,
+            feedEntity.title,
+            feedEntity.pubDate,
+            pubDateInString,
+            feedEntity.url,
+            feedEntity.author,
+            feedEntity.imageUrl
+        )
     }
 }

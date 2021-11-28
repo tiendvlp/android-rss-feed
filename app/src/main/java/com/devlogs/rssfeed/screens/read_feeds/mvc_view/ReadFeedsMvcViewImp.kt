@@ -56,6 +56,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         lvFeeds.setItemViewCacheSize(50)
         lvFeeds.setHasFixedSize(true)
         feedsRcvAdapter.setRecyclerView(lvFeeds)
+        feedsRcvAdapter.isLoadMoreEnable = false
         lvFeeds.adapter = feedsRcvAdapter
 
         feedsRcvAdapter.onFeedClicked = { type, selectedFeeds ->
@@ -86,12 +87,14 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
 
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
+        feedsRcvAdapter.isLoadMoreEnable = true
         this.feeds.addAll(feeds)
         feedsRcvAdapter.notifyItemRangeInserted(this.feeds.size,feeds.size)
     }
 
     override fun addNewFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Add new feeds: ${feeds.size}")
+        feedsRcvAdapter.isLoadMoreEnable = true
         refreshLayout.isRefreshing = false
         feedsRcvAdapter.isLoading = false
         this.feeds.addAll(feeds)

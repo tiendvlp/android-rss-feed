@@ -11,7 +11,7 @@ sealed class ReadFeedsScreenPresentationAction : PresentationAction {
     data class InitialLoadSuccessAction (val feeds: TreeSet<FeedPresentableModel>, val channel: RssChannelPresentableModel, val userAvatar: String) : ReadFeedsScreenPresentationAction()
     class LoadMoreAction () : ReadFeedsScreenPresentationAction()
     class ReloadAction (): ReadFeedsScreenPresentationAction()
-    class LoadMoreSuccessAction (val feeds: TreeSet<FeedPresentableModel>, val channelPresentableModel: RssChannelPresentableModel, val userAvatar: String) : ReadFeedsScreenPresentationAction()
+    class LoadMoreSuccessAction (val feeds: TreeSet<FeedPresentableModel>) : ReadFeedsScreenPresentationAction()
     class LoadMoreFailedAction (val errorMessage: String) : ReadFeedsScreenPresentationAction()
     class NewFeedsAction (val feeds: TreeSet<FeedPresentableModel>) : ReadFeedsScreenPresentationAction ()
 }
