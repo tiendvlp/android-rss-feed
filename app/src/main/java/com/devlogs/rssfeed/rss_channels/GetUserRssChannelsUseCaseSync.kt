@@ -33,20 +33,23 @@ class GetUserRssChannelsUseCaseSync @Inject constructor(private val getLoggedInU
                     Log.d("GetUserRssChannel", "add: " + it["channelId"].toString())
                     val channelId = it["channelId"].toString()
                     val channelDocument = fireStore.collection("RssChannels").document(channelId).get().await()
-                    addedChannels.add(RssChannelEntity(
+                    val channel = RssChannelEntity(
                         channelId,
                         channelDocument["url"].toString(),
                         channelDocument["rssUrl"].toString(),
                         channelDocument["title"].toString(),
                         channelDocument["description"].toString(),
                         channelDocument["imageUrl"].toString()
-                        ))
+                    )
+                    addedChannels.add(channel)
+                    Log.d("GetUserRssChannel", "get: " + channel.title)
                 }
+                Log.d("GetUserRssChannel", "get: " + addedChannels.elementAt(0).title)
+                return@withContext Result.Success(addedChannels)
             } catch (ex: Exception) {
                 ex.message?.let { Log.e("GetUserRssChannel", it) }
                 return@withContext Result.GeneralError()
             }
-            return@withContext Result.Success(addedChannels)
         }
 
         throw RuntimeException("UnHandel result")

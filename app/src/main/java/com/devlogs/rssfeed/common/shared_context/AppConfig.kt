@@ -7,5 +7,6 @@ object AppConfig {
         val USER_ID = "USER_ID"
         val USER_AVATAR = "USER_AVATAR"
         val LOGIN_EXPIRED_TIME = "LOGIN_EXPIRED_TIME"
+        val SELECTED_CHANNEL = "SELECTED_CHANNEL"
     }
 }

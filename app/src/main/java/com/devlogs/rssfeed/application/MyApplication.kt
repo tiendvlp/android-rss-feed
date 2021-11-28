@@ -1,4 +1,4 @@
-package com.devlogs.rssfeed
+package com.devlogs.rssfeed.application
 
 import android.app.Application
 import dagger.hilt.android.HiltAndroidApp

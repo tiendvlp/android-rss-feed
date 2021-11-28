@@ -14,6 +14,7 @@ import android.widget.Toast
 import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
+import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.ValidateLoginUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_EMAIL
@@ -50,33 +51,29 @@ class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackin
     protected lateinit var getUserRssChannelUseCaseSync: GetUserRssChannelsUseCaseSync
     @Inject
     protected lateinit var getFeedsByRssChannelUseCaseSync: GetFeedsByRssChannelUseCaseSync
+    @Inject
+    protected lateinit var applicationStateManager : ApplicationStateManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_splash)
 
-        val htmlTextView = findViewById<HtmlTextView>(R.id.img)
-        htmlTextView.setHtml(
-            "<img src=\"https://vcdn1-giaitri.vnecdn.net/2021/11/27/erik-1638029251-3302-1638029325.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=uMkWDNBA9tz_o-OAoB1ovw\">"
-            , HtmlHttpImageGetter(htmlTextView, "", true)
-        )
         CoroutineScope(BackgroundDispatcher).launch {
-
             withContext(Dispatchers.Main.immediate) {
-//                val gResult = getFeedsByRssChannelUseCaseSync.executes(UrlEncrypt.encode("https://vnexpress.net/rss/tin-noi-bat.rss"), System.currentTimeMillis(), 20) as GetFeedsByRssChannelUseCaseSync.Result.Success
-
-//                gResult.rssChannel.forEach {
-//                    Log.d("SplashActivity", "GetFeed: " + it.title)
-//                }
-//
-                addNewRssChannelByRssUrlUseCaseSync.executes("https://vnexpress.net/rss/tin-noi-bat.rss")
-                val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
-                RssChannelTrackingService.bind(this@SplashActivity, this@SplashActivity)
-                Log.d("Add Rss result", result.javaClass.simpleName)
-                if (validateLoginUseCaseSync.executes() is ValidateLoginUseCaseSync.Result.InValid) {
+                if (applicationStateManager.user == null) {
                     LoginActivity.start(this@SplashActivity)
                 } else {
-//                    Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
+                    if (applicationStateManager.selectedChannelId == null) {
+                        Log.w("SplashActivity", "The default selected channel is null")
+                        val getChannelResult = getUserRssChannelUseCaseSync.executes()
+                        if (getChannelResult is GetUserRssChannelsUseCaseSync.Result.Success) {
+                            Log.d("SplashActivity", "The default selected channel set to ${getChannelResult.channels.elementAt(0).title}")
+                            applicationStateManager.selectedChannelId = getChannelResult.channels.elementAt(0).id
+                        } else {
+                            Log.e("SplashActivity", "Error happen when initial the default channel, ${getChannelResult.javaClass.simpleName}")
+                        }
+                    }
                     MainActivity.start(this@SplashActivity)
                 }
                 finish()

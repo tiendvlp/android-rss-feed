@@ -18,13 +18,18 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import android.content.Context
 import android.widget.Toast
+import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.SSOLoginUseCaseSync
+import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.main.MainActivity
 import com.facebook.login.LoginManager
 import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,6 +43,10 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
 
     @Inject
     protected lateinit var loginController: LoginController
+    @Inject
+    protected lateinit var applicationStateManager : ApplicationStateManager
+    @Inject
+    protected lateinit var getUserRssChannelUseCaseSync: GetUserRssChannelsUseCaseSync
     private lateinit var callbackManager : CallbackManager
     private lateinit var loginButton : LoginButton
     private lateinit var signInButton : SignInButton
@@ -134,7 +143,13 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
 
     override fun loginSuccess() {
         Toast.makeText(this, "Login success", Toast.LENGTH_LONG).show()
-        MainActivity.start(this)
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            val result = getUserRssChannelUseCaseSync.executes()
+            if (result is GetUserRssChannelsUseCaseSync.Result.Success) {
+                applicationStateManager.selectedChannelId = result.channels.elementAt(0).id
+            }
+            MainActivity.start(this@LoginActivity)
+        }
     }
 
     override fun loginFailed(errorMessage: String) {

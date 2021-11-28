@@ -7,12 +7,14 @@ import androidx.fragment.app.FragmentManager
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
+import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
 import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.ncapdevi.fragnav.FragNavController
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.scopes.ActivityScoped
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -30,6 +32,12 @@ class ActivityModule {
     @Provides
     fun provideUIToolkit (activity: Activity, inflater: LayoutInflater) : UIToolkit {
         return UIToolkit(activity.window, activity, inflater)
+    }
+
+    @Provides
+    @ActivityScoped
+    fun providePresentationStateManager () : PresentationStateManager {
+        return PresentationStateManager()
     }
 
     @Provides
