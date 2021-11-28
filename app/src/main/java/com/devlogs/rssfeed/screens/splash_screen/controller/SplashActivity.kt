@@ -37,7 +37,7 @@ import org.sufficientlysecure.htmltextview.HtmlTextView
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackingService.Listener {
+class SplashActivity : AppCompatActivity() {
 
     @Inject
     protected lateinit var sharedPreferences: SharedPreferences;
@@ -82,16 +82,4 @@ class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackin
 
     }
 
-    override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-        val binder = service as? RssChannelTrackingService.LocalBinder
-        binder?.service?.registerAllChannel( this)
-    }
-
-    override fun onServiceDisconnected(name: ComponentName?) {
-        TODO("Not yet implemented")
-    }
-
-    override fun onNewFeed(feed: FeedEntity) {
-        Log.d("SplashActivity", feed.id)
-    }
 }

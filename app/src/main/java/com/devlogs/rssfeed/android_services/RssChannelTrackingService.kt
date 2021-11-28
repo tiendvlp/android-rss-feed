@@ -11,17 +11,22 @@ import com.devlogs.rssfeed.common.base.Observable
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.google.firebase.firestore.*
+import com.google.firebase.firestore.EventListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.lang.RuntimeException
+import java.util.*
 import javax.inject.Inject
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.HashSet
 
 @AndroidEntryPoint
 class RssChannelTrackingService : Service() {
     interface Listener {
-        fun onNewFeed(feed: FeedEntity)
+        fun onNewFeed(feed: TreeSet<FeedEntity>)
     }
 
     private inner class ListenerManager : Observable <Listener>, EventListener<QuerySnapshot> {
@@ -74,10 +79,12 @@ class RssChannelTrackingService : Service() {
             // If it from cache that means, it's the old change
             else if (value!!.documentChanges.isNotEmpty() && !value.metadata.isFromCache) {
                 Log.d("RssChannelTracking", "Number of doc changed: " + value.documentChanges.size)
+                val feeds = TreeSet<FeedEntity>()
+                value.documentChanges.forEach {doc->
+                    feeds.add(fireStoreDocToFeedEntity(doc.document))
+                }
                 listeners.forEach {listener ->
-                    value.documentChanges.forEach {doc->
-                        listener.onNewFeed(fireStoreDocToFeedEntity(doc.document))
-                    }
+                    listener.onNewFeed(feeds)
                 }
             } else {
                 Log.d("RssChannelTracking", "Unchanged: ")

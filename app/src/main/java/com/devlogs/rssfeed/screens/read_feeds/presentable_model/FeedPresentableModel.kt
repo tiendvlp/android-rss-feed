@@ -11,15 +11,7 @@ data class FeedPresentableModel
       val author: String,
       val imageUrl: String?) : Comparable<FeedPresentableModel> {
 
-    override fun equals(other: Any?): Boolean {
-        if (other == null) {return false}
 
-        if (!other.javaClass.equals(javaClass)) {
-            return false
-        }
-
-        return (other as FeedPresentableModel).id.equals(id)
-    }
 
     override fun compareTo(other: FeedPresentableModel): Int {
         if (other.id.equals(id)) {
@@ -34,6 +26,16 @@ data class FeedPresentableModel
             return -1
         }
         return 1
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other == null) {return false}
+
+        if (!other.javaClass.equals(javaClass)) {
+            return false
+        }
+
+        return (other as FeedPresentableModel).id.equals(id)
     }
 
 }

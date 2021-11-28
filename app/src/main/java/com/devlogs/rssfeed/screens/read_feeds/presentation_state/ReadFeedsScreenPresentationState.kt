@@ -21,10 +21,11 @@ sealed class ReadFeedsScreenPresentationState : PresentationState {
             action: PresentationAction
         ): CauseAndEffect {
             when (action) {
-                is LoadMoreAction -> return CauseAndEffect(action, copy())
+                is NewFeedsAction -> return CauseAndEffect(action, copy(feeds = appendFeeds(action.feeds)))
+                is ReloadActionFailed -> return CauseAndEffect(action, copy())
                 is LoadMoreSuccessAction -> return CauseAndEffect(action, copy(feeds = appendFeeds(action.feeds)))
                 is LoadMoreFailedAction -> return CauseAndEffect(action, copy())
-                is ReloadAction -> return CauseAndEffect(action, this)
+                is ReloadActionSuccess -> return CauseAndEffect(action, copy())
             }
             return super.consumeAction(previousState, action)
         }

@@ -1,5 +1,7 @@
 package com.devlogs.rssfeed.domain.entities
 
+import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
+
 data class FeedEntity
                 (
                 val id: String,
@@ -11,4 +13,21 @@ data class FeedEntity
                 val url: String,
                 val author: String,
                 val content: String,
-                val imageUrl: String?, )
+                val imageUrl: String?, ) : Comparable<FeedEntity> {
+
+
+    override fun compareTo(other: FeedEntity): Int {
+        if (other.id.equals(id)) {
+            return 0
+        }
+
+        if (other.pubDate == pubDate) {
+            return title.compareTo(other.title)
+        }
+
+        if (other.pubDate < pubDate) {
+            return -1
+        }
+        return 1
+    }
+}

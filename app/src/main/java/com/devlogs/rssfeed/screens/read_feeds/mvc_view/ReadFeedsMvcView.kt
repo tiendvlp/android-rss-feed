@@ -12,6 +12,7 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
         fun onFeedClicked(selectedFeeds: FeedPresentableModel)
         fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel)
         fun onLoadMoreFeeds()
+        fun onReload()
 
     }
 
@@ -19,6 +20,7 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
     fun setChannels (channel: RssChannelPresentableModel)
     fun appendFeeds (feeds: TreeSet<FeedPresentableModel>)
     fun addNewFeeds (feeds: TreeSet<FeedPresentableModel>)
+    fun hideRefreshLayout()
 }
 
 fun MvcViewFactory.getReadFeedsMvcView (viewGroup: ViewGroup?) : ReadFeedsMvcView = ReadFeedsMvcViewImp(uiToolkit, viewGroup)

@@ -45,20 +45,6 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     private fun addEvents() {
-    }
-
-    private fun addControls() {
-        refreshLayout = findViewById(R.id.refresh)
-        lvFeeds = findViewById(R.id.lvFeeds)
-        toolbar = findViewById(R.id.toolbar)
-        feedsRcvAdapter = FeedsRcvAdapter(feeds)
-        lvFeeds.layoutManager = LinearLayoutManager(getContext())
-        lvFeeds.setItemViewCacheSize(50)
-        lvFeeds.setHasFixedSize(true)
-        feedsRcvAdapter.setRecyclerView(lvFeeds)
-        feedsRcvAdapter.isLoadMoreEnable = false
-        lvFeeds.adapter = feedsRcvAdapter
-
         feedsRcvAdapter.onFeedClicked = { type, selectedFeeds ->
             getListener().forEach { listener ->
                 if (type == FeedsRcvAdapter.FeedInteractionType.Clicked) {
@@ -74,6 +60,26 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
                 listener.onLoadMoreFeeds()
             }
         }
+
+        refreshLayout.setOnRefreshListener {
+            getListener().forEach { listener ->
+                listener.onReload()
+            }
+        }
+    }
+
+    private fun addControls() {
+        refreshLayout = findViewById(R.id.refresh)
+        lvFeeds = findViewById(R.id.lvFeeds)
+        toolbar = findViewById(R.id.toolbar)
+        feedsRcvAdapter = FeedsRcvAdapter(feeds)
+        lvFeeds.layoutManager = LinearLayoutManager(getContext())
+        lvFeeds.setItemViewCacheSize(50)
+        lvFeeds.setHasFixedSize(true)
+        feedsRcvAdapter.setRecyclerView(lvFeeds)
+        feedsRcvAdapter.isLoadMoreEnable = false
+        lvFeeds.adapter = feedsRcvAdapter
+
 
     }
 
@@ -99,6 +105,10 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         feedsRcvAdapter.isLoading = false
         this.feeds.addAll(feeds)
         feedsRcvAdapter.notifyItemRangeInserted(0,feeds.size)
+    }
+
+    override fun hideRefreshLayout() {
+        refreshLayout.isRefreshing = false
     }
 
 }

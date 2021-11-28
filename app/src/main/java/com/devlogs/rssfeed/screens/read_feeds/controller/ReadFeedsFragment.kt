@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.ReadFeedsMvcView
@@ -36,7 +37,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     @Inject
     protected lateinit var mvcViewFactory: MvcViewFactory
     private lateinit var mvcView : ReadFeedsMvcView
-    private val coroutine = CoroutineScope(Dispatchers.Main.immediate)
     @Inject
     protected lateinit var getFeedsByRssChannelUseCaseSync : GetFeedsByRssChannelUseCaseSync
     @Inject
@@ -45,6 +45,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     protected lateinit var feedsController: FeedsController
     @Inject
     protected lateinit var applicationStateManager: ApplicationStateManager
+    @Inject
+    protected lateinit var newFeedsServiceConnector: NewFeedsServiceConnector
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -94,6 +97,10 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         feedsController.loadMore()
     }
 
+    override fun onReload() {
+        feedsController.reload()
+    }
+
     override fun onStateChanged(
         previousState: PresentationState?,
         currentState: PresentationState,
@@ -101,7 +108,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     ) {
         Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName)
         when (currentState) {
-            is InitialLoadingState -> {}
+            is InitialLoadingState -> {
+            }
             is InitialLoadFailedState -> {}
             is DisplayState -> {
                 displayStateProcess (previousState, currentState, action)
@@ -115,7 +123,21 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         action: PresentationAction
     ) {
         when (action) {
-            is InitialLoadSuccessAction -> {mvcView.appendFeeds(action.feeds); mvcView.setChannels(action.channel); mvcView.setUserAvatarUrl(action.userAvatar)}
+            is ReloadActionSuccess -> {
+                mvcView.hideRefreshLayout()
+            }
+            is ReloadActionFailed -> {
+                mvcView.hideRefreshLayout()
+            }
+            is NewFeedsAction -> {
+                mvcView.addNewFeeds(action.feeds)
+            }
+            is InitialLoadSuccessAction -> {
+                mvcView.appendFeeds(action.feeds)
+                mvcView.setChannels(action.channel)
+                mvcView.setUserAvatarUrl(action.userAvatar)
+                RssChannelTrackingService.bind(requireContext(), newFeedsServiceConnector)
+            }
             is LoadMoreFailedAction -> {
                 Log.d("ReadFeedsFragment", "Load more failed: ${action.errorMessage}")
             }
