@@ -1,5 +1,7 @@
 package com.devlogs.rssfeed.screens.add_rss_channel.mvc_view
 
+import android.os.Build
+import android.text.Html
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
@@ -11,11 +13,16 @@ import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import dagger.hilt.android.internal.Contexts.getApplication
 
 class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddRssChannelMvcView{
-
+    private val NOTE_TEXT = "<b>Note:</b> <br/>\n" +
+            "Most of websites nowadays already supports the RSS content, but if your website is not support we regret that we can’t add your website to our platform. <br/><br/>\n" +
+            "\n" +
+            "<b>How to enter url correctly:</b> <br/>\n" +
+            "Enter your website url like <u>https://tinhte.vn</u>, <u>https://techrum.vn</u> .\n" +
+            "Or you can enter RSS url directly: <u>https://tinhte.vn/rss</u>. If you don’t know how to get the RSS url, please contact the adminstrator of your website."
     private val uiToolkit: UIToolkit
-
     private lateinit var toolbar: Toolbar
     private lateinit var layoutToolbar: View
+    private lateinit var txtToolbarTitle : TextView
     private lateinit var edtUrl : EditText
     private lateinit var btnSearch: Button
     private lateinit var btnAdd: Button
@@ -53,6 +60,8 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
 
     private fun setupToolbar () {
         layoutToolbar = uiToolkit.layoutInflater.inflate(R.layout.layout_title_toolbar, toolbar, false)
+        txtToolbarTitle = layoutToolbar.findViewById(R.id.txtTitle)
+        txtToolbarTitle.text = "Add Channel"
         toolbar.addView(layoutToolbar)
     }
 
@@ -112,6 +121,11 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     }
 
     override fun clearResult() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            txtTut.text = Html.fromHtml(NOTE_TEXT, Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            txtTut.text = Html.fromHtml(NOTE_TEXT)
+        }
         txtEmptyResult.visibility = View.GONE
         layoutResult.visibility = View.GONE
         txtTut.visibility = View.VISIBLE

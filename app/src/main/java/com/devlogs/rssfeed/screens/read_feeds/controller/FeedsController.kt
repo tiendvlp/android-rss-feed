@@ -3,6 +3,7 @@ package com.devlogs.rssfeed.screens.read_feeds.controller
 import android.util.Log
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.helper.isSameDate
+import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
 import com.devlogs.rssfeed.rss_channels.GetRssChannelByIdUseCaseSync
@@ -18,8 +19,9 @@ import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
-class FeedsController @Inject constructor(private val stateManager: PresentationStateManager,
+class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val stateManager: PresentationStateManager,
                                           private val getFeedsByRssChannelUseCaseSync: GetFeedsByRssChannelUseCaseSync,
                                           private val getRssChannelByIdUseCaseSync: GetRssChannelByIdUseCaseSync,
                                           private val reloadRssChannelUseCaseSync: ReloadRssChannelUseCaseSync,
@@ -95,8 +97,11 @@ class FeedsController @Inject constructor(private val stateManager: Presentation
             }
 
             // success let's init the LoadingActionSuccess
-            stateManager.consumeAction(InitialLoadSuccessAction(feeds, channel, avatarUrl!!))
-
+            if (stateManager.currentState is InitialLoadingState) {
+                stateManager.consumeAction(InitialLoadSuccessAction(feeds, channel, avatarUrl!!))
+            } else {
+                Log.e("FeedsController", "Invalid state happen ")
+            }
         }
     }
 
@@ -171,8 +176,7 @@ class FeedsController @Inject constructor(private val stateManager: Presentation
     fun reload() {
         Log.d("FeedsController", "Reload start")
         if (stateManager.currentState !is DisplayState) {
-
-            throw RuntimeException("Invalid state, reload only run with DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")
+            throw RuntimeException("Invalid state, reload only run with DisplayState but ${stateManager.currentState.javaClass.canonicalName} is found")
         }
         val displayState = stateManager.currentState as DisplayState
         val channelId = displayState.channelPresentableModel.id

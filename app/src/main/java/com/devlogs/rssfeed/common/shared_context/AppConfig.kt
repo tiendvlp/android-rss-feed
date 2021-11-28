@@ -9,4 +9,9 @@ object AppConfig {
         val LOGIN_EXPIRED_TIME = "LOGIN_EXPIRED_TIME"
         val SELECTED_CHANNEL = "SELECTED_CHANNEL"
     }
+
+    object DaggerNamed {
+        const val FRAGMENT_SCOPE = "FragmentScope"
+        const val ACTIVITY_SCOPE = "ActivityScope"
+    }
 }

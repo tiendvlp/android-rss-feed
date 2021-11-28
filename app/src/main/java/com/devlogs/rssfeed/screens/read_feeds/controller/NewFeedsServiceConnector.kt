@@ -5,6 +5,7 @@ import android.content.ServiceConnection
 import android.os.IBinder
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.common.helper.isSameDate
+import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
@@ -14,8 +15,9 @@ import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
+import javax.inject.Named
 
-class NewFeedsServiceConnector @Inject constructor (private val stateManager: PresentationStateManager) : ServiceConnection, RssChannelTrackingService.Listener {
+class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) private val stateManager: PresentationStateManager) : ServiceConnection, RssChannelTrackingService.Listener {
 
     private var service : RssChannelTrackingService? = null
 

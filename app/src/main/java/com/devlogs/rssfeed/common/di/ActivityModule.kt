@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import androidx.fragment.app.FragmentActivity
 import androidx.fragment.app.FragmentManager
 import com.devlogs.rssfeed.R
+import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.ACTIVITY_SCOPE
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
@@ -15,6 +16,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ActivityComponent
 import dagger.hilt.android.scopes.ActivityScoped
+import javax.inject.Named
 
 @Module
 @InstallIn(ActivityComponent::class)
@@ -36,6 +38,7 @@ class ActivityModule {
 
     @Provides
     @ActivityScoped
+    @Named(ACTIVITY_SCOPE)
     fun providePresentationStateManager () : PresentationStateManager {
         return PresentationStateManager()
     }

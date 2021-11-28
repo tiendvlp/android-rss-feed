@@ -11,6 +11,7 @@ import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationActi
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
+import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.ReadFeedsMvcView
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.getReadFeedsMvcView
@@ -27,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
+import javax.inject.Named
 
 @AndroidEntryPoint
 class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationStateChangedListener {
@@ -41,6 +43,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     @Inject
     protected lateinit var applicationStateManager: ApplicationStateManager
     @Inject
+    @Named(FRAGMENT_SCOPE)
     protected lateinit var presentationStateManager: PresentationStateManager
     private lateinit var mvcView : ReadFeedsMvcView
     @Inject
@@ -58,7 +61,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         if (presentationStateManager.currentState is InitialLoadingState) {
             feedsController.initialLoad()
         }
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
