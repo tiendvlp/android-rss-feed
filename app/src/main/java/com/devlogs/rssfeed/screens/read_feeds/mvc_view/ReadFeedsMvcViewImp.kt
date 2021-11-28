@@ -52,6 +52,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         lvFeeds.layoutManager = LinearLayoutManager(getContext())
         lvFeeds.setItemViewCacheSize(50)
         lvFeeds.setHasFixedSize(true)
+        feedsRcvAdapter.setRecyclerView(lvFeeds)
         lvFeeds.adapter = feedsRcvAdapter
 
     }
