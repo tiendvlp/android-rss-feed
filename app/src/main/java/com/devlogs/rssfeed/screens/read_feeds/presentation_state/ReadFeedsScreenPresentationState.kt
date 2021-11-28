@@ -1,4 +1,69 @@
 package com.devlogs.rssfeed.screens.read_feeds.presentation_state
 
-class ReadFeedsScreenPresentationState {
+import com.devlogs.rssfeed.screens.common.presentation_state.CauseAndEffect
+import com.devlogs.rssfeed.screens.common.presentation_state.PresentationAction
+import com.devlogs.rssfeed.screens.common.presentation_state.PresentationState
+import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
+import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.*
+import java.util.*
+
+sealed class ReadFeedsScreenPresentationState : PresentationState {
+
+    data class DisplayState (val feeds : TreeSet<FeedPresentableModel>) : ReadFeedsScreenPresentationState () {
+        override val allowSave: Boolean
+            get() = true
+
+        override fun consumeAction(
+            previousState: PresentationState,
+            action: PresentationAction
+        ): CauseAndEffect {
+            when (action) {
+                is LoadMoreAction -> return CauseAndEffect(action, copy())
+                is LoadMoreSuccessAction -> return CauseAndEffect(action, copy(appendFeeds(action.feeds)))
+                is LoadMoreFailedAction -> return CauseAndEffect(action, copy())
+                is ReloadAction -> return CauseAndEffect(action, this)
+            }
+            return super.consumeAction(previousState, action)
+        }
+
+        private fun appendFeeds(feeds: TreeSet<FeedPresentableModel>): TreeSet<FeedPresentableModel> {
+            val newChannels = TreeSet<FeedPresentableModel>()
+            newChannels.addAll(this.feeds)
+            newChannels.addAll(feeds)
+            return newChannels
+        }
+    }
+
+    class InitialLoadingState : ReadFeedsScreenPresentationState () {
+        override val allowSave: Boolean
+            get() = false
+
+        override fun consumeAction(
+            previousState: PresentationState,
+            action: PresentationAction
+        ): CauseAndEffect {
+
+            when (action) {
+                is InitialLoadFailedAction -> return CauseAndEffect(action, InitialLoadFailedState(action.message))
+                is InitialLoadSuccessAction -> return CauseAndEffect(action, DisplayState(action.feeds))
+            }
+
+            return super.consumeAction(previousState, action)
+        }
+    }
+
+    data class InitialLoadFailedState (val message: String) : ReadFeedsScreenPresentationState() {
+        override val allowSave: Boolean
+            get() = true
+
+        override fun consumeAction(
+            previousState: PresentationState,
+            action: PresentationAction
+        ): CauseAndEffect {
+            when(action) {
+                is InitialLoadAction -> CauseAndEffect(action, InitialLoadingState())
+            }
+            return super.consumeAction(previousState, action)
+        }
+    }
 }
