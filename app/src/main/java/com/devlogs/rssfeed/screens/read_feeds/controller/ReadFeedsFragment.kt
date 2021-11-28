@@ -38,15 +38,15 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     @Inject
     protected lateinit var mvcViewFactory: MvcViewFactory
+    @Inject
+    protected lateinit var applicationStateManager: ApplicationStateManager
+    @Inject
+    protected lateinit var presentationStateManager: PresentationStateManager
     private lateinit var mvcView : ReadFeedsMvcView
     @Inject
     protected lateinit var getFeedsByRssChannelUseCaseSync : GetFeedsByRssChannelUseCaseSync
     @Inject
-    protected lateinit var presentationStateManager: PresentationStateManager
-    @Inject
     protected lateinit var feedsController: FeedsController
-    @Inject
-    protected lateinit var applicationStateManager: ApplicationStateManager
     @Inject
     protected lateinit var newFeedsServiceConnector: NewFeedsServiceConnector
 

@@ -62,6 +62,12 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
                 listener.onBtnSearchClicked()
             }
         }
+
+        btnAdd.setOnClickListener {
+            getListener().forEach { listener ->
+                listener.onBtnAddClicked(txtWebUrl.text)
+            }
+        }
     }
 
     override fun showResult(channel: RssChannelResultPresentableModel) {
