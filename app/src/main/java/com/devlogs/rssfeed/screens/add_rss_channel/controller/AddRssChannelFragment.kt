@@ -1,32 +1,29 @@
 package com.devlogs.rssfeed.screens.add_rss_channel.controller
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
-import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat.getSystemService
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
-import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.screens.add_rss_channel.mvc_view.AddRssChannelMvcView
 import com.devlogs.rssfeed.screens.add_rss_channel.mvc_view.getAddRssChannelMvcView
 import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction
+import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.SearchAction
 import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.SearchSuccessAction
-import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationState
 import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationState.*
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationAction
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationState
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateChangedListener
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
-import com.devlogs.rssfeed.screens.read_feeds.mvc_view.ReadFeedsMvcView
-import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
-import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import javax.inject.Named
@@ -35,13 +32,14 @@ import javax.inject.Named
 class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
     PresentationStateChangedListener {
     companion object {
-
         @JvmStatic
         fun newInstance() = AddRssChannelFragment()
     }
 
     @Inject
     protected lateinit var mvcViewFactory: MvcViewFactory
+    @Inject
+    protected lateinit var addRssChannelController: AddRssChannelController
     @Inject
     protected lateinit var applicationStateManager: ApplicationStateManager
     @Inject
@@ -85,7 +83,10 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
         Log.d("AddRssChannelFragment", "${currentState.javaClass.simpleName} with ${action.javaClass.simpleName}")
         when (currentState) {
             is DisplayState -> processDisplayState(action, currentState, previousState)
-            is SearchingState -> {mvcView.loading()}
+            is SearchingState -> {
+                mvcView.loading()
+                addRssChannelController.search((action as SearchAction).url)
+            }
             is SearchFailedState -> {mvcView.error(currentState.errorMessage)}
         }
     }
@@ -120,12 +121,16 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
         }
     }
 
-    override fun onBtnSearchClicked() {
-        TODO("Not yet implemented")
+    override fun onBtnSearchClicked(url: String) {
+        activity?.currentFocus?.let { view ->
+            val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+        presentationStateManager.consumeAction(SearchAction(url))
     }
 
-    override fun onBtnAddClicked(text: CharSequence?) {
-        TODO("Not yet implemented")
+    override fun onBtnAddClicked(text: String) {
+
     }
 
 

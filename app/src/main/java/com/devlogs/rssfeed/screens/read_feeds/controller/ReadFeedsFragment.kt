@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
@@ -21,12 +20,9 @@ import com.devlogs.rssfeed.screens.common.presentation_state.PresentationAction
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationState
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateChangedListener
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
-import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.*
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.*
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import javax.inject.Inject
 import javax.inject.Named
 

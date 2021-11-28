@@ -55,9 +55,13 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
         if (getRssChannelResult is RssParser.Result.Success) {
             val rssObject = getRssChannelResult.rssObject
             val channel = rssObject.channel
-
+            var comparedUrl = channel.url
+            if (comparedUrl[comparedUrl.length-1].equals('/')) {
+                comparedUrl = comparedUrl.substring(0, comparedUrl.length -1)
+            }
+            Log.d("FindRssU", "Compare: $comparedUrl")
             val snapshot =
-                fireStore.collection("RssChannels").whereEqualTo("rssUrl", channel.link).get()
+                fireStore.collection("RssChannels").whereEqualTo("rssUrl", comparedUrl).get()
                     .await()
             if (!snapshot.isEmpty) {
                 val document = snapshot.documents.first()

@@ -2,15 +2,21 @@ package com.devlogs.rssfeed.screens.add_rss_channel.mvc_view
 
 import android.os.Build
 import android.text.Html
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.add_rss_channel.presentable_model.RssChannelResultPresentableModel
 import com.devlogs.rssfeed.screens.common.mvcview.BaseMvcView
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import dagger.hilt.android.internal.Contexts.getApplication
+import androidx.core.content.ContextCompat.getSystemService
+
+
+
 
 class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddRssChannelMvcView{
     private val NOTE_TEXT = "<b>Note:</b> <br/>\n" +
@@ -67,14 +73,27 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
 
     private fun addEvents() {
         btnSearch.setOnClickListener {
-            getListener().forEach { listener ->
-                listener.onBtnSearchClicked()
+            if (!edtUrl.text.contains("http")) {
+                Toast.makeText(getContext(), "Your url have to contains https", Toast.LENGTH_SHORT).show()
+            } else {
+                getListener().forEach { listener ->
+                    listener.onBtnSearchClicked(edtUrl.text.toString())
+                }
             }
         }
 
         btnAdd.setOnClickListener {
             getListener().forEach { listener ->
-                listener.onBtnAddClicked(txtWebUrl.text)
+                listener.onBtnAddClicked(txtWebUrl.text.toString())
+            }
+        }
+
+        edtUrl.setOnFocusChangeListener { v, hasFocus ->
+            if (hasFocus) {
+                Log.d("AddRssChannelMVC", "EdtUrl clicked")
+                if(edtUrl.text.isEmpty()) {
+                    edtUrl.setText( "https://")
+                }
             }
         }
     }
@@ -85,15 +104,17 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         layoutResult.visibility = View.VISIBLE
         txtWebTitle.text = channel.title
         txtWebUrl.text = channel.url
+        layoutLoading.visibility = View.GONE
 
         if (channel.isAdded){
-            btnAdd.setTextColor(getApplication(getContext()).getResources().getColor(R.color.gold))
+            btnAdd.text = "Added"
+            btnAdd.setTextColor(getContext().getResources().getColor(R.color.gold))
             btnAdd.isEnabled = false
         } else {
+            btnAdd.text = "Add"
             btnAdd.isEnabled = true
-            btnAdd.setTextColor(getApplication(getContext()).getResources().getColor(R.color.white))
+            btnAdd.setTextColor(getContext().getResources().getColor(R.color.white))
         }
-
     }
 
     override fun loading() {

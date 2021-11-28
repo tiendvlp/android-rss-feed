@@ -7,8 +7,8 @@ import com.devlogs.rssfeed.screens.common.mvcview.ObservableMvcView
 
 interface AddRssChannelMvcView : ObservableMvcView<AddRssChannelMvcView.Listener> {
     interface Listener {
-        fun onBtnSearchClicked()
-        fun onBtnAddClicked(text: CharSequence?)
+        fun onBtnSearchClicked(url: String)
+        fun onBtnAddClicked(rssChannelUrl: String)
 
     }
 

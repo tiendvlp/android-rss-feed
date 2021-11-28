@@ -35,7 +35,7 @@ sealed class AddChannelPresentationState : PresentationState {
             action: PresentationAction
         ): CauseAndEffect {
             when(action) {
-                is SearchAction -> SearchingState()
+                is SearchAction ->return CauseAndEffect(action,SearchingState())
             }
             return super.consumeAction(previousState, action)
         }
@@ -51,7 +51,7 @@ sealed class AddChannelPresentationState : PresentationState {
         ): CauseAndEffect {
             when(action) {
                 is InitAction -> return CauseAndEffect(action, copy())
-                is SearchAction -> return CauseAndEffect(action, copy())
+                is SearchAction -> return CauseAndEffect(action, SearchingState())
                 is RestoreAction -> return CauseAndEffect(action, copy())
             }
 
