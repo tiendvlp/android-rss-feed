@@ -2,6 +2,7 @@ package com.devlogs.rssfeed.screens.common.presentation_state
 
 import android.os.Bundle
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.common.base.BaseObservable
 
 class PresentationStateManager : BaseObservable<PresentationStateChangedListener>() {
@@ -11,7 +12,7 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
 
     fun init(savedInstanceState: Bundle?, defaultState: PresentationState) {
         if (savedInstanceState != null && savedInstanceState.containsKey(defaultState.getTag())) {
-            currentAction = CommonPresentationAction.RestoreAction
+            currentAction = RestoreAction
             currentState = savedInstanceState.getSerializable(defaultState.getTag()) as PresentationState
         } else {
             currentAction = CommonPresentationAction.InitAction
@@ -37,7 +38,7 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
     fun register (listener: PresentationStateChangedListener, getPreviousEvent: Boolean) {
         register(listener)
         if (getPreviousEvent && previousState != null) {
-            listener.onStateChanged(previousState, currentState, currentAction)
+            listener.onStateChanged(previousState, currentState, RestoreAction)
         }
     }
 

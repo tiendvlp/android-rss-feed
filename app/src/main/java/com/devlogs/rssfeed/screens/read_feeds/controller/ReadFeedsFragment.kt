@@ -7,6 +7,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction
+import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
@@ -106,7 +108,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         currentState: PresentationState,
         action: PresentationAction
     ) {
-        Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName)
+        Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName + " with action: " + action.javaClass.simpleName)
         when (currentState) {
             is InitialLoadingState -> {
             }
@@ -123,6 +125,12 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         action: PresentationAction
     ) {
         when (action) {
+            is RestoreAction -> {
+                mvcView.appendFeeds(currentState.feeds)
+                mvcView.setChannels(currentState.channelPresentableModel)
+                mvcView.setUserAvatarUrl(currentState.avatarUrl)
+                RssChannelTrackingService.bind(requireContext(), newFeedsServiceConnector)
+            }
             is ReloadActionSuccess -> {
                 mvcView.hideRefreshLayout()
             }
@@ -133,9 +141,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 mvcView.addNewFeeds(action.feeds)
             }
             is InitialLoadSuccessAction -> {
-                mvcView.appendFeeds(action.feeds)
-                mvcView.setChannels(action.channel)
-                mvcView.setUserAvatarUrl(action.userAvatar)
+                mvcView.appendFeeds(currentState.feeds)
+                mvcView.setChannels(currentState.channelPresentableModel)
+                mvcView.setUserAvatarUrl(currentState.avatarUrl)
                 RssChannelTrackingService.bind(requireContext(), newFeedsServiceConnector)
             }
             is LoadMoreFailedAction -> {
