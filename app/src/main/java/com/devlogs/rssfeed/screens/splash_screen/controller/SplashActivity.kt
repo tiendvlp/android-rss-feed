@@ -6,8 +6,12 @@ import android.content.SharedPreferences
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.IBinder
+import android.text.Html
 import android.util.Log
+import android.webkit.WebView
+import android.widget.ImageView
 import android.widget.Toast
+import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.authentication.ValidateLoginUseCaseSync
@@ -26,6 +30,9 @@ import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
+import org.sufficientlysecure.htmltextview.HtmlResImageGetter
+import org.sufficientlysecure.htmltextview.HtmlTextView
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -48,7 +55,11 @@ class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackin
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_splash)
 
-
+        val htmlTextView = findViewById<HtmlTextView>(R.id.img)
+        htmlTextView.setHtml(
+            "<img src=\"https://vcdn1-giaitri.vnecdn.net/2021/11/27/erik-1638029251-3302-1638029325.jpg?w=1200&amp;h=0&amp;q=100&amp;dpr=1&amp;fit=crop&amp;s=uMkWDNBA9tz_o-OAoB1ovw\">"
+            , HtmlHttpImageGetter(htmlTextView, "", true)
+        )
         CoroutineScope(BackgroundDispatcher).launch {
 
             withContext(Dispatchers.Main.immediate) {
@@ -60,12 +71,12 @@ class SplashActivity : AppCompatActivity(), ServiceConnection, RssChannelTrackin
 //
                 addNewRssChannelByRssUrlUseCaseSync.executes("https://vnexpress.net/rss/tin-noi-bat.rss")
                 val result = addNewRssChannelByRssUrlUseCaseSync.executes("https://vatvostudio.vn/feed")
-//                RssChannelTrackingService.bind(this@SplashActivity, this@SplashActivity)
-//                Log.d("Add Rss result", result.javaClass.simpleName)
+                RssChannelTrackingService.bind(this@SplashActivity, this@SplashActivity)
+                Log.d("Add Rss result", result.javaClass.simpleName)
                 if (validateLoginUseCaseSync.executes() is ValidateLoginUseCaseSync.Result.InValid) {
                     LoginActivity.start(this@SplashActivity)
                 } else {
-                    Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
+//                    Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
                     MainActivity.start(this@SplashActivity)
                 }
                 finish()

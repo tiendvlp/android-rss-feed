@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <integer name="margin_left">23</integer>
-    <integer name="margin_right">23</integer>
-    <integer name="margin_top">20</integer>
+    <dimen name="margin_left">12dp</dimen>
+    <dimen name="margin_right">12dp</dimen>
+    <dimen name="margin_top">20dp</dimen>
 </resources>

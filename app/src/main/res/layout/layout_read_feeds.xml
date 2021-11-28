@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/grey80"
-    tools:context=".screens.ReadFeeds.controller.ReadFeedsFragment">
+    tools:context=".screens.read_feeds.controller.ReadFeedsFragment">
 
     <include
         android:id="@+id/toolbar"
@@ -19,6 +18,8 @@
         android:id="@+id/lvFeeds"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginLeft="@dimen/margin_left"
+        android:layout_marginRight="@dimen/margin_right"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

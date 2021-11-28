@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/grey80"
+    android:layout_height="wrap_content"
+    android:background="@color/grey95"
+    android:layout_marginTop="20dp"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
@@ -62,7 +63,23 @@
         android:layout_width="80dp"
         android:layout_height="80dp"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/txtAuthor"
+        app:layout_constraintTop_toBottomOf="@id/txtAuthor" />
+
+    <org.sufficientlysecure.htmltextview.HtmlTextView
+        android:id="@+id/imgHtml"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtAuthor" />
+
+    <LinearLayout
+        android:layout_marginTop="20dp"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:background="@color/grey40"
+        app:layout_constraintTop_toBottomOf="@id/txtPubDate"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

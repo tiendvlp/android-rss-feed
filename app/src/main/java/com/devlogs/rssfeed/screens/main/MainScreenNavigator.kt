@@ -2,7 +2,7 @@ package com.devlogs.rssfeed.screens.main
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import com.devlogs.rssfeed.screens.ReadFeeds.controller.ReadFeedsFragment
+import com.devlogs.rssfeed.screens.read_feeds.controller.ReadFeedsFragment
 import com.devlogs.rssfeed.screens.add_rss_channel.controller.AddRssChannelFragment
 import com.devlogs.rssfeed.screens.saved_feeds.controller.SavedFeedsFragment
 import com.ncapdevi.fragnav.FragNavController

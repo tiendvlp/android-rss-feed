@@ -62,6 +62,7 @@ dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:12.0.0'
     implementation 'com.google.android.gms:play-services-auth:19.2.0'
     implementation "com.airbnb.android:lottie:3.4.0"
+    implementation 'org.sufficientlysecure:html-textview:4.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9"
 }
 

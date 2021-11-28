@@ -1,4 +1,4 @@
-package com.devlogs.rssfeed.screens.ReadFeeds.presentable_model
+package com.devlogs.rssfeed.screens.read_feeds.presentable_model
 
 data class FeedPresentableModel
     ( val id: String,
@@ -8,7 +8,8 @@ data class FeedPresentableModel
       val pubDate:Long,
       val pubDateInString: String,
       val url: String,
-      val author: String ) : Comparable<FeedPresentableModel> {
+      val author: String,
+      val imageUrl: String?) : Comparable<FeedPresentableModel> {
 
     override fun equals(other: Any?): Boolean {
         if (other == null) {return false}

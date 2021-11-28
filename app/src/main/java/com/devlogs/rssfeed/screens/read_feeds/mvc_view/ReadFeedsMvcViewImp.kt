@@ -1,13 +1,16 @@
-package com.devlogs.rssfeed.screens.ReadFeeds.mvc_view
+package com.devlogs.rssfeed.screens.read_feeds.mvc_view
 
+import android.util.Log
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
-import com.devlogs.rssfeed.screens.ReadFeeds.presentable_model.FeedPresentableModel
-import com.devlogs.rssfeed.screens.ReadFeeds.presentable_model.RssChannelPresentableModel
+import com.devlogs.rssfeed.screens.read_feeds.controller.FeedsRcvAdapter
+import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
+import com.devlogs.rssfeed.screens.read_feeds.presentable_model.RssChannelPresentableModel
 import com.devlogs.rssfeed.screens.common.mvcview.BaseMvcView
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import de.hdodenhof.circleimageview.CircleImageView
@@ -19,12 +22,14 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     private lateinit var txtChannelTitle : TextView
     private lateinit var imgAvatar: CircleImageView
     private lateinit var lvFeeds: RecyclerView
-    private val feeds = TreeSet<FeedPresentableModel> ().descendingSet()
+    private val feeds = TreeSet<FeedPresentableModel> ()
     private val uiToolkit: UIToolkit
+    private lateinit var feedsRcvAdapter : FeedsRcvAdapter
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
+        setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_read_feeds, viewGroup, false))
+        feeds.descendingSet()
         this.uiToolkit = uiToolkit
-        setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_add_rss_channel, viewGroup))
         addControls();
         addEvents();
         initToolbar()
@@ -38,12 +43,17 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     private fun addEvents() {
-        TODO("Not yet implemented")
     }
 
     private fun addControls() {
         lvFeeds = findViewById(R.id.lvFeeds)
         toolbar = findViewById(R.id.toolbar)
+        feedsRcvAdapter = FeedsRcvAdapter(feeds)
+        lvFeeds.layoutManager = LinearLayoutManager(getContext())
+        lvFeeds.setItemViewCacheSize(50)
+        lvFeeds.setHasFixedSize(true)
+        lvFeeds.adapter = feedsRcvAdapter
+
     }
 
     override fun setUserAvatarUrl(url: String) {
@@ -55,11 +65,15 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
-        feeds.addAll(feeds)
+        Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
+        this.feeds.addAll(feeds)
+        feedsRcvAdapter.notifyDataSetChanged()
     }
 
     override fun addNewFeeds(feeds: TreeSet<FeedPresentableModel>) {
-        feeds.addAll(feeds)
+        Log.d("ReadFeedsMvcView", "Add new feeds: ${feeds.size}")
+        this.feeds.addAll(feeds)
+        feedsRcvAdapter.notifyDataSetChanged()
     }
 
 }
