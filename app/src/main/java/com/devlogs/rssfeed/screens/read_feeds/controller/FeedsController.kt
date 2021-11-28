@@ -127,16 +127,15 @@ class FeedsController @Inject constructor(private val stateManager: Presentation
 
     private fun feedEntityToPresentableModel (feedEntity: FeedEntity): FeedPresentableModel {
 
-        val oneDay : Long = 24 * 60 * 60 * 1000
-        val twoDay = oneDay * 2
-        val threeDay = oneDay * 3
+        val today = Date()
 
-        val delta =  System.currentTimeMillis() - feedEntity.pubDate
+        val yesterday = Date()
+        yesterday.date = yesterday.date - 1
 
         val pubDate = Date(feedEntity.pubDate)
-        val isToday = pubDate.isSameDate(Date())
-        val isTwoDayAgo = delta in twoDay..threeDay
-        val isYesterday = delta in oneDay..twoDay
+
+        val isToday = pubDate.isSameDate(today)
+        val isYesterday = pubDate.isSameDate(yesterday)
 
         val formater = SimpleDateFormat("dd/MM/yy")
         val hourFormater = SimpleDateFormat("HH:mm")
@@ -145,9 +144,6 @@ class FeedsController @Inject constructor(private val stateManager: Presentation
         when {
             isToday -> {
                 pubDateInString = "Today"
-            }
-            isTwoDayAgo -> {
-                pubDateInString = "Two days ago"
             }
             isYesterday -> {
                 pubDateInString = "Yesterday"
