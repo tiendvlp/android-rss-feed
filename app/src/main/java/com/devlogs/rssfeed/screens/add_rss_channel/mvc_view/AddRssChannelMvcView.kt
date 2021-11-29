@@ -17,6 +17,7 @@ interface AddRssChannelMvcView : ObservableMvcView<AddRssChannelMvcView.Listener
     fun error (errorMessage: String)
     fun emptyResult ()
     fun clearResult ()
+    fun showNotificationError(errorMessage: String)
 }
 
 fun MvcViewFactory.getAddRssChannelMvcView (viewGroup: ViewGroup?) : AddRssChannelMvcView = AddRssChannelMvcViewImp(uiToolkit, viewGroup)

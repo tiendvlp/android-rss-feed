@@ -50,9 +50,11 @@ sealed class AddChannelPresentationState : PresentationState {
             action: PresentationAction
         ): CauseAndEffect {
             when(action) {
+                is AddFailedAction -> return CauseAndEffect(action, copy())
                 is InitAction -> return CauseAndEffect(action, copy())
                 is SearchAction -> return CauseAndEffect(action, SearchingState())
                 is RestoreAction -> return CauseAndEffect(action, copy())
+                is AddSuccessAction -> return CauseAndEffect(action, copy(result!!.copy(isAdded = true)))
             }
 
             return super.consumeAction(previousState, action)

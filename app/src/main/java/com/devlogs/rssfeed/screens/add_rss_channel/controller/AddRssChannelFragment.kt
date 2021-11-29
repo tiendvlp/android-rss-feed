@@ -8,16 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat.getSystemService
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.screens.add_rss_channel.mvc_view.AddRssChannelMvcView
 import com.devlogs.rssfeed.screens.add_rss_channel.mvc_view.getAddRssChannelMvcView
-import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction
-import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.SearchAction
-import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.SearchSuccessAction
+import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.*
 import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationState.*
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationAction
@@ -97,6 +94,12 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
         previousState: PresentationState?
     ) {
         when (action) {
+            is AddSuccessAction -> {
+                mvcView.showResult(currentState.result!!)
+            }
+            is AddFailedAction -> {
+                mvcView.showNotificationError(action.errorMessage)
+            }
             is RestoreAction -> {
                 if (currentState.showTut) {
                     mvcView.clearResult()
@@ -130,7 +133,7 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
     }
 
     override fun onBtnAddClicked(text: String) {
-
+        addRssChannelController.addNewChannel(text)
     }
 
 

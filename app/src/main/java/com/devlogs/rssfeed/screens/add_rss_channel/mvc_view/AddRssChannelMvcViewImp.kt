@@ -30,6 +30,7 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     private lateinit var layoutToolbar: View
     private lateinit var txtToolbarTitle : TextView
     private lateinit var edtUrl : EditText
+    private lateinit var addProgressBar: ProgressBar
     private lateinit var btnSearch: Button
     private lateinit var btnAdd: Button
     private lateinit var layoutResult: ConstraintLayout
@@ -51,6 +52,7 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
 
     private fun addControls() {
         btnAdd = findViewById(R.id.btnAdd)
+        addProgressBar = findViewById(R.id.addProgressBar)
         txtEmptyResult = findViewById(R.id.txtEmptyResult)
         toolbar = findViewById(R.id.toolbar)
         edtUrl = findViewById(R.id.edtUrl)
@@ -72,6 +74,10 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     }
 
     private fun addEvents() {
+        val hide = Runnable {
+            addProgressBar.visibility = View.VISIBLE
+            btnAdd.setVisibility(View.GONE)
+        }
         btnSearch.setOnClickListener {
             if (!edtUrl.text.contains("http")) {
                 Toast.makeText(getContext(), "Your url have to contains https", Toast.LENGTH_SHORT).show()
@@ -83,6 +89,9 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         }
 
         btnAdd.setOnClickListener {
+            // a little bit tricky here because when we set visibility to gone android will but it back bc the onClick animation
+            btnAdd.postDelayed(hide, 3000)
+
             getListener().forEach { listener ->
                 listener.onBtnAddClicked(txtWebUrl.text.toString())
             }
@@ -103,7 +112,9 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         txtEmptyResult.visibility = View.GONE
         layoutResult.visibility = View.VISIBLE
         txtWebTitle.text = channel.title
+        addProgressBar.visibility = View.GONE
         txtWebUrl.text = channel.url
+        btnAdd.visibility = View.VISIBLE
         layoutLoading.visibility = View.GONE
 
         if (channel.isAdded){
@@ -151,5 +162,11 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         layoutResult.visibility = View.GONE
         txtTut.visibility = View.VISIBLE
         layoutLoading.visibility = View.GONE
+    }
+
+    override fun showNotificationError(errorMessage: String) {
+        btnAdd.visibility = View.VISIBLE
+        addProgressBar.visibility = View.GONE
+        Toast.makeText(getContext(), "Add failed due to: $errorMessage", Toast.LENGTH_LONG).show()
     }
 }

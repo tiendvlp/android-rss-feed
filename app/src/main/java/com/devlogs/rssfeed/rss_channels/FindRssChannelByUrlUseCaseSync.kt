@@ -8,6 +8,7 @@ import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import java.lang.RuntimeException
 import javax.inject.Inject
 
 
@@ -27,7 +28,6 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
 
         data class AlreadyAdded(val channel: RssChannelEntity) : Result()
         class NotFound() : Result()
-        data class GeneralError(val errorMessage: String?) : Result()
     }
 
     suspend fun executes(url: String): Result = withContext(BackgroundDispatcher) {
@@ -42,15 +42,13 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
             return@withContext parseXml(findResult.rssUrl)
         }
 
-        return@withContext Result.GeneralError("")
+        throw RuntimeException("Unexpected result exception")
     }
 
     private suspend fun parseXml(rssUrl: String): Result {
         val getRssChannelResult = rssParser.parse(rssUrl)
 
-        if (getRssChannelResult is RssParser.Result.GeneralError) {
-            return Result.GeneralError("Found rss url (${rssUrl} but can not parse the rss channel")
-        }
+
 
         if (getRssChannelResult is RssParser.Result.Success) {
             val rssObject = getRssChannelResult.rssObject
@@ -82,7 +80,8 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
                 channel.description,
                 channel.image
             )
-        }
+        } else {
             return Result.NotFound()
+        }
     }
 }

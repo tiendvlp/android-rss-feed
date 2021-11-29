@@ -7,4 +7,6 @@ sealed class AddChannelPresentationAction : PresentationAction {
     data class SearchSuccessAction (val channel: RssChannelResultPresentableModel?): AddChannelPresentationAction()
     data class SearchFailedAction (val errorMessage: String): AddChannelPresentationAction()
     data class SearchAction (val url: String): AddChannelPresentationAction()
+    data class AddFailedAction (val errorMessage: String) : AddChannelPresentationAction()
+    class AddSuccessAction () : AddChannelPresentationAction()
 }

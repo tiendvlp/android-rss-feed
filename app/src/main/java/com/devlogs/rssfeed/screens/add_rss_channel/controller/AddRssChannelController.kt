@@ -6,12 +6,14 @@ import com.devlogs.rssfeed.rss_channels.AddNewRssChannelByRssUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.FindRssChannelByUrlUseCaseSync
 import com.devlogs.rssfeed.screens.add_rss_channel.presentable_model.RssChannelResultPresentableModel
 import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction
-import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.SearchFailedAction
-import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.SearchSuccessAction
+import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationAction.*
+import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationState
+import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannelPresentationState.DisplayState
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.lang.RuntimeException
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -29,10 +31,6 @@ class AddRssChannelController @Inject constructor (
 
             if (findResult is FindRssChannelByUrlUseCaseSync.Result.NotFound) {
                 stateManager.consumeAction(SearchSuccessAction(null))
-            }
-
-            if (findResult is FindRssChannelByUrlUseCaseSync.Result.GeneralError) {
-                stateManager.consumeAction(SearchFailedAction("Internal error"))
             }
 
             if (findResult is FindRssChannelByUrlUseCaseSync.Result.AlreadyAdded) {
@@ -62,6 +60,23 @@ class AddRssChannelController @Inject constructor (
             entity.imageUrl,
             isAdded
         )
+    }
+    
+    fun addNewChannel (rssUrl: String) {
+        if (stateManager.currentState !is DisplayState) {
+            throw RuntimeException("UnExpected state happen, the addNewChannel require the DisplayState to run but ${stateManager.currentState.javaClass.simpleName} is found")
+        }
+        val displayState = stateManager.currentState as DisplayState
+
+        coroutine.launch {
+           val result = addNewRssChannelByRssUrlUseCaseSync.executes(displayState.result!!.rssUrl)
+            
+            if (result is AddNewRssChannelByRssUrlUseCaseSync.Result.Success) {
+                stateManager.consumeAction(AddSuccessAction())
+            } else {
+                stateManager.consumeAction(AddFailedAction(result.javaClass.simpleName))
+            }
+        }
     }
 
 
