@@ -5,15 +5,26 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/grey80"
-    tools:context=".screens.navigation_drawer.MainNavFragment"
+    tools:context=".screens.navigation_drawer.controller.MainNavFragment"
 
      >
+<!--    Loading-->
 
+    <LinearLayout
+        android:id="@+id/layoutLoading"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="30dp"
+            android:layout_height="30dp"/>
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutMain"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
         >
 
 <!--        Header-->
@@ -29,6 +40,7 @@
             />
 
         <TextView
+            android:id="@+id/txtUserName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintLeft_toRightOf="@id/imgAvatar"
@@ -54,13 +66,15 @@
             android:paddingTop="20dp"
             android:paddingLeft="@dimen/margin_left"
             android:background="@color/grey95"
-            android:layout_height="wrap_content">
+            app:layout_constraintBottom_toTopOf="@id/btnSignOut"
+            android:layout_marginBottom="120dp"
+            android:layout_height="0dp">
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:gravity="center_vertical"
                 android:layout_height="wrap_content">
-                <androidx.constraintlayout.utils.widget.ImageFilterView
+                <ImageView
                     android:layout_width="30dp"
                     android:layout_height="30dp"
                     android:tint="@color/white"
@@ -85,17 +99,19 @@
                 android:layout_marginLeft="30dp"
                 />
 
-           <ListView
+           <androidx.recyclerview.widget.RecyclerView
                android:layout_marginLeft="20dp"
                android:id="@+id/lvChannels"
                android:layout_marginTop="10dp"
+               android:layout_marginRight="@dimen/margin_right"
                android:layout_width="match_parent"
-               android:layout_height="wrap_content"/>
+               android:layout_height="match_parent"/>
 
         </LinearLayout>
 
 
         <com.devlogs.rssfeed.screens.common.customview.Button
+            android:id="@+id/btnSignOut"
             android:layout_width="155dp"
             android:layout_height="55dp"
             android:text="Sign out"

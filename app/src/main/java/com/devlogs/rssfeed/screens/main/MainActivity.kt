@@ -12,7 +12,7 @@ import androidx.fragment.app.FragmentTransaction
 import com.devlogs.chatty.screen.common.BackPressDispatcher
 import com.devlogs.chatty.screen.common.BackPressListener
 import com.devlogs.rssfeed.R
-import com.devlogs.rssfeed.screens.navigation_drawer.MainNavFragment
+import com.devlogs.rssfeed.screens.navigation_drawer.controller.MainNavFragment
 import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
