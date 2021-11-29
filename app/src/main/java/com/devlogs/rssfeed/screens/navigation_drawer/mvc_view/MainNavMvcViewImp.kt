@@ -4,10 +4,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.common.mvcview.BaseMvcView
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
+import com.devlogs.rssfeed.screens.navigation_drawer.controller.ChannelRcvAdapter
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPresentableModel
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.UserPresentableModel
 
@@ -18,9 +21,12 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
     private lateinit var layoutLoading: LinearLayout
     private lateinit var layoutMain: ConstraintLayout
     private lateinit var imgAvatar: ImageView
-    private lateinit var lvChannels: ListView
+    private lateinit var lvChannels: RecyclerView
     private lateinit var btnSignOut: Button
     private lateinit var txtUserName: TextView
+    private lateinit var channelAdapter: ChannelRcvAdapter
+
+    private val channels = ArrayList<ChannelPresentableModel> ()
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
         this.uiToolkit = uiToolkit
@@ -37,6 +43,10 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
         imgAvatar = findViewById(R.id.imgAvatar)
         lvChannels = findViewById(R.id.lvChannels)
         btnSignOut = findViewById(R.id.btnSignOut)
+
+        channelAdapter = ChannelRcvAdapter(channels)
+        lvChannels.layoutManager = LinearLayoutManager(getContext())
+        lvChannels.adapter = channelAdapter
     }
 
     private fun addEvents() {
@@ -55,6 +65,9 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
     override fun setChannels(channels: List<ChannelPresentableModel>) {
         layoutLoading.visibility = View.GONE
         layoutMain.visibility = View.VISIBLE
+        this.channels.clear()
+        this.channels.addAll(channels)
+        channelAdapter.notifyDataSetChanged()
     }
 
     override fun setUsers(user: UserPresentableModel) {

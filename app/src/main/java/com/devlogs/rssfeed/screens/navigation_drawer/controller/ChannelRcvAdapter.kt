@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPresentableModel
 
@@ -14,9 +15,14 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ChannelRcvAdapter.ViewHolder> {
     class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
         private val img: ImageView = view.findViewById(R.id.img)
         private val txtTitle: TextView = view.findViewById(R.id.txtTitle)
-
+        private val failedDrawable = view.context.getDrawable(R.drawable.ic_www)
         fun bind (channel: ChannelPresentableModel) {
+            Glide.with(itemView.context)
+                .load(channel.url)
+                .into(img)
+                .onLoadFailed(failedDrawable)
 
+            txtTitle.text = channel.title
         }
     }
 

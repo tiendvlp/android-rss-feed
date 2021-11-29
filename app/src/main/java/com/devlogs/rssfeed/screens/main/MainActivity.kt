@@ -25,8 +25,13 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
         }
     }
 
+    interface ReloadAble {
+        fun reload ()
+    }
+
     private var backPressListeners: HashSet<BackPressListener> = HashSet()
 
+    private lateinit var reloadAble: ReloadAble
     private lateinit var grBottomNav : RadioGroup
     private lateinit var btnMenu : Button
     private lateinit var rbtnFavoriteFeed : RadioButton
@@ -49,7 +54,8 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     }
 
     private fun setupNavDrawer() {
-        val newFragment: Fragment = MainNavFragment()
+        val newFragment = MainNavFragment.newInstance()
+        reloadAble = newFragment
         val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.navFragContent, newFragment)
         transaction.addToBackStack(null)
@@ -69,6 +75,8 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     private fun addEvents() {
         btnMenu.setOnClickListener {
             drawer.openDrawer(Gravity.LEFT)
+            reloadAble.reload()
+
         }
         grBottomNav.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {

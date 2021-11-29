@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/grey80"
+    android:background="@color/grey95"
     tools:context=".screens.navigation_drawer.controller.MainNavFragment"
 
      >
@@ -63,11 +63,11 @@
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_width="0dp"
-            android:paddingTop="20dp"
+            android:paddingTop="10dp"
             android:paddingLeft="@dimen/margin_left"
             android:background="@color/grey95"
             app:layout_constraintBottom_toTopOf="@id/btnSignOut"
-            android:layout_marginBottom="120dp"
+            android:layout_marginBottom="30dp"
             android:layout_height="0dp">
 
             <LinearLayout
@@ -75,8 +75,8 @@
                 android:gravity="center_vertical"
                 android:layout_height="wrap_content">
                 <ImageView
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
                     android:tint="@color/white"
                     android:src="@drawable/ic_hamburger"
                     />
@@ -93,7 +93,7 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="0.5dp"
+                android:layout_height="0.4dp"
                 android:background="@color/grey60"
                 android:layout_marginTop="6dp"
                 android:layout_marginLeft="30dp"
@@ -102,10 +102,10 @@
            <androidx.recyclerview.widget.RecyclerView
                android:layout_marginLeft="20dp"
                android:id="@+id/lvChannels"
-               android:layout_marginTop="10dp"
+               android:layout_marginTop="22dp"
                android:layout_marginRight="@dimen/margin_right"
                android:layout_width="match_parent"
-               android:layout_height="match_parent"/>
+               android:layout_height="wrap_content"/>
 
         </LinearLayout>
 
@@ -123,7 +123,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginLeft="@dimen/margin_left"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="20dp"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

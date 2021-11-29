@@ -20,14 +20,14 @@
             >
         <com.devlogs.rssfeed.screens.common.customview.Button
             android:id="@+id/btnMenu"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:paddingTop="15dp"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:button="@null"
             android:drawableTop="@drawable/rbtn_menu_background"
             android:gravity="center"
-            android:scaleX="1.3"
-            android:scaleY="1.4"
+            android:scaleX="1.1"
+            android:scaleY="1.1"
             android:layout_weight="1"
             android:background="@null"
             />
@@ -49,8 +49,8 @@
             <RadioButton
                 android:id="@+id/rbtnReadFeeds"
                 android:layout_width="wrap_content"
-                android:scaleX="1.3"
-                android:scaleY="1.3"
+                android:scaleX="1.1"
+                android:scaleY="1.1"
                 android:layout_height="wrap_content"
                 android:paddingTop="15dp"
                 android:button="@null"
@@ -64,8 +64,8 @@
                 android:id="@+id/rbtnAddChannel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleX="1.3"a
-                android:scaleY="1.3"
+                android:scaleX="1.1"
+                android:scaleY="1.1"
                 android:paddingTop="15dp"
                 android:button="@null"
                 android:drawableTop="@drawable/rbtn_add_rss_background"

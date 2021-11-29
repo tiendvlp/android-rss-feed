@@ -85,11 +85,15 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 link = link.substring(0, link.length-1)
             }
 
+            var title = rssChannel.title
+
+            title = title.replace("rss", "", true).trim()
+
             val channelEntity = RssChannelEntity(
                 id,
                 link,
                 rssUrl,
-                rssChannel.title,
+                title,
                 rssChannel.description,
                 rssChannel.image
             )
