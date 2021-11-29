@@ -4,10 +4,16 @@ import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.Gravity
 import android.widget.*
+import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.devlogs.chatty.screen.common.BackPressDispatcher
 import com.devlogs.chatty.screen.common.BackPressListener
 import com.devlogs.rssfeed.R
+import com.devlogs.rssfeed.screens.navigation_drawer.MainNavFragment
+import com.google.android.material.navigation.NavigationView
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -22,10 +28,12 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     private var backPressListeners: HashSet<BackPressListener> = HashSet()
 
     private lateinit var grBottomNav : RadioGroup
-    private lateinit var rbtnMenu : RadioButton
+    private lateinit var btnMenu : Button
     private lateinit var rbtnFavoriteFeed : RadioButton
     private lateinit var rbtnReadFeeds : RadioButton
     private lateinit var rbtnAddChannel : RadioButton
+    private lateinit var drawer : DrawerLayout
+    private lateinit var navigation: NavigationView
 
     @Inject
     protected lateinit var mainScreenNavigator: MainScreenNavigator
@@ -36,20 +44,34 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
         mainScreenNavigator.init(savedInstanceState)
         addControls ()
         addEvents()
+        setupNavDrawer()
+        grBottomNav.check(rbtnReadFeeds.id)
+    }
+
+    private fun setupNavDrawer() {
+        val newFragment: Fragment = MainNavFragment()
+        val transaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+        transaction.replace(R.id.navFragContent, newFragment)
+        transaction.addToBackStack(null)
+        transaction.commit()
     }
 
     private fun addControls() {
         grBottomNav = findViewById(R.id.grBottomNav)
-        rbtnMenu = findViewById(R.id.rbtnMenu)
+        btnMenu = findViewById(R.id.btnMenu)
         rbtnFavoriteFeed = findViewById(R.id.rbtnFavoriteFeed)
         rbtnReadFeeds = findViewById(R.id.rbtnReadFeeds)
         rbtnAddChannel = findViewById(R.id.rbtnAddChannel)
+        drawer = findViewById(R.id.drawer)
+        navigation = findViewById(R.id.navigation)
     }
 
     private fun addEvents() {
+        btnMenu.setOnClickListener {
+            drawer.openDrawer(Gravity.LEFT)
+        }
         grBottomNav.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
-                rbtnMenu.id -> Toast.makeText(this, "Show the menu", Toast.LENGTH_LONG).show()
                 rbtnFavoriteFeed.id -> mainScreenNavigator.switchToSavedFeedsTab()
                 rbtnReadFeeds.id -> mainScreenNavigator.switchToFeedsTab()
                 rbtnAddChannel.id -> mainScreenNavigator.switchToAddChannelTab()

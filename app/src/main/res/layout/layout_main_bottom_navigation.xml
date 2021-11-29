@@ -9,6 +9,8 @@
         android:background="@color/grey60"
         android:layout_height="0.5dp">
     </LinearLayout>
+
+
     <RadioGroup
             android:id="@+id/grBottomNav"
             android:orientation="horizontal"
@@ -16,20 +18,20 @@
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             >
+        <com.devlogs.rssfeed.screens.common.customview.Button
+            android:id="@+id/btnMenu"
+            android:layout_width="wrap_content"
+            android:paddingTop="15dp"
+            android:layout_height="wrap_content"
+            android:button="@null"
+            android:drawableTop="@drawable/rbtn_menu_background"
+            android:gravity="center"
+            android:scaleX="1.3"
+            android:scaleY="1.4"
+            android:layout_weight="1"
+            android:background="@null"
+            />
 
-            <RadioButton
-                android:id="@+id/rbtnMenu"
-                android:layout_width="wrap_content"
-                android:paddingTop="15dp"
-                android:layout_height="wrap_content"
-                android:button="@null"
-                android:drawableTop="@drawable/rbtn_menu_background"
-                android:gravity="center"
-                android:scaleX="1.3"
-                android:scaleY="1.4"
-                android:layout_weight="1"
-                android:background="@null"
-                />
             <RadioButton
                 android:id="@+id/rbtnFavoriteFeed"
                 android:layout_width="wrap_content"
@@ -62,7 +64,7 @@
                 android:id="@+id/rbtnAddChannel"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleX="1.3"
+                android:scaleX="1.3"a
                 android:scaleY="1.3"
                 android:paddingTop="15dp"
                 android:button="@null"
