@@ -9,12 +9,14 @@ import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.main.MainActivity
+import com.devlogs.rssfeed.screens.main.MainScreenInsiderObservable
 import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.MainNavMvcView
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.getMainNavMvcView
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPresentableModel
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.UserPresentableModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.layout_main.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,6 +30,8 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
     protected lateinit var applicationStateManager: ApplicationStateManager
     @Inject
     protected lateinit var mainScreenNavigator: MainScreenNavigator
+    @Inject
+    protected lateinit var mainScreenInsiderObservable: MainScreenInsiderObservable
 
     private lateinit var mvcView: MainNavMvcView
 
@@ -70,7 +74,9 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
 
     override fun onChannelSelected(channel: ChannelPresentableModel) {
         applicationStateManager.selectedChannelId = channel.id
-        Toast.makeText(requireContext(), "Selected ${channel.title}", Toast.LENGTH_LONG).show()
+        mainScreenInsiderObservable.userSelectChannel(channel.id)
+        mainScreenNavigator.switchToFeedsTab()
+        requireActivity().onBackPressed()
     }
 
     override fun reload() {

@@ -1,6 +1,5 @@
 package com.devlogs.rssfeed.screens.read_feeds.presentation_state
 
-import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.rssfeed.screens.common.presentation_state.CauseAndEffect
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationAction
@@ -21,6 +20,7 @@ sealed class ReadFeedsScreenPresentationState : PresentationState {
             action: PresentationAction
         ): CauseAndEffect {
             when (action) {
+                is UserSelectChannelAction -> return CauseAndEffect(action, InitialLoadingState(action.channelId))
                 is NewFeedsAction -> return CauseAndEffect(action, copy(feeds = appendFeeds(action.feeds)))
                 is ReloadActionFailed -> return CauseAndEffect(action, copy())
                 is LoadMoreSuccessAction -> return CauseAndEffect(action, copy(feeds = appendFeeds(action.feeds)))
@@ -48,6 +48,7 @@ sealed class ReadFeedsScreenPresentationState : PresentationState {
         ): CauseAndEffect {
 
             when (action) {
+                is UserSelectChannelAction -> return CauseAndEffect(action, InitialLoadingState(action.channelId))
                 is InitAction -> return CauseAndEffect(action, copy())
                 is InitialLoadFailedAction -> return CauseAndEffect(action, InitialLoadFailedState(action.message))
                 is InitialLoadSuccessAction -> return CauseAndEffect(action, DisplayState(action.feeds, action.channel, action.userAvatar))
@@ -66,6 +67,7 @@ sealed class ReadFeedsScreenPresentationState : PresentationState {
             action: PresentationAction
         ): CauseAndEffect {
             when(action) {
+                is UserSelectChannelAction -> return CauseAndEffect(action, InitialLoadingState(action.channelId))
                 is InitialLoadAction -> CauseAndEffect(action, InitialLoadingState(action.channelId))
             }
             return super.consumeAction(previousState, action)

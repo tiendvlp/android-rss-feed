@@ -105,6 +105,10 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
         }
     }
 
+    fun cancel () {
+//        coroutine.coroutineContext.cancelChildren()
+    }
+
     fun loadMore() {
         if (stateManager.currentState !is DisplayState) {
             throw RuntimeException("Invalid state, loadMore only run with DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")

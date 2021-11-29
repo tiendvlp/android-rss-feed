@@ -20,6 +20,8 @@ import com.devlogs.rssfeed.screens.common.presentation_state.PresentationAction
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationState
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateChangedListener
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
+import com.devlogs.rssfeed.screens.main.MainScreenInsiderListener
+import com.devlogs.rssfeed.screens.main.MainScreenInsiderObservable
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.*
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.*
 import dagger.hilt.android.AndroidEntryPoint
@@ -27,7 +29,7 @@ import javax.inject.Inject
 import javax.inject.Named
 
 @AndroidEntryPoint
-class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationStateChangedListener {
+class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationStateChangedListener, MainScreenInsiderListener{
     companion object {
         @JvmStatic
         fun newInstance() =
@@ -43,7 +45,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     protected lateinit var presentationStateManager: PresentationStateManager
     private lateinit var mvcView : ReadFeedsMvcView
     @Inject
-    protected lateinit var getFeedsByRssChannelUseCaseSync : GetFeedsByRssChannelUseCaseSync
+    protected lateinit var mainScreenInsiderObservable: MainScreenInsiderObservable
     @Inject
     protected lateinit var feedsController: FeedsController
     @Inject
@@ -52,11 +54,11 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        presentationStateManager.init(savedInstanceState, InitialLoadingState(applicationStateManager.selectedChannelId!!))
+        val userSelectedChannelId = applicationStateManager.selectedChannelId
+        presentationStateManager.init(savedInstanceState, InitialLoadingState(userSelectedChannelId!!))
+
         Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName)
-        if (presentationStateManager.currentState is InitialLoadingState) {
-            feedsController.initialLoad()
-        }
+
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -69,13 +71,22 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
+        val userSelectedChannelId = applicationStateManager.selectedChannelId
         mvcView = mvcViewFactory.getReadFeedsMvcView(container)
+        if (presentationStateManager.currentState is DisplayState) {
+            val currentDisplayChannelId = (presentationStateManager.currentState as DisplayState).channelPresentableModel.id
+            if (!currentDisplayChannelId.equals(userSelectedChannelId)) {
+                presentationStateManager.consumeAction(UserSelectChannelAction(userSelectedChannelId!!))
+            }
+        }
         return mvcView.getRootView()
     }
 
     override fun onStart() {
         super.onStart()
         mvcView.register(this)
+        mainScreenInsiderObservable.register(this)
+
         presentationStateManager.register(this, true)
     }
 
@@ -83,6 +94,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         super.onStop()
         mvcView.unRegister(this)
         presentationStateManager.unRegister(this)
+        requireContext().unbindService(newFeedsServiceConnector)
+        mainScreenInsiderObservable.unRegister(this)
     }
 
     override fun onFeedClicked(selectedFeeds: FeedPresentableModel) {
@@ -109,12 +122,23 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName + " with action: " + action.javaClass.simpleName)
         when (currentState) {
             is InitialLoadingState -> {
+                feedsController.initialLoad()
             }
-            is InitialLoadFailedState -> {}
+            is InitialLoadFailedState -> {
+                requireContext().unbindService(newFeedsServiceConnector)
+            }
             is DisplayState -> {
                 displayStateProcess (previousState, currentState, action)
             }
         }
+    }
+
+    override fun onUserSelectedChannel(channelId: String) {
+        super.onUserSelectedChannel(channelId)
+        Log.d("ReadFeedsFragment", "User selected : ${channelId}")
+        presentationStateManager.consumeAction(UserSelectChannelAction(channelId))
+        feedsController.cancel()
+
     }
 
     private fun displayStateProcess(
@@ -140,6 +164,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 mvcView.addNewFeeds(action.feeds)
             }
             is InitialLoadSuccessAction -> {
+                mvcView.clear()
                 mvcView.appendFeeds(currentState.feeds)
                 mvcView.setChannels(currentState.channelPresentableModel)
                 mvcView.setUserAvatarUrl(currentState.avatarUrl)

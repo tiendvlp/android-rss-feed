@@ -111,4 +111,9 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         refreshLayout.isRefreshing = false
     }
 
+    override fun clear() {
+        feeds.clear()
+        feedsRcvAdapter.notifyDataSetChanged()
+    }
+
 }

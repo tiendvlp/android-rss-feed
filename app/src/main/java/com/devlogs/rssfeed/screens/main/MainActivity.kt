@@ -101,6 +101,12 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
     }
 
     override fun onBackPressed() {
+
+        if (drawer.isDrawerOpen(Gravity.LEFT)) {
+            drawer.closeDrawer(Gravity.LEFT)
+            return
+        }
+
         var isBackPressConsumed = false
 
         backPressListeners.forEach { listener ->

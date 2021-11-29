@@ -21,7 +21,7 @@ class ApplicationStateManager @Inject constructor(private val getLoggedInUserUse
         return sharedPreferences.getString(SELECTED_CHANNEL, null)
     }
     set(value) {
-        sharedPreferences.edit().putString(SELECTED_CHANNEL, value).apply()
+        sharedPreferences.edit().putString(SELECTED_CHANNEL, value).commit()
     }
 
 }

@@ -9,6 +9,7 @@ import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.ACTIVITY_
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
+import com.devlogs.rssfeed.screens.main.MainScreenInsiderObservable
 import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.ncapdevi.fragnav.FragNavController
 import dagger.Module
@@ -44,6 +45,12 @@ class ActivityModule {
     }
 
     @Provides
+    @ActivityScoped
+    fun provideMainScreenInsiderObservable () : MainScreenInsiderObservable {
+        return MainScreenInsiderObservable()
+    }
+
+    @Provides
     fun provideMvcViewFactory (toolKit: UIToolkit): MvcViewFactory {
         return MvcViewFactory(toolKit)
     }
@@ -53,6 +60,7 @@ class ActivityModule {
     }
 
     @Provides
+    @ActivityScoped
     fun provideMainScreenNavigator (fragmentManager: FragmentManager) : MainScreenNavigator {
         return MainScreenNavigator(getMainFragNavController(fragmentManager))
     }
