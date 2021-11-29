@@ -1,6 +1,7 @@
 package com.devlogs.rssfeed.screens.common.presentation_state
 
 import android.os.Bundle
+import android.util.Log
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.common.base.BaseObservable
@@ -9,11 +10,15 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
     lateinit var currentState: PresentationState private set
     private lateinit var currentAction : PresentationAction
     private var previousState : PresentationState? = null
+    private lateinit var defaultState : PresentationState
+
+    private val TAG = "PRESENTATION_STATE"
 
     fun init(savedInstanceState: Bundle?, defaultState: PresentationState) {
-        if (savedInstanceState != null && savedInstanceState.containsKey(defaultState.getTag())) {
+        this.defaultState = defaultState
+        if (savedInstanceState != null && savedInstanceState.containsKey(TAG)) {
             currentAction = RestoreAction
-            currentState = savedInstanceState.getSerializable(defaultState.getTag()) as PresentationState
+            currentState = savedInstanceState.getSerializable(TAG) as PresentationState
         } else {
             currentAction = CommonPresentationAction.InitAction
             currentState = defaultState
@@ -43,8 +48,13 @@ class PresentationStateManager : BaseObservable<PresentationStateChangedListener
     }
 
     fun onSavedInstanceState (outState: Bundle) {
+        Log.d("PresentationStateManager", "onSavedInstantState: ${currentState.javaClass.simpleName} amd allowSave: ${currentState.allowSave}")
         if (currentState.allowSave) {
-            outState.putSerializable(currentState.getTag(), currentState)
+            outState.putSerializable(TAG, currentState)
+        } else {
+            outState.remove(TAG)
+            previousState = currentState
+            currentState = defaultState
         }
     }
 }

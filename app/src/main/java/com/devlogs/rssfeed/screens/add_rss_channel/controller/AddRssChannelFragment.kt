@@ -45,11 +45,10 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
     private lateinit var mvcView: AddRssChannelMvcView
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         presentationStateManager.init(savedInstanceState,
             DisplayState(null, true)
         )
-        Log.d("AddRssChannelFragment", presentationStateManager.currentState.javaClass.simpleName)
-
     }
 
     override fun onCreateView(
@@ -57,6 +56,7 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
         savedInstanceState: Bundle?
     ): View? {
         mvcView = mvcViewFactory.getAddRssChannelMvcView(container)
+
         return mvcView.getRootView()
     }
 
@@ -66,10 +66,16 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
         presentationStateManager.register(this, true)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        presentationStateManager.onSavedInstanceState(outState)
+        super.onSaveInstanceState(outState)
+    }
+
     override fun onStop() {
         super.onStop()
         mvcView.unRegister(this)
         presentationStateManager.unRegister(this)
+        addRssChannelController.cancel()
     }
 
     override fun onStateChanged(
@@ -77,12 +83,22 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
         currentState: PresentationState,
         action: PresentationAction
     ) {
+
         Log.d("AddRssChannelFragment", "${currentState.javaClass.simpleName} with ${action.javaClass.simpleName}")
         when (currentState) {
             is DisplayState -> processDisplayState(action, currentState, previousState)
             is SearchingState -> {
-                mvcView.loading()
-                addRssChannelController.search((action as SearchAction).url)
+                when (action) {
+                    is SearchAction -> {
+                        mvcView.loading()
+                        addRssChannelController.search((action).url)
+                    }
+                    is RestoreAction -> {
+                        mvcView.loading()
+                        addRssChannelController.search(currentState.url)
+                    }
+                }
+
             }
             is SearchFailedState -> {mvcView.error(currentState.errorMessage)}
         }

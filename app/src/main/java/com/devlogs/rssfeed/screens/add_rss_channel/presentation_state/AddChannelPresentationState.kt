@@ -10,7 +10,7 @@ import com.devlogs.rssfeed.screens.common.presentation_state.PresentationState
 
 sealed class AddChannelPresentationState : PresentationState {
 
-    class SearchingState : PresentationState {
+    data class SearchingState (val url : String): PresentationState {
         override val allowSave: Boolean
             get() = false
 
@@ -35,7 +35,7 @@ sealed class AddChannelPresentationState : PresentationState {
             action: PresentationAction
         ): CauseAndEffect {
             when(action) {
-                is SearchAction ->return CauseAndEffect(action,SearchingState())
+                is SearchAction ->return CauseAndEffect(action,SearchingState(action.url))
             }
             return super.consumeAction(previousState, action)
         }
@@ -52,7 +52,7 @@ sealed class AddChannelPresentationState : PresentationState {
             when(action) {
                 is AddFailedAction -> return CauseAndEffect(action, copy())
                 is InitAction -> return CauseAndEffect(action, copy())
-                is SearchAction -> return CauseAndEffect(action, SearchingState())
+                is SearchAction -> return CauseAndEffect(action, SearchingState(action.url))
                 is RestoreAction -> return CauseAndEffect(action, copy())
                 is AddSuccessAction -> return CauseAndEffect(action, copy(result!!.copy(isAdded = true)))
             }

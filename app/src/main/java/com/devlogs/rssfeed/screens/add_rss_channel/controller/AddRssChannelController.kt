@@ -12,6 +12,7 @@ import com.devlogs.rssfeed.screens.add_rss_channel.presentation_state.AddChannel
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import java.lang.RuntimeException
 import javax.inject.Inject
@@ -33,11 +34,11 @@ class AddRssChannelController @Inject constructor (
                 stateManager.consumeAction(SearchSuccessAction(null))
             }
 
-            if (findResult is FindRssChannelByUrlUseCaseSync.Result.AlreadyAdded) {
+            else if (findResult is FindRssChannelByUrlUseCaseSync.Result.AlreadyAdded) {
                 stateManager.consumeAction(SearchSuccessAction(convertChannelEntityToPm(findResult.channel, true)))
             }
 
-            if (findResult is FindRssChannelByUrlUseCaseSync.Result.Found) {
+            else if (findResult is FindRssChannelByUrlUseCaseSync.Result.Found) {
                 stateManager.consumeAction(SearchSuccessAction(RssChannelResultPresentableModel(
                     null,
                     findResult.url,
@@ -48,11 +49,15 @@ class AddRssChannelController @Inject constructor (
                 )))
             }
 
-            if (findResult is FindRssChannelByUrlUseCaseSync.Result.GeneralError) {
+            else if (findResult is FindRssChannelByUrlUseCaseSync.Result.GeneralError) {
                 stateManager.consumeAction(SearchFailedAction (findResult.errorMessage))
             }
         }
 
+    }
+
+    fun cancel () {
+        coroutine.coroutineContext.cancelChildren()
     }
 
     private fun convertChannelEntityToPm (entity: RssChannelEntity, isAdded: Boolean) : RssChannelResultPresentableModel {

@@ -127,6 +127,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 mvcView.appendFeeds(currentState.feeds)
                 mvcView.setChannels(currentState.channelPresentableModel)
                 mvcView.setUserAvatarUrl(currentState.avatarUrl)
+                mvcView.hideRefreshLayout()
                 RssChannelTrackingService.bind(requireContext(), newFeedsServiceConnector)
             }
             is ReloadActionSuccess -> {
