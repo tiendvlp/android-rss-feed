@@ -12,7 +12,7 @@ import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPr
 
 class ChannelRcvAdapter : RecyclerView.Adapter<ChannelRcvAdapter.ViewHolder> {
 
-    class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
+    inner class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
         private val img: ImageView = view.findViewById(R.id.img)
         private val txtTitle: TextView = view.findViewById(R.id.txtTitle)
         private val failedDrawable = view.context.getDrawable(R.drawable.ic_www)
@@ -21,12 +21,16 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ChannelRcvAdapter.ViewHolder> {
                 .load(channel.url)
                 .into(img)
                 .onLoadFailed(failedDrawable)
-
+            itemView.setOnClickListener {
+                onItemClicked?.invoke(channel)
+            }
             txtTitle.text = channel.title
         }
     }
 
     private val channels: List<ChannelPresentableModel>
+
+    var onItemClicked : ((channel: ChannelPresentableModel) -> Unit)? = null
 
     constructor(channels: List<ChannelPresentableModel>) {
         this.channels = channels

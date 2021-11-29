@@ -50,6 +50,11 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
     }
 
     private fun addEvents() {
+        channelAdapter.onItemClicked = { channel ->
+            getListener().forEach { listener ->
+                listener.onChannelSelected(channel)
+            }
+        }
         btnSignOut.setOnClickListener {
             getListener().forEach { listener ->
                 listener.onBtnSignOutClicked()

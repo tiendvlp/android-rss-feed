@@ -9,6 +9,7 @@ import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.main.MainActivity
+import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.MainNavMvcView
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.getMainNavMvcView
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPresentableModel
@@ -25,6 +26,9 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
     protected lateinit var channelController: ChannelsController
     @Inject
     protected lateinit var applicationStateManager: ApplicationStateManager
+    @Inject
+    protected lateinit var mainScreenNavigator: MainScreenNavigator
+
     private lateinit var mvcView: MainNavMvcView
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -65,6 +69,7 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
     }
 
     override fun onChannelSelected(channel: ChannelPresentableModel) {
+        applicationStateManager.selectedChannelId = channel.id
         Toast.makeText(requireContext(), "Selected ${channel.title}", Toast.LENGTH_LONG).show()
     }
 
