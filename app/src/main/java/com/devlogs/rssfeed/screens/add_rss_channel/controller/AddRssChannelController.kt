@@ -47,6 +47,10 @@ class AddRssChannelController @Inject constructor (
                     false
                 )))
             }
+
+            if (findResult is FindRssChannelByUrlUseCaseSync.Result.GeneralError) {
+                stateManager.consumeAction(SearchFailedAction (findResult.errorMessage))
+            }
         }
 
     }

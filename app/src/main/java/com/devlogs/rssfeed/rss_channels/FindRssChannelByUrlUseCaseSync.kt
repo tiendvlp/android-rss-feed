@@ -28,17 +28,25 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
 
         data class AlreadyAdded(val channel: RssChannelEntity) : Result()
         class NotFound() : Result()
+        data class GeneralError (val errorMessage: String) : Result()
     }
 
     suspend fun executes(url: String): Result = withContext(BackgroundDispatcher) {
-
+        Log.d("FindRssChannel", "Find: " + url)
         val findResult = rssUrlFinder.find(url)
+
+        if (findResult is RssUrlFinder.Result.IllegalUrl) {
+            Log.e("FindRssChannel", "Illegal url: $url")
+            return@withContext Result.GeneralError("Illegal Url")
+        }
 
         if (findResult is RssUrlFinder.Result.RssNotFound) {
             // check maybe it's self is a rss url
+            Log.w("FindRssChannel", "RssChannel notfound")
             return@withContext parseXml(url)
         }
         if (findResult is RssUrlFinder.Result.Success) {
+            Log.d("FindRssChannel", "Success")
             return@withContext parseXml(findResult.rssUrl)
         }
 
@@ -47,8 +55,6 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
 
     private suspend fun parseXml(rssUrl: String): Result {
         val getRssChannelResult = rssParser.parse(rssUrl)
-
-
 
         if (getRssChannelResult is RssParser.Result.Success) {
             val rssObject = getRssChannelResult.rssObject
@@ -69,7 +75,7 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
                     document["rssUrl"].toString(),
                     document["title"].toString(),
                     document["description"].toString(),
-                    document["image"].toString(),
+                    document["imageUrl"].toString(),
                 )
                 return Result.AlreadyAdded(addedChannel)
             }

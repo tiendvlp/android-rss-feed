@@ -125,15 +125,19 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
     }
 
     override fun onBtnSearchClicked(url: String) {
-        activity?.currentFocus?.let { view ->
-            val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
-            imm?.hideSoftInputFromWindow(view.windowToken, 0)
+        if (presentationStateManager.currentState is DisplayState || presentationStateManager.currentState is SearchFailedState) {
+            activity?.currentFocus?.let { view ->
+                val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
+                imm?.hideSoftInputFromWindow(view.windowToken, 0)
+            }
+            presentationStateManager.consumeAction(SearchAction(url))
         }
-        presentationStateManager.consumeAction(SearchAction(url))
     }
 
     override fun onBtnAddClicked(text: String) {
-        addRssChannelController.addNewChannel(text)
+        if (presentationStateManager.currentState is DisplayState && (presentationStateManager.currentState as DisplayState).result != null){
+            addRssChannelController.addNewChannel(text)
+        }
     }
 
 

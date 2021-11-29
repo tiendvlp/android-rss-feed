@@ -76,10 +76,19 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         try {
             var id = UrlEncrypt.encode(rssChannel.url)
 
+            var rssUrl = rssChannel.url
+            var link = rssChannel.link
+            if (rssUrl[rssUrl.length-1].equals('/')) {
+                rssUrl = rssUrl.substring(0, rssUrl.length-1)
+            }
+            if (link[link.length-1].equals('/')) {
+                link = link.substring(0, link.length-1)
+            }
+
             val channelEntity = RssChannelEntity(
                 id,
-                rssChannel.link,
-                rssChannel.url,
+                link,
+                rssUrl,
                 rssChannel.title,
                 rssChannel.description,
                 rssChannel.image

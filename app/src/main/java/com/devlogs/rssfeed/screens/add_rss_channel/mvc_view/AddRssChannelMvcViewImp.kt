@@ -1,6 +1,7 @@
 package com.devlogs.rssfeed.screens.add_rss_channel.mvc_view
 
 import android.os.Build
+import android.os.Handler
 import android.text.Html
 import android.util.Log
 import android.view.View
@@ -14,8 +15,11 @@ import com.devlogs.rssfeed.screens.common.mvcview.BaseMvcView
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import dagger.hilt.android.internal.Contexts.getApplication
 import androidx.core.content.ContextCompat.getSystemService
-
-
+import com.bumptech.glide.Glide
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 
 class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddRssChannelMvcView{
@@ -30,6 +34,7 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     private lateinit var layoutToolbar: View
     private lateinit var txtToolbarTitle : TextView
     private lateinit var edtUrl : EditText
+    private lateinit var progressBar: ProgressBar
     private lateinit var addProgressBar: ProgressBar
     private lateinit var btnSearch: Button
     private lateinit var btnAdd: Button
@@ -54,6 +59,7 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         btnAdd = findViewById(R.id.btnAdd)
         addProgressBar = findViewById(R.id.addProgressBar)
         txtEmptyResult = findViewById(R.id.txtEmptyResult)
+        progressBar = findViewById(R.id.progressBar)
         toolbar = findViewById(R.id.toolbar)
         edtUrl = findViewById(R.id.edtUrl)
         btnSearch = findViewById(R.id.btnSearch)
@@ -74,24 +80,20 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     }
 
     private fun addEvents() {
-        val hide = Runnable {
-            addProgressBar.visibility = View.VISIBLE
-            btnAdd.setVisibility(View.GONE)
-        }
         btnSearch.setOnClickListener {
-            if (!edtUrl.text.contains("http")) {
-                Toast.makeText(getContext(), "Your url have to contains https", Toast.LENGTH_SHORT).show()
+            val content = edtUrl.text.trim().toString()
+            if (content.length > 5 && !content.substring(0,4).equals("http")) {
+                Toast.makeText(getContext(), "Your url have to start with http", Toast.LENGTH_SHORT).show()
             } else {
                 getListener().forEach { listener ->
-                    listener.onBtnSearchClicked(edtUrl.text.toString())
+                    listener.onBtnSearchClicked(content)
                 }
             }
         }
 
         btnAdd.setOnClickListener {
-            // a little bit tricky here because when we set visibility to gone android will but it back bc the onClick animation
-            btnAdd.postDelayed(hide, 3000)
-
+            addProgressBar.visibility = View.VISIBLE
+            btnAdd.visibility = View.GONE
             getListener().forEach { listener ->
                 listener.onBtnAddClicked(txtWebUrl.text.toString())
             }
@@ -108,6 +110,7 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     }
 
     override fun showResult(channel: RssChannelResultPresentableModel) {
+        val wwwIcDrawable = getContext().getDrawable(R.drawable.ic_www)
         txtTut.visibility = View.GONE
         txtEmptyResult.visibility = View.GONE
         layoutResult.visibility = View.VISIBLE
@@ -116,6 +119,12 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         txtWebUrl.text = channel.url
         btnAdd.visibility = View.VISIBLE
         layoutLoading.visibility = View.GONE
+
+        Log.d("LoadingImage", channel.imageUrl)
+        val glide = Glide.with(getContext())
+            .load(channel.imageUrl)
+            .into(imgWeb)
+        glide.onLoadFailed(wwwIcDrawable)
 
         if (channel.isAdded){
             btnAdd.text = "Added"
@@ -130,6 +139,8 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
 
     override fun loading() {
         txtError.text = ""
+        progressBar.visibility = View.VISIBLE
+        txtError.visibility = View.GONE
         txtEmptyResult.visibility = View.GONE
         layoutResult.visibility = View.GONE
         txtTut.visibility = View.GONE
@@ -140,6 +151,8 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
     override fun error(errorMessage: String) {
         txtEmptyResult.visibility = View.GONE
         txtError.text = errorMessage
+        txtError.visibility = View.VISIBLE
+        progressBar.visibility = View.GONE
         layoutResult.visibility = View.GONE
         txtTut.visibility = View.GONE
         layoutLoading.visibility = View.VISIBLE
