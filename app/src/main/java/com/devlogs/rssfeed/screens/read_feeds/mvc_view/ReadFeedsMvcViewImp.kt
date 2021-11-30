@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
+import com.devlogs.rssfeed.screens.common.RssLinearLayoutManager
 import com.devlogs.rssfeed.screens.read_feeds.controller.FeedsRcvAdapter
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.RssChannelPresentableModel
@@ -73,8 +74,8 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         lvFeeds = findViewById(R.id.lvFeeds)
         toolbar = findViewById(R.id.toolbar)
         feedsRcvAdapter = FeedsRcvAdapter(feeds)
-        lvFeeds.layoutManager = LinearLayoutManager(getContext())
-        lvFeeds.setItemViewCacheSize(50)
+        lvFeeds.layoutManager = RssLinearLayoutManager(getContext())
+        lvFeeds.setItemViewCacheSize(30)
         lvFeeds.setHasFixedSize(true)
         feedsRcvAdapter.setRecyclerView(lvFeeds)
         feedsRcvAdapter.isLoadMoreEnable = false
@@ -94,8 +95,9 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
         feedsRcvAdapter.isLoadMoreEnable = true
-        this.feeds.addAll(feeds)
-        feedsRcvAdapter.notifyItemRangeInserted(this.feeds.size,feeds.size)
+        if (this.feeds.addAll(feeds)) {
+            feedsRcvAdapter.notifyItemRangeInserted(this.feeds.size,feeds.size)
+        }
     }
 
     override fun addNewFeeds(feeds: TreeSet<FeedPresentableModel>) {
@@ -103,8 +105,9 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         feedsRcvAdapter.isLoadMoreEnable = true
         refreshLayout.isRefreshing = false
         feedsRcvAdapter.isLoading = false
-        this.feeds.addAll(feeds)
-        feedsRcvAdapter.notifyItemRangeInserted(0,feeds.size)
+        if (this.feeds.addAll(feeds)) {
+            feedsRcvAdapter.notifyItemRangeInserted(0, feeds.size)
+        }
     }
 
     override fun hideRefreshLayout() {

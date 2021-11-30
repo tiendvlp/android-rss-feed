@@ -3,6 +3,7 @@ package com.devlogs.rssfeed.screens.read_feeds.controller
 import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
+import android.util.Log
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.common.helper.isSameDate
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
@@ -41,12 +42,15 @@ class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) priva
     }
 
     override fun onNewFeed(feeds: TreeSet<FeedEntity>) {
+        Log.d("OnNewFeedConnector", "Feed comming: ${feeds.size}")
         if (stateManager.currentState is DisplayState) {
             val result = TreeSet<FeedPresentableModel>()
             feeds.forEach {
                 result.add(feedEntityToPresentableModel(it))
             }
-            stateManager.consumeAction(NewFeedsAction(result))
+            if (feeds.isNotEmpty()) {
+                stateManager.consumeAction(NewFeedsAction(result))
+            }
         }
     }
 

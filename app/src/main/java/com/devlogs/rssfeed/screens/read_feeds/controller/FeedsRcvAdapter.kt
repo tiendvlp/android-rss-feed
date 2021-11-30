@@ -61,7 +61,7 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
                             dataSource: DataSource?,
                             isFirstResource: Boolean
                         ): Boolean {
-                            return true
+                            return false
                         }
 
                     })
