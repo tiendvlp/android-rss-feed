@@ -1,6 +1,7 @@
 package com.devlogs.rssfeed.screens.read_feeds.mvc_view
 
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toolbar
@@ -26,6 +27,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     private lateinit var lvFeeds: RecyclerView
     private val feeds = TreeSet<FeedPresentableModel> ()
     private val uiToolkit: UIToolkit
+    private lateinit var txtEmptyResult : TextView
     private lateinit var feedsRcvAdapter : FeedsRcvAdapter
     private lateinit var refreshLayout: SwipeRefreshLayout
 
@@ -70,6 +72,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     private fun addControls() {
+        txtEmptyResult = findViewById(R.id.txtEmpty)
         refreshLayout = findViewById(R.id.refresh)
         lvFeeds = findViewById(R.id.lvFeeds)
         toolbar = findViewById(R.id.toolbar)
@@ -92,6 +95,9 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
 
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
+        refreshLayout.isEnabled = true
+        refreshLayout.visibility = View.VISIBLE
+        txtEmptyResult.visibility = View.GONE
         feedsRcvAdapter.isLoadMoreEnable = true
         if (this.feeds.addAll(feeds)) {
             feedsRcvAdapter.notifyItemRangeInserted(this.feeds.size,feeds.size)
@@ -100,6 +106,10 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
 
     override fun addNewFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Add new feeds: ${feeds.size}")
+        refreshLayout.isEnabled = true
+        refreshLayout.visibility = View.VISIBLE
+        txtEmptyResult.visibility = View.GONE
+
         feedsRcvAdapter.isLoadMoreEnable = true
         refreshLayout.isRefreshing = false
         feedsRcvAdapter.isLoading = false
@@ -115,6 +125,13 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     override fun clear() {
         feeds.clear()
         feedsRcvAdapter.notifyDataSetChanged()
+    }
+
+    override fun empty() {
+        refreshLayout.isRefreshing = false
+        refreshLayout.isEnabled = false
+        refreshLayout.visibility = View.GONE
+        txtEmptyResult.visibility = View.VISIBLE
     }
 
 }

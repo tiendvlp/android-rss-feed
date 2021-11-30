@@ -22,6 +22,7 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
     fun addNewFeeds (feeds: TreeSet<FeedPresentableModel>)
     fun hideRefreshLayout()
     fun clear()
+    fun empty()
 }
 
 fun MvcViewFactory.getReadFeedsMvcView (viewGroup: ViewGroup?) : ReadFeedsMvcView = ReadFeedsMvcViewImp(uiToolkit, viewGroup)

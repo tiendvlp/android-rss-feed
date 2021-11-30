@@ -1,8 +1,10 @@
 package com.devlogs.rssfeed.rss_channels
 
 import android.util.Log
+import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
+import com.devlogs.rssfeed.encrypt.UrlEncrypt
 import com.devlogs.rssfeed.rss.RssUrlFinder
 import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -15,7 +17,8 @@ import javax.inject.Inject
 class FindRssChannelByUrlUseCaseSync @Inject constructor(
     private val fireStore: FirebaseFirestore,
     private val rssUrlFinder: RssUrlFinder,
-    private val rssParser: RssParser
+    private val rssParser: RssParser,
+    private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync
 ) {
     sealed class Result {
         data class Found(
@@ -63,12 +66,14 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
             if (comparedUrl[comparedUrl.length-1].equals('/')) {
                 comparedUrl = comparedUrl.substring(0, comparedUrl.length -1)
             }
-            Log.d("FindRssU", "Compare: $comparedUrl")
-            val snapshot =
-                fireStore.collection("RssChannels").whereEqualTo("rssUrl", comparedUrl).get()
+            Log.d("FindRssU", "Compare: ${UrlEncrypt.encode(comparedUrl)}")
+            val getUserResult = getLoggedInUserUseCaseSync.executes() as GetLoggedInUserUseCaseSync.Result.Success
+
+            val addedChannelId =
+                fireStore.collection("Users").document(getUserResult.user.email).collection("AddedChannels").document(UrlEncrypt.encode(comparedUrl)).get()
                     .await()
-            if (!snapshot.isEmpty) {
-                val document = snapshot.documents.first()
+            if (addedChannelId.exists()) {
+                val document = fireStore.collection("RssChannels").document(addedChannelId.get("channelId").toString()).get().await()
                 val addedChannel = RssChannelEntity(
                     document["id"].toString(),
                     document["url"].toString(),

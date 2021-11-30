@@ -28,6 +28,9 @@ class GetUserRssChannelsUseCaseSync @Inject constructor(private val getLoggedInU
         if (getLoggedInUserResult is GetLoggedInUserUseCaseSync.Result.Success) {
            val querySnapshot = fireStore.collection("Users").document(getLoggedInUserResult.user.email).collection("AddedChannels").get().await()
             val addedChannels: HashSet<RssChannelEntity>  = HashSet()
+            if (querySnapshot.isEmpty) {
+                return@withContext Result.Success(addedChannels)
+            }
             try {
                 querySnapshot.forEach {
                     Log.d("GetUserRssChannel", "add: " + it["channelId"].toString())

@@ -38,6 +38,22 @@ sealed class ReadFeedsScreenPresentationState : PresentationState {
         }
     }
 
+    class EmptyState : ReadFeedsScreenPresentationState() {
+        override val allowSave: Boolean
+            get() = true
+
+        override fun consumeAction(
+            previousState: PresentationState,
+            action: PresentationAction
+        ): CauseAndEffect {
+            when (action) {
+                is InitAction -> return CauseAndEffect(action, EmptyState())
+                is UserSelectChannelAction -> return CauseAndEffect(action, InitialLoadingState(action.channelId))
+            }
+            return super.consumeAction(previousState, action)
+        }
+    }
+
     data class InitialLoadingState (val channelId: String) : ReadFeedsScreenPresentationState () {
         override val allowSave: Boolean
             get() = false

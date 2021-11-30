@@ -22,9 +22,12 @@ import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateCh
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
 import com.devlogs.rssfeed.screens.main.MainScreenInsiderListener
 import com.devlogs.rssfeed.screens.main.MainScreenInsiderObservable
+import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.*
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.*
 import dagger.hilt.android.AndroidEntryPoint
+import java.lang.Exception
+import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 
@@ -50,15 +53,22 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     protected lateinit var feedsController: FeedsController
     @Inject
     protected lateinit var newFeedsServiceConnector: NewFeedsServiceConnector
-
+    @Inject
+    protected lateinit var mainScreenNavigator: MainScreenNavigator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val userSelectedChannelId = applicationStateManager.selectedChannelId
-        presentationStateManager.init(savedInstanceState, InitialLoadingState(userSelectedChannelId!!))
+
+        if (userSelectedChannelId == null) {
+            presentationStateManager.init(savedInstanceState, EmptyState())
+        } else {
+            presentationStateManager.init(savedInstanceState, InitialLoadingState(userSelectedChannelId!!))
+
+        }
+
 
         Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName)
-
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -70,14 +80,19 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-
-        val userSelectedChannelId = applicationStateManager.selectedChannelId
-
         mvcView = mvcViewFactory.getReadFeedsMvcView(container)
-        if (presentationStateManager.currentState is DisplayState) {
-            val currentDisplayChannelId = (presentationStateManager.currentState as DisplayState).channelPresentableModel.id
-            if (!currentDisplayChannelId.equals(userSelectedChannelId)) {
-                presentationStateManager.consumeAction(UserSelectChannelAction(userSelectedChannelId!!))
+        val userSelectedChannelId = applicationStateManager.selectedChannelId
+        if (userSelectedChannelId != null) {
+            if (presentationStateManager.currentState is DisplayState) {
+                val currentDisplayChannelId =
+                    (presentationStateManager.currentState as DisplayState).channelPresentableModel.id
+                if (!currentDisplayChannelId.equals(userSelectedChannelId)) {
+                    presentationStateManager.consumeAction(
+                        UserSelectChannelAction(
+                            userSelectedChannelId!!
+                        )
+                    )
+                }
             }
         }
         return mvcView.getRootView()
@@ -95,7 +110,12 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         super.onStop()
         mvcView.unRegister(this)
         presentationStateManager.unRegister(this)
-        requireContext().unbindService(newFeedsServiceConnector)
+        try {
+            requireContext().unbindService(newFeedsServiceConnector)
+        } catch (ex: Exception) {
+            ex.message?.let { Log.w("ReadFeedsFragment", it) }
+        }
+
         mainScreenInsiderObservable.unRegister(this)
     }
 
@@ -128,6 +148,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     ) {
         Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName + " with action: " + action.javaClass.simpleName)
         when (currentState) {
+            is EmptyState -> {
+                mvcView.empty()
+            }
             is InitialLoadingState -> {
                 feedsController.initialLoad()
             }

@@ -25,7 +25,7 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
     private lateinit var btnSignOut: Button
     private lateinit var txtUserName: TextView
     private lateinit var channelAdapter: ChannelRcvAdapter
-
+    private lateinit var txtEmpty : TextView
     private val channels = ArrayList<ChannelPresentableModel> ()
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
@@ -43,7 +43,7 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
         imgAvatar = findViewById(R.id.imgAvatar)
         lvChannels = findViewById(R.id.lvChannels)
         btnSignOut = findViewById(R.id.btnSignOut)
-
+        txtEmpty = findViewById(R.id.txtEmpty)
         channelAdapter = ChannelRcvAdapter(channels)
         lvChannels.layoutManager = LinearLayoutManager(getContext())
         lvChannels.adapter = channelAdapter
@@ -63,16 +63,24 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
     }
 
     override fun loading() {
+        txtEmpty.visibility = View.GONE
         layoutLoading.visibility = View.VISIBLE
         layoutMain.visibility = View.GONE
     }
 
     override fun setChannels(channels: List<ChannelPresentableModel>) {
-        layoutLoading.visibility = View.GONE
         layoutMain.visibility = View.VISIBLE
-        this.channels.clear()
-        this.channels.addAll(channels)
-        channelAdapter.notifyDataSetChanged()
+        if (channels.isEmpty()) {
+            txtEmpty.visibility = View.VISIBLE
+            layoutLoading.visibility = View.GONE
+            lvChannels.visibility = View.GONE
+        } else {
+            layoutLoading.visibility = View.GONE
+            lvChannels.visibility = View.VISIBLE
+            this.channels.clear()
+            this.channels.addAll(channels)
+            channelAdapter.notifyDataSetChanged()
+        }
     }
 
     override fun setUsers(user: UserPresentableModel) {

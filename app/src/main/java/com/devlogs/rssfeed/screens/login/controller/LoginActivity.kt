@@ -88,7 +88,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
                 var request = GraphRequest.newMeRequest(loginResult!!.accessToken) { o, r ->
                     try {
                         val email = o!!.getString("email")
-                        val avatarUrl = "https://graph.facebook.com/\" + loginResult!!.accessToken.userId + \"/picture?return_ssl_resource=1"
+                        val avatarUrl = "https://graph.facebook.com/${loginResult!!.accessToken.userId}/picture?return_ssl_resource=1"
                         val name = o!!.getString("name")
                         login(email,name, avatarUrl)
                         Log.d("LoginFacebook", email)

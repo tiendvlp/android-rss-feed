@@ -58,8 +58,9 @@ class SplashActivity : AppCompatActivity() {
                         Log.w("SplashActivity", "The default selected channel is null")
                         val getChannelResult = getUserRssChannelUseCaseSync.executes()
                         if (getChannelResult is GetUserRssChannelsUseCaseSync.Result.Success) {
-                            Log.d("SplashActivity", "The default selected channel set to ${getChannelResult.channels.elementAt(0).title}")
-                            applicationStateManager.selectedChannelId = getChannelResult.channels.elementAt(0).id
+                            if (getChannelResult.channels.isNotEmpty()) {
+                                applicationStateManager.selectedChannelId = getChannelResult.channels.elementAt(0).id
+                            }
                         } else {
                             Log.e("SplashActivity", "Error happen when initial the default channel, ${getChannelResult.javaClass.simpleName}")
                         }

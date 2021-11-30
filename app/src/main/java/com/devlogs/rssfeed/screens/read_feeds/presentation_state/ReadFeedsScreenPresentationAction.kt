@@ -10,6 +10,7 @@ sealed class ReadFeedsScreenPresentationAction : PresentationAction {
     data class InitialLoadFailedAction (val message: String) : ReadFeedsScreenPresentationAction()
     data class InitialLoadSuccessAction (val feeds: TreeSet<FeedPresentableModel>, val channel: RssChannelPresentableModel, val userAvatar: String) : ReadFeedsScreenPresentationAction()
     data class UserSelectChannelAction (val channelId: String) : ReadFeedsScreenPresentationAction()
+    class EmptyChannelAction  : ReadFeedsScreenPresentationAction()
     class ReloadActionFailed (val message: String): ReadFeedsScreenPresentationAction()
     class ReloadActionSuccess (): ReadFeedsScreenPresentationAction()
     class LoadMoreSuccessAction (val feeds: TreeSet<FeedPresentableModel>) : ReadFeedsScreenPresentationAction()
