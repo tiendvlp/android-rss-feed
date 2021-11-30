@@ -16,7 +16,7 @@ import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class FeedContentActivity : AppCompatActivity() {
+class FeedContentActivity : AppCompatActivity(), FeedContentMvcView.Listener {
 
     data class Param (
         val feedUrl: String,
@@ -84,9 +84,23 @@ class FeedContentActivity : AppCompatActivity() {
         )
     }
 
+    override fun onStart() {
+        super.onStart()
+        mvcView.register(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        mvcView.unRegister(this)
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putSerializable(PARAM_FEED, param)
         super.onSaveInstanceState(outState)
+    }
+
+    override fun onBtnBackClicked() {
+        onBackPressed()
     }
 
 }

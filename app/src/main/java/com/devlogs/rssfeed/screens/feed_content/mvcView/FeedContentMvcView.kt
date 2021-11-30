@@ -7,7 +7,7 @@ import com.devlogs.rssfeed.screens.common.mvcview.ObservableMvcView
 
 interface FeedContentMvcView : ObservableMvcView<FeedContentMvcView.Listener> {
     interface Listener {
-
+        fun onBtnBackClicked()
     }
 
     fun show (feed: FeedPresentableModel)
