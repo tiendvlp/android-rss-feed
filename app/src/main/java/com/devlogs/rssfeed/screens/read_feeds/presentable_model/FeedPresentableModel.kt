@@ -1,15 +1,18 @@
 package com.devlogs.rssfeed.screens.read_feeds.presentable_model
 
+import java.io.Serializable
+
 data class FeedPresentableModel
     ( val id: String,
       val rssChannelId: String,
       val channelTitle: String,
       val title: String,
       val pubDate:Long,
+      val content: String,
       val pubDateInString: String,
       val url: String,
       val author: String,
-      val imageUrl: String?) : Comparable<FeedPresentableModel> {
+      val imageUrl: String?) : Comparable<FeedPresentableModel>, Serializable {
 
 
 

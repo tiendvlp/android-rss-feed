@@ -170,6 +170,7 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
             feedEntity.channelTitle,
             feedEntity.title,
             feedEntity.pubDate,
+            feedEntity.content,
             pubDateInString,
             feedEntity.url,
             feedEntity.author,

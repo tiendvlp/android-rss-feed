@@ -80,8 +80,6 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         feedsRcvAdapter.setRecyclerView(lvFeeds)
         feedsRcvAdapter.isLoadMoreEnable = false
         lvFeeds.adapter = feedsRcvAdapter
-
-
     }
 
     override fun setUserAvatarUrl(url: String) {

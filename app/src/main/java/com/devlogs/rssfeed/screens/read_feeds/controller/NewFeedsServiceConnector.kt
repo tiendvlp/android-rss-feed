@@ -90,6 +90,7 @@ class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) priva
             feedEntity.channelTitle,
             feedEntity.title,
             feedEntity.pubDate,
+            feedEntity.content,
             pubDateInString,
             feedEntity.url,
             feedEntity.author,

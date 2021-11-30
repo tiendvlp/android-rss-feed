@@ -11,7 +11,7 @@ import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationActi
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
-import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
+import com.devlogs.rssfeed.screens.feed_content.controller.FeedContentActivity
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.ReadFeedsMvcView
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.getReadFeedsMvcView
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
@@ -100,6 +100,12 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onFeedClicked(selectedFeeds: FeedPresentableModel) {
         Toast.makeText(requireContext(), selectedFeeds.title, Toast.LENGTH_SHORT).show()
+
+        if (presentationStateManager.currentState is DisplayState) {
+            val param = FeedContentActivity.Param(selectedFeeds.url, selectedFeeds.channelTitle, selectedFeeds.title, selectedFeeds.content,selectedFeeds.author, selectedFeeds.pubDate)
+            FeedContentActivity.start(requireContext(),param)
+        }
+
     }
 
     override fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel) {
