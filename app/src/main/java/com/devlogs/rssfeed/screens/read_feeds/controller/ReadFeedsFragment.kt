@@ -70,8 +70,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
+
         val userSelectedChannelId = applicationStateManager.selectedChannelId
+
         mvcView = mvcViewFactory.getReadFeedsMvcView(container)
         if (presentationStateManager.currentState is DisplayState) {
             val currentDisplayChannelId = (presentationStateManager.currentState as DisplayState).channelPresentableModel.id

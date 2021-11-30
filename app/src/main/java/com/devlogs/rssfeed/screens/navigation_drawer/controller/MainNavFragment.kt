@@ -7,14 +7,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
+import com.devlogs.rssfeed.authentication.SignOutUseCase
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.main.MainActivity
+import com.devlogs.rssfeed.screens.main.MainActivity.Companion.start
 import com.devlogs.rssfeed.screens.main.MainScreenInsiderObservable
 import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.MainNavMvcView
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.getMainNavMvcView
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPresentableModel
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.UserPresentableModel
+import com.devlogs.rssfeed.screens.splash_screen.controller.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.layout_main.*
 import javax.inject.Inject
@@ -32,6 +35,8 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
     protected lateinit var mainScreenNavigator: MainScreenNavigator
     @Inject
     protected lateinit var mainScreenInsiderObservable: MainScreenInsiderObservable
+    @Inject
+    protected lateinit var signOutUseCase: SignOutUseCase
 
     private lateinit var mvcView: MainNavMvcView
 
@@ -69,7 +74,9 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
     }
 
     override fun onBtnSignOutClicked() {
-        Toast.makeText(requireContext(), "SignOut", Toast.LENGTH_LONG).show()
+        signOutUseCase.executes()
+        SplashActivity.start(requireContext())
+        requireActivity().finishAffinity()
     }
 
     override fun onChannelSelected(channel: ChannelPresentableModel) {

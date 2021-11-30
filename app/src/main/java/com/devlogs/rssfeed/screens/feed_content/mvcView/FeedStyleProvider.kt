@@ -10,10 +10,15 @@ class FeedStyleProvider {
                 }
                 
                 body {
+                    padding-top:24px;
                     font-size: 14px;
                 }
                 
                 a {
+        	        color: white;
+                }
+                
+                h1, h2, h3, h4, h5, h6 {
         	        color: white
                 }
                 
@@ -105,8 +110,8 @@ class FeedStyleProvider {
                 <span class="v3_849"><br/>         
                     <div class="v3_805">
                     <span class="v3_844">_feedTitle</span> 
-                </span> 
-                <span> _content </span>
+                </span> <br/>
+                <span> <br/> _content </span>
                 <div class="visitOutline">
                     <span><a class="aref" href="_feedUrl">Visit Website</a></span> 
                 </div>

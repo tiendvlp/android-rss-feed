@@ -1,43 +1,32 @@
 package com.devlogs.rssfeed.screens.splash_screen.controller
 
-import android.content.ComponentName
-import android.content.ServiceConnection
-import android.content.SharedPreferences
+import android.content.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.IBinder
-import android.text.Html
 import android.util.Log
-import android.webkit.WebView
-import android.widget.ImageView
 import android.widget.Toast
-import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
-import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.ValidateLoginUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
-import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_EMAIL
-import com.devlogs.rssfeed.common.shared_context.AppConfig.SharedPreferencesKey.USER_NAME
-import com.devlogs.rssfeed.domain.entities.FeedEntity
-import com.devlogs.rssfeed.encrypt.UrlEncrypt
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
 import com.devlogs.rssfeed.rss_channels.AddNewRssChannelByRssUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.FindRssChannelByUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.login.controller.LoginActivity
 import com.devlogs.rssfeed.screens.main.MainActivity
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
-import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
-import org.sufficientlysecure.htmltextview.HtmlResImageGetter
-import org.sufficientlysecure.htmltextview.HtmlTextView
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
+
+    companion object {
+        fun start (context: Context) {
+            context.startActivity(Intent(context, SplashActivity::class.java))
+        }
+    }
 
     @Inject
     protected lateinit var sharedPreferences: SharedPreferences;
@@ -60,6 +49,7 @@ class SplashActivity : AppCompatActivity() {
 
         CoroutineScope(BackgroundDispatcher).launch {
             withContext(Dispatchers.Main.immediate) {
+                delay(3000)
                 if (applicationStateManager.user == null) {
                     LoginActivity.start(this@SplashActivity)
                 } else {
