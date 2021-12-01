@@ -13,7 +13,6 @@ import com.devlogs.rssfeed.screens.common.mvcview.BaseMvcView
 import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 
 class CategoriesMvcViewImp : BaseMvcView<CategoriesMvcView.Listener>, CategoriesMvcView {
-
     private val uiToolkit: UIToolkit
     private lateinit var lvCategories : RecyclerView
     private lateinit var toolbar : Toolbar
