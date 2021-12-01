@@ -13,7 +13,7 @@ import javax.inject.Inject
 class CreateCategoryUseCaseSync @Inject constructor(private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync, private val fireStore: FirebaseFirestore){
 
     sealed class Result {
-        class Success (createdCategory : CategoryEntity) : Result()
+        data class Success (val createdCategory : CategoryEntity) : Result()
         class AlreadyExist () : Result()
         class UnAuthorized () : Result ()
         class GeneralError (errorMessage: String?) : Result ()

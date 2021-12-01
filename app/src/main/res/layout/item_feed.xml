@@ -55,7 +55,6 @@
         app:layout_constraintTop_toTopOf="@id/txtPubDate"
         app:layout_constraintBottom_toBottomOf="@id/txtPubDate"
         android:scaleType="centerInside"
-        android:visibility="gone"
         android:tint="@color/white"
         app:layout_constraintRight_toRightOf="@id/txtTitle"
         />

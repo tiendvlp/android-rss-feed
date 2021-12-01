@@ -11,6 +11,7 @@ import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationActi
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
+import com.devlogs.rssfeed.screens.bottomsheet_categories.CategoriesBottomSheet
 import com.devlogs.rssfeed.screens.feed_content.controller.FeedContentActivity
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.ReadFeedsMvcView
 import com.devlogs.rssfeed.screens.read_feeds.mvc_view.getReadFeedsMvcView
@@ -27,6 +28,7 @@ import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreen
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.*
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.element_bottom_navigation.*
 import java.lang.Exception
 import java.util.*
 import javax.inject.Inject
@@ -42,6 +44,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     @Inject
     protected lateinit var mvcViewFactory: MvcViewFactory
+    @Inject
+    protected lateinit var categoriesBottomSheet: CategoriesBottomSheet
     @Inject
     protected lateinit var applicationStateManager: ApplicationStateManager
     @Inject
@@ -101,6 +105,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onStart() {
         super.onStart()
+        categoriesBottomSheet.show(requireContext())
         mvcView.register(this)
         mainScreenInsiderObservable.register(this)
 
@@ -132,6 +137,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel) {
         Toast.makeText(requireContext(),"Saved: " + selectedFeeds.title, Toast.LENGTH_SHORT).show()
+        categoriesBottomSheet.setSelectedFeedId(selectedFeeds.id)
+        categoriesBottomSheet.show(requireContext())
     }
 
     override fun onLoadMoreFeeds() {

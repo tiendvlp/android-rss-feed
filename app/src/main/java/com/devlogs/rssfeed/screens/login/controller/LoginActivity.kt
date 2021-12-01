@@ -138,7 +138,6 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
     private fun login (email: String, name: String, avatarUrl: String) {
         loginController.register(this)
         loginController.login(email,name, avatarUrl)
-
     }
 
     override fun loginSuccess() {
@@ -146,7 +145,9 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
         CoroutineScope(Dispatchers.Main.immediate).launch {
             val result = getUserRssChannelUseCaseSync.executes()
             if (result is GetUserRssChannelsUseCaseSync.Result.Success) {
-                applicationStateManager.selectedChannelId = result.channels.elementAt(0).id
+                if (result.channels.isNotEmpty()) {
+                    applicationStateManager.selectedChannelId = result.channels.elementAt(0).id
+                }
             }
             MainActivity.start(this@LoginActivity)
         }
