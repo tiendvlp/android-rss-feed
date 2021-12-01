@@ -2,8 +2,7 @@ package com.devlogs.rssfeed.screens.feed_content.controller
 
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import com.devlogs.rssfeed.screens.feed_content.mvcView.FeedContentMvcView
-import com.devlogs.rssfeed.screens.feed_content.mvcView.FeedContentMvcViewImp
+import com.devlogs.rssfeed.screens.feed_content.mvc_view.FeedContentMvcView
 import android.content.Intent
 import android.net.Uri
 

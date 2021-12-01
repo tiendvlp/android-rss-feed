@@ -1,4 +1,4 @@
-package com.devlogs.rssfeed.screens.feed_content.mvcView
+package com.devlogs.rssfeed.screens.feed_content.mvc_view
 
 import com.devlogs.rssfeed.screens.feed_content.presentable_model.FeedPresentableModel
 

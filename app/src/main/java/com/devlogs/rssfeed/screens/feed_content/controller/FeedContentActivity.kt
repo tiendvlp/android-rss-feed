@@ -5,8 +5,8 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import com.devlogs.rssfeed.screens.feed_content.mvcView.FeedContentMvcView
-import com.devlogs.rssfeed.screens.feed_content.mvcView.getFeedContentMvcView
+import com.devlogs.rssfeed.screens.feed_content.mvc_view.FeedContentMvcView
+import com.devlogs.rssfeed.screens.feed_content.mvc_view.getFeedContentMvcView
 import com.devlogs.rssfeed.screens.feed_content.presentable_model.FeedPresentableModel
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import dagger.hilt.android.AndroidEntryPoint

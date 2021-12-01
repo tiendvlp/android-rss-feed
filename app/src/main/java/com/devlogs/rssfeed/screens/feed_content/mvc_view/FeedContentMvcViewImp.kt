@@ -1,4 +1,4 @@
-package com.devlogs.rssfeed.screens.feed_content.mvcView
+package com.devlogs.rssfeed.screens.feed_content.mvc_view
 
 import android.view.View
 import android.view.ViewGroup
