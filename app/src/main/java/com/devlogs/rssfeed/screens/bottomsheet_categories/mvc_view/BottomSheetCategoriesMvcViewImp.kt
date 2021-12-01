@@ -17,7 +17,7 @@ class BottomSheetCategoriesMvcViewImp : BaseMvcView<BottomSheetCategoriesMvcView
     private val uiToolkit: UIToolkit
     private lateinit var edtCategoryName: EditText
     private lateinit var btnCreate:  Button
-    private lateinit var progressBar: ProgressBar
+    private lateinit var layoutLoading: LinearLayout
     private lateinit var  txtEmpty : TextView
     private lateinit var lvCategories : RecyclerView
     private lateinit var btnConfirm : Button
@@ -32,14 +32,13 @@ class BottomSheetCategoriesMvcViewImp : BaseMvcView<BottomSheetCategoriesMvcView
         addControls()
         addEvents()
         controller.setMvcView(this)
-        controller.getCategories()
     }
 
     private fun addControls() {
         edtCategoryName = findViewById(R.id.edtCategoryName)
         btnCreate = findViewById(R.id.btnCreate)
         btnConfirm = findViewById(R.id.btnConfirm)
-        progressBar = findViewById(R.id.progressBar)
+        layoutLoading = findViewById(R.id.layoutLoading)
         txtEmpty = findViewById(R.id.txtEmpty)
         lvCategories = findViewById(R.id.lvCategories)
         lvCategories.layoutManager = LinearLayoutManager(getContext())
@@ -64,6 +63,9 @@ class BottomSheetCategoriesMvcViewImp : BaseMvcView<BottomSheetCategoriesMvcView
 
 
     override fun setCategories(categories: Set<CategoryPresentableModel>) {
+        txtEmpty.visibility = View.GONE
+        lvCategories.visibility = View.VISIBLE
+        layoutLoading.visibility = View.GONE
         this.categories.clear()
         this.categories.addAll(categories)
         Log.d("CategoriesMvcViewImp", "Show: " + categories.size)
@@ -82,12 +84,12 @@ class BottomSheetCategoriesMvcViewImp : BaseMvcView<BottomSheetCategoriesMvcView
     override fun loading() {
         txtEmpty.visibility = View.GONE
         lvCategories.visibility = View.GONE
-        progressBar.visibility = View.VISIBLE
+        layoutLoading.visibility = View.VISIBLE
     }
 
     override fun showEmptyNotification() {
         txtEmpty.visibility = View.VISIBLE
         lvCategories.visibility = View.GONE
-        progressBar.visibility = View.GONE
+        layoutLoading.visibility = View.GONE
     }
 }

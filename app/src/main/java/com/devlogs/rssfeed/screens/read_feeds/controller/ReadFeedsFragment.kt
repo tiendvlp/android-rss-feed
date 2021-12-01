@@ -105,7 +105,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onStart() {
         super.onStart()
-        categoriesBottomSheet.show(requireContext())
         mvcView.register(this)
         mainScreenInsiderObservable.register(this)
 
@@ -137,8 +136,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel) {
         Toast.makeText(requireContext(),"Saved: " + selectedFeeds.title, Toast.LENGTH_SHORT).show()
-        categoriesBottomSheet.setSelectedFeedId(selectedFeeds.id)
-        categoriesBottomSheet.show(requireContext())
+        categoriesBottomSheet.show(requireContext(), selectedFeeds.id)
     }
 
     override fun onLoadMoreFeeds() {

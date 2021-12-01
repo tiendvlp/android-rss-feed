@@ -1,7 +1,9 @@
 package com.devlogs.rssfeed.screens.bottomsheet_categories.controller
 
+import android.util.Log
 import com.devlogs.rssfeed.categories.AddFeedToCategoryUseCaseSync
 import com.devlogs.rssfeed.categories.CreateCategoryUseCaseSync
+import com.devlogs.rssfeed.categories.GetFeedCategoriesUseCaseSync
 import com.devlogs.rssfeed.categories.GetUserCategoriesUseCaseSync
 import com.devlogs.rssfeed.screens.bottomsheet_categories.mvc_view.BottomSheetCategoriesMvcView
 import com.devlogs.rssfeed.screens.bottomsheet_categories.presentable_model.CategoryPresentableModel
@@ -12,6 +14,7 @@ import javax.inject.Inject
 
 class CategoriesController @Inject constructor(private val addFeedToCategoryUseCaseSync: AddFeedToCategoryUseCaseSync,
                                                private val createCategoryUseCaseSync: CreateCategoryUseCaseSync,
+                                               private val getFeedCategoriesUseCaseSync: GetFeedCategoriesUseCaseSync,
                                                private val getUserCategoriesUseCaseSync: GetUserCategoriesUseCaseSync) : BottomSheetCategoriesMvcView.Listener {
 
 
@@ -25,6 +28,8 @@ class CategoriesController @Inject constructor(private val addFeedToCategoryUseC
     }
 
     fun getCategories () {
+        mvcView.loading()
+        Log.d("GetCategoriesController", "Runnn")
         coroutine.launch {
             val result = getUserCategoriesUseCaseSync.executes()
 
@@ -32,7 +37,18 @@ class CategoriesController @Inject constructor(private val addFeedToCategoryUseC
                 if (result.categories.isEmpty()) {
                     mvcView.showEmptyNotification()
                 } else {
-                    mvcView.setCategories(result.categories.map { CategoryPresentableModel(it.title) }.toSet())
+                    val getFeedCategoryResult = getFeedCategoriesUseCaseSync.executes(selectedFeedId)
+                    val pm = HashSet<CategoryPresentableModel> ()
+                    if (getFeedCategoryResult is GetFeedCategoriesUseCaseSync.Result.Success) {
+                        Log.d("GetCategoriesController", "Success")
+                        result.categories.forEach {
+                            pm.add(CategoryPresentableModel(it.title, getFeedCategoryResult.categories.find { e -> e.title.equals(it.title) } != null))
+                        }
+                    }
+                    pm.forEach {
+                        Log.d("GetCategoriesController", it.title)
+                    }
+                    mvcView.setCategories(pm)
                 }
             } else {
                 mvcView.toast("Internal server error")
@@ -51,7 +67,7 @@ class CategoriesController @Inject constructor(private val addFeedToCategoryUseC
                 mvcView.toast("Internal error")
             }
             else if (result is CreateCategoryUseCaseSync.Result.Success) {
-                mvcView.addNewCategories (CategoryPresentableModel(result.createdCategory.title))
+                mvcView.addNewCategories (CategoryPresentableModel(result.createdCategory.title, true))
                 mvcView.toast("Success")
             }
 

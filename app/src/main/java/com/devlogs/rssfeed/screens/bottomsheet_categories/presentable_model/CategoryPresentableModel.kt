@@ -1,7 +1,7 @@
 package com.devlogs.rssfeed.screens.bottomsheet_categories.presentable_model
 
 
-data class CategoryPresentableModel (val title : String) : Comparable<CategoryPresentableModel> {
+data class CategoryPresentableModel (val title : String, val added: Boolean) : Comparable<CategoryPresentableModel> {
 
     override fun compareTo(other: CategoryPresentableModel): Int {
         if (other == this) {
@@ -12,7 +12,7 @@ data class CategoryPresentableModel (val title : String) : Comparable<CategoryPr
             return 0
         }
 
-        return title.compareTo(other.title)
+        return 1
     }
 
 }

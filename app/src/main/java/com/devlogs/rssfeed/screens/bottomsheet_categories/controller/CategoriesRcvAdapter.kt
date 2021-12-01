@@ -19,15 +19,22 @@ class CategoriesRcvAdapter : RecyclerView.Adapter<CategoriesRcvAdapter.ViewHolde
 
         internal fun bind (category: CategoryPresentableModel) {
             txtTitle.text = category.title
+            if (category.added) {
+                checkBox.isEnabled = true
+                checkBox.isChecked = true
+                checkBox.isEnabled = false
+            } else {
+                checkBox.isEnabled = true
+                checkBox.isChecked = false
+            }
             checkBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked) {
+                if (isChecked && buttonView.isEnabled) {
                     checkedCategories.add(category)
                 } else {
                     checkedCategories.remove(category)
                 }
             }
         }
-
     }
 
     val checkedCategories = HashSet<CategoryPresentableModel> ()

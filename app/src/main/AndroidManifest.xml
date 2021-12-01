@@ -16,9 +16,11 @@
         <activity
             android:name=".screens.feed_content.controller.FeedContentActivity"
             android:exported="false"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
             android:name=".screens.main.MainActivity"
+            android:screenOrientation="portrait"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
@@ -26,6 +28,7 @@
 
         <activity
             android:name=".screens.splash_screen.controller.SplashActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,6 +38,7 @@
         </activity>
         <activity
             android:name=".screens.login.controller.LoginActivity"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
         <meta-data

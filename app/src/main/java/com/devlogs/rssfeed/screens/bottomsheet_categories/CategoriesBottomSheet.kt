@@ -13,23 +13,20 @@ class CategoriesBottomSheet @Inject constructor(private val mvcViewFactory: MvcV
 
     private lateinit var bottomSheet : BottomSheetDialog
     private val mvcView : BottomSheetCategoriesMvcView = mvcViewFactory.getBottomSheetCategoriesMvcView(controller)
-
-    fun show (context: Context) {
+    fun show (context: Context, feedId: String) {
         if (!::bottomSheet.isInitialized) {
             bottomSheet = BottomSheetDialog(context)
             bottomSheet.setContentView(mvcView.getRootView())
         }
 
         bottomSheet.show()
+        controller.setSelectedFeed(feedId)
+        controller.getCategories()
     }
 
     fun dismiss () {
         bottomSheet.dismissWithAnimation = true
         bottomSheet.dismiss()
-    }
-
-    fun setSelectedFeedId (feedId: String) {
-        controller.setSelectedFeed(feedId)
     }
 
 }
