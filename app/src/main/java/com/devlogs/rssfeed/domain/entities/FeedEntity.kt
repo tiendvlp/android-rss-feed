@@ -1,7 +1,5 @@
 package com.devlogs.rssfeed.domain.entities
 
-import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
-
 data class FeedEntity
                 (
                 val id: String,

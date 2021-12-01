@@ -14,6 +14,7 @@ class CreateCategoryUseCaseSync @Inject constructor(private val getLoggedInUserU
 
     sealed class Result {
         class Success (createdCategory : CategoryEntity) : Result()
+        class AlreadyExist () : Result()
         class UnAuthorized () : Result ()
         class GeneralError (errorMessage: String?) : Result ()
     }
@@ -28,15 +29,18 @@ class CreateCategoryUseCaseSync @Inject constructor(private val getLoggedInUserU
         }
 
         if (getUserResult is GetLoggedInUserUseCaseSync.Result.Success) {
-            val newDoc = fireStore
+            try {
+                val docRef = fireStore
                 .collection("Users")
                 .document(getUserResult.user.email)
-                .collection("Categories").document()
+                .collection("Categories").document(title)
 
-            val generatedId = newDoc.id
-            val newCategory = CategoryEntity(generatedId, title)
-            try {
-                newDoc.set(newCategory).await()
+                if (docRef.get().await().exists()) {
+                    return@withContext Result.AlreadyExist()
+                }
+
+                val newCategory = CategoryEntity(title)
+                docRef.set(newCategory).await()
                 return@withContext Result.Success(newCategory)
             } catch (ex: Exception) {
                 return@withContext Result.GeneralError(ex.message)

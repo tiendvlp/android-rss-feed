@@ -13,6 +13,7 @@ class AddFeedToCategoryUseCaseSync  @Inject constructor(private val getLoggedInU
 
     sealed class Result {
         class Success () : Result()
+        class AlreadyExist () : Result()
         class UnAuthorized () : Result ()
         class GeneralError (errorMessage: String?) : Result ()
     }
@@ -28,15 +29,20 @@ class AddFeedToCategoryUseCaseSync  @Inject constructor(private val getLoggedInU
 
         if (getUserResult is GetLoggedInUserUseCaseSync.Result.Success) {
             try {
-                val snapshot = fireStore.collection("Users")
+                val doc = fireStore.collection("Users")
                     .document(getUserResult.user.email)
                     .collection("Categories")
                     .document(categoryId)
-                    .collection("Feeds").document(feedId).set(
-                        hashMapOf(
-                            "id" to feedId
-                        )
-                    ).await()
+                    .collection("Feeds").document(feedId)
+
+                if (doc.get().await().exists()) {
+                    return@withContext Result.AlreadyExist()
+                }
+                doc.set(
+                    hashMapOf(
+                        "id" to feedId
+                    )
+                ).await()
             } catch (ex: Exception) {
                 return@withContext Result.GeneralError(ex.message)
             }

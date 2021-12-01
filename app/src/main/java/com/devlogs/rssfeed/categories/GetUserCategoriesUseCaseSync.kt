@@ -38,7 +38,6 @@ class GetUserCategoriesUseCaseSync @Inject constructor (private val getLoggedInU
                 snapShot.documents.forEach { doc ->
                     categories.add(
                         CategoryEntity(
-                        doc.getString("id")!!,
                         doc.getString("title")!!,
                         )
                     )

@@ -1,6 +1,6 @@
 package com.devlogs.rssfeed.domain.entities
 
-data class CategoryEntity (val id: String, val title : String) : Comparable<CategoryEntity> {
+data class CategoryEntity (val title : String) : Comparable<CategoryEntity> {
 
 
     override fun compareTo(other: CategoryEntity): Int {
@@ -8,7 +8,7 @@ data class CategoryEntity (val id: String, val title : String) : Comparable<Cate
             return 0
         }
 
-        if (other.id.equals(id)) {
+        if (other.title.equals(title)) {
             return 0
         }
 
