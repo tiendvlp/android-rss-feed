@@ -1,9 +1,11 @@
 package com.devlogs.rssfeed.screens.categories.controllers
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebView
@@ -31,6 +33,7 @@ class CategoriesRcvAdapter : RecyclerView.Adapter<CategoriesRcvAdapter.ViewHolde
         private val imgHtml1 : WebView = view.findViewById(R.id.imgHtml1)
         private val imgHtml2 : WebView = view.findViewById(R.id.imgHtml2)
         private val imgHtml3 : WebView = view.findViewById(R.id.imgHtml3)
+        @SuppressLint("ClickableViewAccessibility")
         internal fun bind (category: CategoryPresentableModel) {
             txtTitle.text = category.title
             img1.clipToOutline = true
@@ -67,6 +70,30 @@ class CategoriesRcvAdapter : RecyclerView.Adapter<CategoriesRcvAdapter.ViewHolde
                 imgHtml3.visibility = View.GONE
                 img3.visibility = View.VISIBLE
                 img3.setImageResource(R.drawable.ic_off)
+            }
+
+            imgHtml1.setOnTouchListener { v, event ->
+
+                if (v.getId() == R.id.imgHtml1 && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    onItemClicked?.invoke(category)
+                }
+                return@setOnTouchListener false
+            }
+
+            imgHtml2.setOnTouchListener { v, event ->
+
+                if (v.getId() == R.id.imgHtml2 && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    onItemClicked?.invoke(category)
+                }
+                return@setOnTouchListener false
+            }
+
+            imgHtml3.setOnTouchListener { v, event ->
+
+                if (v.getId() == R.id.imgHtml3 && event.getAction() == MotionEvent.ACTION_DOWN) {
+                    onItemClicked?.invoke(category)
+                }
+                return@setOnTouchListener false
             }
 
             view.setOnClickListener {

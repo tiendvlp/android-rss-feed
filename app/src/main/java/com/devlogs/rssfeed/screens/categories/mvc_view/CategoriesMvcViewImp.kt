@@ -43,6 +43,8 @@ class CategoriesMvcViewImp : BaseMvcView<CategoriesMvcView.Listener>, Categories
         progressBar = findViewById(R.id.progressBar)
         categoriesAdapter = CategoriesRcvAdapter(categories)
         lvCategories.layoutManager = LinearLayoutManager(getContext())
+        lvCategories.setItemViewCacheSize(30)
+        lvCategories.setHasFixedSize(true)
         lvCategories.adapter = categoriesAdapter
 
     }
