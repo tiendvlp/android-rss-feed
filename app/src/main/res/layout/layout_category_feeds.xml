@@ -40,6 +40,8 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lvFeeds"
+        android:layout_marginLeft="@dimen/margin_left"
+        android:layout_marginRight="@dimen/margin_right"
         app:layout_constraintTop_toBottomOf="@id/toolbar"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

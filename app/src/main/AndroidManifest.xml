@@ -15,9 +15,8 @@
         android:usesCleartextTraffic="true">
         <activity
             android:name=".screens.category_feeds.controllers.CategoryFeedsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".screens.categories.controllers.CategoriesActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:screenOrientation="portrait"
             android:exported="false" />
         <activity
             android:name=".screens.feed_content.controller.FeedContentActivity"

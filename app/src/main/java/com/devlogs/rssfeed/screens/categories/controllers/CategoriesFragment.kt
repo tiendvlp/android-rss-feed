@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import com.devlogs.rssfeed.screens.categories.mvc_view.CategoriesMvcView
 import com.devlogs.rssfeed.screens.categories.mvc_view.getCategoriesFullMvcView
 import com.devlogs.rssfeed.screens.categories.presentable_model.CategoryPresentableModel
+import com.devlogs.rssfeed.screens.category_feeds.controllers.CategoryFeedsActivity
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -53,7 +54,7 @@ class CategoriesFragment : Fragment(), CategoriesMvcView.Listener {
     }
 
     override fun onItemClicked(category: CategoryPresentableModel) {
-        Toast.makeText(context, "Selected: ${category.title}", Toast.LENGTH_LONG).show()
+        CategoryFeedsActivity.start(requireContext(), category.title)
     }
 
 }

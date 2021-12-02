@@ -1,8 +1,8 @@
 package com.devlogs.rssfeed.screens.category_feeds.mvc_view
 
 import android.view.View
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.devlogs.rssfeed.R
@@ -18,18 +18,30 @@ class CategoryFeedsMvcViewImp : BaseMvcView<CategoryFeedsMvcView.Listener> , Cat
     private lateinit var txtEmpty : TextView
     private lateinit var lvFeeds: RecyclerView
     private lateinit var progressBar: ProgressBar
+    private lateinit var toolbar: Toolbar
+    private lateinit var btnToolbarBack: ImageButton
     private val feeds = TreeSet<FeedPresentableModel> ()
     private lateinit var feedAdapter : FeedsRcvAdapter
+    private lateinit var txtToolbarTitle: TextView
 
-    constructor(uiToolkit: UIToolkit) {
+    constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
         this.uiToolkit = uiToolkit
-
+        setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_category_feeds, viewGroup, false))
         addControls()
+        setupToolbar()
         addEvents()
+    }
+
+    private fun setupToolbar() {
+        val layoutToolbar = uiToolkit.layoutInflater.inflate(R.layout.layout_title_back_toolbar, toolbar, false)
+        toolbar.addView(layoutToolbar)
+        btnToolbarBack = layoutToolbar.findViewById(R.id.btnBack)
+        txtToolbarTitle = layoutToolbar.findViewById(R.id.txtTitle)
     }
 
     private fun addControls() {
         txtEmpty = findViewById(R.id.txtEmpty)
+        toolbar = findViewById(R.id.toolbar)
         lvFeeds = findViewById(R.id.lvFeeds)
         progressBar = findViewById(R.id.progressBar)
         feedAdapter = FeedsRcvAdapter(feeds)
@@ -43,6 +55,12 @@ class CategoryFeedsMvcViewImp : BaseMvcView<CategoryFeedsMvcView.Listener> , Cat
         feedAdapter.onFeedClicked = {
             getListener().forEach { listener ->
                 listener.onFeedSelected (it)
+            }
+        }
+
+        btnToolbarBack.setOnClickListener {
+            getListener().forEach { listener ->
+                listener.onBackClicked()
             }
         }
     }
@@ -59,6 +77,10 @@ class CategoryFeedsMvcViewImp : BaseMvcView<CategoryFeedsMvcView.Listener> , Cat
         progressBar.visibility = View.GONE
     }
 
+    override fun setTitle(title: String) {
+        txtToolbarTitle.text = title
+    }
+
     override fun setFeeds(feeds: Set<FeedPresentableModel>) {
         txtEmpty.visibility = View.GONE
         lvFeeds.visibility = View.VISIBLE
@@ -68,5 +90,9 @@ class CategoryFeedsMvcViewImp : BaseMvcView<CategoryFeedsMvcView.Listener> , Cat
         if (this.feeds.addAll(feeds)) {
             feedAdapter.notifyDataSetChanged()
         }
+    }
+
+    override fun toast(message: String) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show()
     }
 }
