@@ -3,8 +3,8 @@
 # android-rss-feed
 
 ## Introduction:
+# Collect all of your favorite news and bring it to a single place
 
-Collect all of your favorite news and bring it to a single place
 ![intro](https://user-images.githubusercontent.com/27767477/144408998-be1d23a1-35b0-4bf0-8d98-397bb43b3dc6.gif)
 
 ## How to Build
