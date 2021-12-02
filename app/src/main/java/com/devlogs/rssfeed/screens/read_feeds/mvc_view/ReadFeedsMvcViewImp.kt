@@ -119,7 +119,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         refreshLayout.isRefreshing = false
         feedsRcvAdapter.isLoading = false
         if (this.feeds.addAll(feeds)) {
-            feedsRcvAdapter.notifyItemRangeInserted(0, this.feeds.size - oldSize)
+            feedsRcvAdapter.notifyDataSetChanged()
         }
         lvFeeds.scrollToPosition(0)
     }
