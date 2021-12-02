@@ -13,13 +13,13 @@ import javax.inject.Inject
 class GetFeedsByCategoryUseCaseSync @Inject constructor(private val fireStore: FirebaseFirestore, private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync){
 
     sealed class Result {
-        class Success (feeds: Set<FeedEntity>) : Result()
+        data class Success (val feeds: Set<FeedEntity>) : Result()
         class UnAuthorized () : Result()
-        class GeneralError (message: String?) : Result()
+        data class GeneralError (val message: String?) : Result()
     }
 
 
-    suspend fun executes (categoryTitle: String) : Result = withContext(BackgroundDispatcher) {
+    suspend fun executes (categoryTitle: String, count: Long) : Result = withContext(BackgroundDispatcher) {
 
         val getUserResult = getLoggedInUserUseCaseSync.executes()
 
@@ -34,6 +34,7 @@ class GetFeedsByCategoryUseCaseSync @Inject constructor(private val fireStore: F
                     .collection("Categories")
                     .document(categoryTitle)
                     .collection("Feeds")
+                    .limit(count)
                     .get().await()
 
                 val feedIds = ArrayList<String>()

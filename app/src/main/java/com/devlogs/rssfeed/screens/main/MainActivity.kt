@@ -80,7 +80,7 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
         }
         grBottomNav.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
-                rbtnFavoriteFeed.id -> mainScreenNavigator.switchToSavedFeedsTab()
+                rbtnFavoriteFeed.id -> mainScreenNavigator.switchToCategoriesFeedsTab()
                 rbtnReadFeeds.id -> mainScreenNavigator.switchToFeedsTab()
                 rbtnAddChannel.id -> mainScreenNavigator.switchToAddChannelTab()
             }

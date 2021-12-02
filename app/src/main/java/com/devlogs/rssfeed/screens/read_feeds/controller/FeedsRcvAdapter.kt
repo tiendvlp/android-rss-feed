@@ -32,7 +32,6 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private val imgHtml : HtmlTextView = view.findViewById(R.id.imgHtml)
         private val btnSaved: ImageButton = view.findViewById(R.id.btnSaved)
         fun bind (feed: FeedPresentableModel) {
-            Log.d("FeedsViewHolder", "Binding: ${feed.title}")
             txtAuthor.text = if (feed.author.isEmpty()) feed.channelTitle else "${feed.author} at ${feed.channelTitle}"
             txtPubDate.text = feed.pubDateInString
             txtTitle.text = feed.title

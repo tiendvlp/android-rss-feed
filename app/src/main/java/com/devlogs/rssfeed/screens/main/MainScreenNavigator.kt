@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.devlogs.rssfeed.screens.read_feeds.controller.ReadFeedsFragment
 import com.devlogs.rssfeed.screens.add_rss_channel.controller.AddRssChannelFragment
-import com.devlogs.rssfeed.screens.saved_feeds.controller.SavedFeedsFragment
+import com.devlogs.rssfeed.screens.categories.controllers.CategoriesFragment
 import com.ncapdevi.fragnav.FragNavController
 import com.ncapdevi.fragnav.FragNavController.Companion.TAB1
 import com.ncapdevi.fragnav.FragNavController.Companion.TAB2
@@ -17,17 +17,17 @@ class MainScreenNavigator {
         override val numberOfRootFragments: Int
             get() = 3
 
-    private lateinit var savedFeedsFragment: SavedFeedsFragment
+    private lateinit var categoriesFeedsFragment: CategoriesFragment
     private lateinit var readFeedsFragment: ReadFeedsFragment
     private lateinit var addRssChannelFragment: AddRssChannelFragment
 
         override fun getRootFragment(index: Int): Fragment {
             return when (index) {
                 TAB1 -> {
-                    if (!::savedFeedsFragment.isInitialized) {
-                        savedFeedsFragment = SavedFeedsFragment.newInstance()
+                    if (!::categoriesFeedsFragment.isInitialized) {
+                        categoriesFeedsFragment = CategoriesFragment.newInstance()
                     }
-                    savedFeedsFragment
+                    categoriesFeedsFragment
                 }
                 TAB2 -> {
                     if (!::readFeedsFragment.isInitialized) {
@@ -67,7 +67,7 @@ class MainScreenNavigator {
         fragNavController.switchTab(TAB2)
     }
 
-    fun switchToSavedFeedsTab () {
+    fun switchToCategoriesFeedsTab () {
         fragNavController.switchTab(TAB1)
     }
 

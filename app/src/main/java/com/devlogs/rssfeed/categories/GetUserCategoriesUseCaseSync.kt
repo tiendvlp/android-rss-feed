@@ -14,7 +14,7 @@ class GetUserCategoriesUseCaseSync @Inject constructor (private val getLoggedInU
     sealed class Result {
         data class Success (val categories: Set<CategoryEntity>) : Result()
         class UnAuthorized() : Result()
-        class GeneralError (errorMessage: String) : Result()
+        data class GeneralError (val errorMessage: String) : Result()
     }
 
 

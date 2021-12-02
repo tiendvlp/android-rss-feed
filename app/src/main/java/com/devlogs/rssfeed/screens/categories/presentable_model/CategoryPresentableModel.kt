@@ -1,7 +1,7 @@
 package com.devlogs.rssfeed.screens.categories.presentable_model
 
 
-data class CategoryPresentableModel (val title : String, val added: Boolean, val feedImg1 : String, val feedImg2: String, val feedImg3: String) : Comparable<CategoryPresentableModel> {
+data class CategoryPresentableModel (val title : String, val feedImgs: List<String?>) : Comparable<CategoryPresentableModel> {
 
     override fun compareTo(other: CategoryPresentableModel): Int {
         if (other == this) {
