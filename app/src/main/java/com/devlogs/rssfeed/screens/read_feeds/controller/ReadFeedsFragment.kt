@@ -72,7 +72,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
         }
 
-
         Log.d("ReadFeedsFragment", presentationStateManager.currentState.javaClass.simpleName)
     }
 
@@ -116,6 +115,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         mvcView.unRegister(this)
         presentationStateManager.unRegister(this)
         try {
+            Log.d("UnBind", "ServiceOnFeeds")
             requireContext().unbindService(newFeedsServiceConnector)
         } catch (ex: Exception) {
             ex.message?.let { Log.w("ReadFeedsFragment", it) }
@@ -167,6 +167,16 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 displayStateProcess (previousState, currentState, action)
             }
         }
+        when (action) {
+            is UserSelectChannelAction -> {
+                try {
+                    Log.d("UnBind", "ServiceOnFeeds")
+                    requireContext().unbindService(newFeedsServiceConnector)
+                } catch (ex: Exception) {
+                    ex.message?.let { Log.w("ReadFeedsFragment", it) }
+                }
+            }
+        }
     }
 
     override fun onUserSelectedChannel(channelId: String) {
@@ -174,7 +184,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         Log.d("ReadFeedsFragment", "User selected : ${channelId}")
         presentationStateManager.consumeAction(UserSelectChannelAction(channelId))
         feedsController.cancel()
-
     }
 
     private fun displayStateProcess(

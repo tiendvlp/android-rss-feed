@@ -38,6 +38,9 @@ class CategoriesController @Inject constructor(private val getFeedsByCategoryUse
 
             if (getCategoriesResult is GetUserCategoriesUseCaseSync.Result.Success) {
                 val categories = HashSet<CategoryPresentableModel> ()
+                if (getCategoriesResult.categories.isEmpty()) {
+                    mvcView.showEmptyText()
+                }
                 getCategoriesResult.categories.forEach { category ->
                     val getFirst3FeedsResult = getFeedsByCategoryUseCaseSync.executes(category.title, 4)
                     Log.d("CategoriesController", getFirst3FeedsResult.javaClass.canonicalName)

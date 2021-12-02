@@ -15,6 +15,7 @@ interface CategoriesMvcView : ObservableMvcView<CategoriesMvcView.Listener> {
     fun setCategories (categories : Set<CategoryPresentableModel>)
     fun loading ()
     fun toast (message: String)
+    fun showEmptyText()
 
 }
 

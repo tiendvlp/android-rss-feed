@@ -49,7 +49,7 @@ class SplashActivity : AppCompatActivity() {
 
         CoroutineScope(BackgroundDispatcher).launch {
             withContext(Dispatchers.Main.immediate) {
-                delay(3000)
+                delay(1500)
                 if (applicationStateManager.user == null) {
                     LoginActivity.start(this@SplashActivity)
                 } else {

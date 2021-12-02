@@ -1,5 +1,6 @@
 package com.devlogs.rssfeed.screens.navigation_drawer.controller
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +11,11 @@ import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPresentableModel
 
+import com.bumptech.glide.request.RequestOptions
+
+
+
+
 class ChannelRcvAdapter : RecyclerView.Adapter<ChannelRcvAdapter.ViewHolder> {
 
     inner class ViewHolder (view: View) : RecyclerView.ViewHolder(view) {
@@ -17,10 +23,15 @@ class ChannelRcvAdapter : RecyclerView.Adapter<ChannelRcvAdapter.ViewHolder> {
         private val txtTitle: TextView = view.findViewById(R.id.txtTitle)
         private val failedDrawable = view.context.getDrawable(R.drawable.ic_www)
         fun bind (channel: ChannelPresentableModel) {
+            Log.d("ChannelRcvAdapter", "Load channel image: ${channel.imageUrl}")
+            val options: RequestOptions = RequestOptions()
+                .centerCrop()
+                .placeholder(R.drawable.ic_www)
+                .error(R.drawable.ic_www)
             Glide.with(itemView.context)
-                .load(channel.url)
+                .load(channel.imageUrl)
+                .apply(options)
                 .into(img)
-                .onLoadFailed(failedDrawable)
             itemView.setOnClickListener {
                 onItemClicked?.invoke(channel)
             }

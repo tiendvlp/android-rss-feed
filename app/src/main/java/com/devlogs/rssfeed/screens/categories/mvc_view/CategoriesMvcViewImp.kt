@@ -46,7 +46,6 @@ class CategoriesMvcViewImp : BaseMvcView<CategoriesMvcView.Listener>, Categories
         lvCategories.setItemViewCacheSize(30)
         lvCategories.setHasFixedSize(true)
         lvCategories.adapter = categoriesAdapter
-
     }
 
     private fun addEvents() {
@@ -74,5 +73,9 @@ class CategoriesMvcViewImp : BaseMvcView<CategoriesMvcView.Listener>, Categories
 
     override fun toast(message: String) {
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show()
+    }
+
+    override fun showEmptyText() {
+
     }
 }

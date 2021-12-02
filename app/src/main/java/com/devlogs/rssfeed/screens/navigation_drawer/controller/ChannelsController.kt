@@ -23,7 +23,7 @@ class ChannelsController @Inject constructor(private val getUserRssChannelsUseCa
            val result = getUserRssChannelsUseCaseSync.executes()
 
            if (result is GetUserRssChannelsUseCaseSync.Result.Success) {
-                mvcView.setChannels(result.channels.map { ChannelPresentableModel(it.id, it.imageUrl, it.title) })
+                mvcView.setChannels(result.channels.map { ChannelPresentableModel(it.id, it.url, it.title, it.imageUrl) })
            }
         }
     }

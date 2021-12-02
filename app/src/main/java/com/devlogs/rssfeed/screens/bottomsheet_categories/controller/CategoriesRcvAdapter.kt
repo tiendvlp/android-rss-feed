@@ -20,10 +20,12 @@ class CategoriesRcvAdapter : RecyclerView.Adapter<CategoriesRcvAdapter.ViewHolde
         internal fun bind (category: CategoryPresentableModel) {
             txtTitle.text = category.title
             if (category.added) {
+                checkedCategories.add(category)
                 checkBox.isEnabled = true
                 checkBox.isChecked = true
                 checkBox.isEnabled = false
             } else {
+                checkedCategories.remove(category)
                 checkBox.isEnabled = true
                 checkBox.isChecked = false
             }

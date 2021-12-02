@@ -29,6 +29,7 @@ class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) priva
         val displayState = stateManager.currentState as DisplayState
         val binder = service as RssChannelTrackingService.LocalBinder
         this.service = binder.service
+        Log.d("OnNewFeedConnector", "Reregister: ${displayState.channelPresentableModel.title}")
         this.service!!.register(displayState.channelPresentableModel.id, this)
     }
 

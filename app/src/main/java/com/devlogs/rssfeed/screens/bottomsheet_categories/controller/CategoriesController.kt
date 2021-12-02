@@ -32,7 +32,6 @@ class CategoriesController @Inject constructor(private val addFeedToCategoryUseC
         Log.d("GetCategoriesController", "Runnn")
         coroutine.launch {
             val result = getUserCategoriesUseCaseSync.executes()
-
             if (result is GetUserCategoriesUseCaseSync.Result.Success) {
                 if (result.categories.isEmpty()) {
                     mvcView.showEmptyNotification()

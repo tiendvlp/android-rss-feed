@@ -48,8 +48,9 @@
 
     <com.devlogs.rssfeed.screens.common.customview.ImageButton
         android:id="@+id/btnSaved"
-        android:layout_width="20dp"
-        android:layout_height="18dp"
+        android:layout_width="50dp"
+        android:layout_height="30dp"
+        android:padding="5dp"
         android:src="@drawable/ic_favorite"
         android:background="@null"
         app:layout_constraintTop_toTopOf="@id/txtPubDate"

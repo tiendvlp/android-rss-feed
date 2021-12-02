@@ -45,6 +45,7 @@ class MainScreenNavigator {
             }
         }
     }
+    var onTabChanged : ((tabIndex: Int) -> Unit)? = null
 
     constructor(fragNavController: FragNavController) {
         this.fragNavController = fragNavController
@@ -65,14 +66,17 @@ class MainScreenNavigator {
 
     fun switchToFeedsTab () {
         fragNavController.switchTab(TAB2)
+        onTabChanged?.invoke(TAB2)
     }
 
     fun switchToCategoriesFeedsTab () {
         fragNavController.switchTab(TAB1)
+        onTabChanged?.invoke(TAB1)
     }
 
     fun switchToAddChannelTab () {
         fragNavController.switchTab(TAB3)
+        onTabChanged?.invoke(TAB3)
     }
 
     fun navigateBack () : Boolean{

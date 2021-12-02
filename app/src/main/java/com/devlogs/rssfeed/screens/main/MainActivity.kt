@@ -14,6 +14,7 @@ import com.devlogs.chatty.screen.common.BackPressListener
 import com.devlogs.rssfeed.R
 import com.devlogs.rssfeed.screens.navigation_drawer.controller.MainNavFragment
 import com.google.android.material.navigation.NavigationView
+import com.ncapdevi.fragnav.FragNavController
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -78,6 +79,15 @@ class MainActivity : AppCompatActivity(), BackPressDispatcher {
             reloadAble.reload()
 
         }
+
+        mainScreenNavigator.onTabChanged = {
+            when (it) {
+                0 -> rbtnFavoriteFeed.isChecked = true
+                1 -> rbtnReadFeeds.isChecked = true
+                2 -> rbtnAddChannel.isChecked = true
+            }
+        }
+
         grBottomNav.setOnCheckedChangeListener { group, checkedId ->
             when (checkedId) {
                 rbtnFavoriteFeed.id -> mainScreenNavigator.switchToCategoriesFeedsTab()

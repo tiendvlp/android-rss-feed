@@ -48,12 +48,20 @@ class BottomSheetCategoriesMvcViewImp : BaseMvcView<BottomSheetCategoriesMvcView
 
     private fun addEvents() {
         btnCreate.setOnClickListener {
+            if (edtCategoryName.text.isBlank()) {
+                toast("Please fill the title field")
+                return@setOnClickListener
+            }
             getListener().forEach { listener ->
                 listener.onBtnCreateClicked (edtCategoryName.text.toString())
             }
         }
 
         btnConfirm.setOnClickListener {
+            if (categoriesAdapter.checkedCategories.isEmpty()) {
+                toast("You must select the category first")
+                return@setOnClickListener
+            }
             getListener().forEach { listener ->
                 listener.onBtnConfirmClicked( categoriesAdapter.checkedCategories
                     .map { it.title }.toSet())
@@ -73,6 +81,9 @@ class BottomSheetCategoriesMvcViewImp : BaseMvcView<BottomSheetCategoriesMvcView
     }
 
     override fun addNewCategories(newCategory: CategoryPresentableModel) {
+        lvCategories.visibility = View.VISIBLE
+        layoutLoading.visibility = View.GONE
+        txtEmpty.visibility = View.GONE
         this.categories.add(newCategory)
         categoriesAdapter.notifyDataSetChanged()
     }
