@@ -16,6 +16,7 @@ import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import dagger.hilt.android.internal.Contexts.getApplication
 import androidx.core.content.ContextCompat.getSystemService
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -121,10 +122,14 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
         layoutLoading.visibility = View.GONE
 
         Log.d("LoadingImage", channel.imageUrl)
-        val glide = Glide.with(getContext())
+        val options: RequestOptions = RequestOptions()
+            .centerCrop()
+            .placeholder(R.drawable.ic_www)
+            .error(R.drawable.ic_www)
+        Glide.with(imgWeb.context)
             .load(channel.imageUrl)
+            .apply(options)
             .into(imgWeb)
-        glide.onLoadFailed(wwwIcDrawable)
 
         if (channel.isAdded){
             btnAdd.text = "Added"

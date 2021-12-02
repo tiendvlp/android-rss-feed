@@ -1,5 +1,6 @@
 package com.devlogs.rssfeed.screens.add_rss_channel.controller
 
+import android.util.Log
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.rss_channels.AddNewRssChannelByRssUrlUseCaseSync
@@ -27,6 +28,7 @@ class AddRssChannelController @Inject constructor (
     private val coroutine = CoroutineScope(Dispatchers.Main.immediate)
 
     fun search(url: String) {
+        Log.d("AddRssChannelController", "Search: $url")
         coroutine.launch {
             val findResult = findRssChannelByUrlUseCaseSync.executes(url)
 
