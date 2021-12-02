@@ -10,6 +10,8 @@ import android.widget.Toast
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.android_services.RssChannelTrackingService
 import com.devlogs.rssfeed.application.ApplicationStateManager
+import com.devlogs.rssfeed.common.helper.InternetChecker
+import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.screens.bottomsheet_categories.CategoriesBottomSheet
 import com.devlogs.rssfeed.screens.feed_content.controller.FeedContentActivity
@@ -135,7 +137,10 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     }
 
     override fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel) {
-        Toast.makeText(requireContext(),"Saved: " + selectedFeeds.title, Toast.LENGTH_SHORT).show()
+        if (!requireContext().isOnline()) {
+            Toast.makeText(requireContext(),"No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
         categoriesBottomSheet.show(requireContext(), selectedFeeds.id)
     }
 
@@ -144,6 +149,11 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     }
 
     override fun onReload() {
+        if (!requireContext().isOnline()) {
+            Toast.makeText(requireContext(),"No internet connection", Toast.LENGTH_SHORT).show()
+            mvcView.hideRefreshLayout()
+            return
+        }
         feedsController.reload()
     }
 

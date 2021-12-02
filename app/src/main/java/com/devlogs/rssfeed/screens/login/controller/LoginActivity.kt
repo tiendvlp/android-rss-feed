@@ -20,6 +20,8 @@ import android.content.Context
 import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.SSOLoginUseCaseSync
+import com.devlogs.rssfeed.common.helper.InternetChecker
+import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.main.MainActivity
 import com.facebook.login.LoginManager
@@ -77,33 +79,45 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
         signInButton = findViewById(R.id.sign_in_button);
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
         signInButton.setOnClickListener {v ->
-            val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
-            startActivityForResult(signInIntent, RC_SIGN_IN)
+            if (!isOnline()) {
+                Toast.makeText(this,"No internet connection", Toast.LENGTH_SHORT).show()
+            } else {
+                val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
+                startActivityForResult(signInIntent, RC_SIGN_IN)
+            }
         }
     }
 
 
     private fun facebookCallbackHandler () = object: FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) {
-                var request = GraphRequest.newMeRequest(loginResult!!.accessToken) { o, r ->
-                    try {
-                        val email = o!!.getString("email")
-                        val avatarUrl = "https://graph.facebook.com/${loginResult!!.accessToken.userId}/picture?return_ssl_resource=1"
-                        val name = o!!.getString("name")
-                        login(email,name, avatarUrl)
-                        Log.d("LoginFacebook", email)
-                        Log.d("LoginFacebook", name)
-                        Log.d("LoginFacebook", avatarUrl)
-                        LoginManager.getInstance().logOut()
-                    } catch (e : JSONException) {
-                        e.message?.let { Log.d("LoginFacebook", it) }
+                if (!isOnline()) {
+                    Toast.makeText(this@LoginActivity,"No internet connection", Toast.LENGTH_SHORT).show()
+                } else {
+                    var request = GraphRequest.newMeRequest(loginResult!!.accessToken) { o, r ->
+                        try {
+                            val email = o!!.getString("email")
+                            val avatarUrl =
+                                "https://graph.facebook.com/${loginResult!!.accessToken.userId}/picture?return_ssl_resource=1"
+                            val name = o!!.getString("name")
+                            login(email, name, avatarUrl)
+                            Log.d("LoginFacebook", email)
+                            Log.d("LoginFacebook", name)
+                            Log.d("LoginFacebook", avatarUrl)
+                        } catch (e: JSONException) {
+                            e.message?.let { Log.d("LoginFacebook", it) }
+                        }
                     }
+                    val param = Bundle();
+                    Log.d(
+                        "AvatarUrl",
+                        "https://graph.facebook.com/" + loginResult!!.accessToken.userId + "/picture?return_ssl_resource=1"
+                    )
+                    param.putString("fields", "email, name, id")
+                    request.parameters = param
+                    request.executeAsync()
                 }
-                val param = Bundle();
-                Log.d("AvatarUrl", "https://graph.facebook.com/" + loginResult!!.accessToken.userId + "/picture?return_ssl_resource=1")
-                param.putString("fields", "email, name, id")
-                request.parameters = param
-                request.executeAsync()
+                LoginManager.getInstance().logOut()
             }
 
             override fun onCancel() {
@@ -150,6 +164,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
                 }
             }
             MainActivity.start(this@LoginActivity)
+            finish()
         }
     }
 

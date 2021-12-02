@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import android.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -95,6 +96,10 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
 
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
         Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
+        if (feeds.isEmpty()) {
+            Toast.makeText(getContext(),"No more", Toast.LENGTH_SHORT).show()
+            return
+        }
         refreshLayout.isEnabled = true
         refreshLayout.visibility = View.VISIBLE
         txtEmptyResult.visibility = View.GONE
@@ -109,14 +114,14 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         refreshLayout.isEnabled = true
         refreshLayout.visibility = View.VISIBLE
         txtEmptyResult.visibility = View.GONE
-
+        val oldSize = this.feeds.size
         feedsRcvAdapter.isLoadMoreEnable = true
         refreshLayout.isRefreshing = false
         feedsRcvAdapter.isLoading = false
         if (this.feeds.addAll(feeds)) {
-            lvFeeds.scrollToPosition(0)
-            feedsRcvAdapter.notifyItemRangeInserted(0, feeds.size)
+            feedsRcvAdapter.notifyItemRangeInserted(0, this.feeds.size - oldSize)
         }
+        lvFeeds.scrollToPosition(0)
     }
 
     override fun hideRefreshLayout() {

@@ -8,9 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.InitAction
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.application.ApplicationStateManager
+import com.devlogs.rssfeed.common.helper.InternetChecker
+import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.screens.add_rss_channel.mvc_view.AddRssChannelMvcView
 import com.devlogs.rssfeed.screens.add_rss_channel.mvc_view.getAddRssChannelMvcView
@@ -141,7 +144,11 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
     }
 
     override fun onBtnSearchClicked(url: String) {
-        if (presentationStateManager.currentState is DisplayState || presentationStateManager.currentState is SearchFailedState) {
+        if (!requireContext().isOnline()) {
+            Toast.makeText(requireContext(),"No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
+            if (presentationStateManager.currentState is DisplayState || presentationStateManager.currentState is SearchFailedState) {
             activity?.currentFocus?.let { view ->
                 val imm = requireActivity().getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager
                 imm?.hideSoftInputFromWindow(view.windowToken, 0)
@@ -151,6 +158,10 @@ class AddRssChannelFragment : Fragment(), AddRssChannelMvcView.Listener,
     }
 
     override fun onBtnAddClicked(text: String) {
+        if (!requireContext().isOnline()) {
+            Toast.makeText(requireContext(),"No internet connection", Toast.LENGTH_SHORT).show()
+            return
+        }
         if (presentationStateManager.currentState is DisplayState && (presentationStateManager.currentState as DisplayState).result != null){
             addRssChannelController.addNewChannel(text)
         }
