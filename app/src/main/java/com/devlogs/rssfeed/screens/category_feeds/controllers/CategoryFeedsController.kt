@@ -26,7 +26,7 @@ class CategoryFeedsController @Inject constructor(private val getFeedsByCategory
         mvcView.setTitle(categoryTitle)
         mvcView.loading()
         coroutine.launch {
-            val result = getFeedsByCategoryUseCaseSync.executes(categoryTitle, Long.MAX_VALUE)
+            val result = getFeedsByCategoryUseCaseSync.executes(categoryTitle)
             Log.d("CategoryFeedsController", result.javaClass.canonicalName)
             if (result is GetFeedsByCategoryUseCaseSync.Result.UnAuthorized) {
                 mvcView.toast("Internal server error")
@@ -37,6 +37,10 @@ class CategoryFeedsController @Inject constructor(private val getFeedsByCategory
             }
 
             if (result is GetFeedsByCategoryUseCaseSync.Result.Success) {
+                if (result.feeds.isEmpty()) {
+                    mvcView.showEmptyText()
+                    return@launch
+                }
                 val feeds = TreeSet<FeedPresentableModel>()
                 result.feeds.forEach {
                     feeds.add(feedEntityToPresentableModel(it))

@@ -4,6 +4,7 @@ import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -19,7 +20,7 @@ class GetFeedsByCategoryUseCaseSync @Inject constructor(private val fireStore: F
     }
 
 
-    suspend fun executes (categoryTitle: String, count: Long) : Result = withContext(BackgroundDispatcher) {
+    suspend fun executes (categoryTitle: String, count: Long? = null) : Result = withContext(BackgroundDispatcher) {
 
         val getUserResult = getLoggedInUserUseCaseSync.executes()
 
@@ -29,13 +30,19 @@ class GetFeedsByCategoryUseCaseSync @Inject constructor(private val fireStore: F
 
         if (getUserResult is GetLoggedInUserUseCaseSync.Result.Success) {
             try {
-                val snapShot = fireStore.collection("Users")
+                var ref = fireStore.collection("Users")
                     .document(getUserResult.user.email)
                     .collection("Categories")
                     .document(categoryTitle)
                     .collection("Feeds")
-                    .limit(count)
-                    .get().await()
+
+                val snapShot : QuerySnapshot
+
+                if (count != null && count < 1000) {
+                    snapShot = ref.limit(count).get().await()
+                } else {
+                    snapShot = ref.get().await()
+                }
 
                 val feedIds = ArrayList<String>()
 
