@@ -37,16 +37,13 @@ https://dropover.cloud/65a444
 
 ### 4. Build and run project.
 
-# Common error when build:
-### Incompatible JDK
-
 # Test google account:
 - To save time you can use the test account: 
-
 #### email: feedyuser1@gmail.com
 #### password: FeedyTesting
- 
 
+# Common error when build:
+### Incompatible JDK
 ![Screen Shot 2021-12-02 at 17 45 03](https://user-images.githubusercontent.com/27767477/144407182-f5b2e90b-c3f4-471b-8514-72be4e065f70.png)
 
 #### Go to Settings -> Build, Execution, Deployment -> Build tools -> Gradle -> Select Java 11 at Gradle JDK section
