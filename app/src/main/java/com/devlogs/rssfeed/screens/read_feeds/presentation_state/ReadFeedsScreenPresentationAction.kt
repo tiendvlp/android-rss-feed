@@ -11,6 +11,11 @@ sealed class ReadFeedsScreenPresentationAction : PresentationAction {
     data class InitialLoadSuccessAction (val feeds: TreeSet<FeedPresentableModel>, val channel: RssChannelPresentableModel, val userAvatar: String) : ReadFeedsScreenPresentationAction()
     data class UserSelectChannelAction (val channelId: String) : ReadFeedsScreenPresentationAction()
     class EmptyChannelAction  : ReadFeedsScreenPresentationAction()
+    // we consider the both unFollow and follow is the FollowProcess
+    class FollowProcessSuccessAction () : ReadFeedsScreenPresentationAction()
+    data class FollowProcessFailedAction (val errorMessage: String) : ReadFeedsScreenPresentationAction()
+    class UnFollowProcessSuccessAction () : ReadFeedsScreenPresentationAction()
+    data class UnFollowProcessFailedAction (val errorMessage: String) : ReadFeedsScreenPresentationAction()
     class ReloadActionFailed (val message: String): ReadFeedsScreenPresentationAction()
     class ReloadActionSuccess (): ReadFeedsScreenPresentationAction()
     class LoadMoreSuccessAction (val feeds: TreeSet<FeedPresentableModel>) : ReadFeedsScreenPresentationAction()

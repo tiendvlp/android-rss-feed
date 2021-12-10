@@ -21,6 +21,18 @@ sealed class ReadFeedsScreenPresentationState : PresentationState {
         ): CauseAndEffect {
             when (action) {
                 is UserSelectChannelAction -> return CauseAndEffect(action, InitialLoadingState(action.channelId))
+                is FollowProcessFailedAction -> return CauseAndEffect(action, copy())
+                is UnFollowProcessFailedAction -> return CauseAndEffect(action, copy())
+                is FollowProcessSuccessAction ->
+                {
+                    val currentChannelButFollow = channelPresentableModel.copy(isFollowed = true)
+                    return CauseAndEffect(action, copy(channelPresentableModel = currentChannelButFollow))
+                }
+                is UnFollowProcessSuccessAction ->
+                {
+                    val currentChannelButUnFollow = channelPresentableModel.copy(isFollowed = false)
+                    return CauseAndEffect(action, copy(channelPresentableModel = currentChannelButUnFollow))
+                }
                 is NewFeedsAction -> return CauseAndEffect(action, copy(feeds = appendFeeds(action.feeds)))
                 is ReloadActionFailed -> return CauseAndEffect(action, copy())
                 is LoadMoreSuccessAction -> return CauseAndEffect(action, copy(feeds = appendFeeds(action.feeds)))

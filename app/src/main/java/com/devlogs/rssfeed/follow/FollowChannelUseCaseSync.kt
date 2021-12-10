@@ -37,7 +37,7 @@ class FollowChannelUseCaseSync @Inject constructor(private val getLoggedInUserUs
                     .document(channelId)
                     .set(
                         hashMapOf(
-                            "ChannelId" to channelId
+                            "channelId" to channelId
                         )
                     )
                     .await()

@@ -82,6 +82,7 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
                     getChannelResult.channel.url,
                     getChannelResult.channel.rssUrl,
                     getChannelResult.channel.title,
+                    getChannelResult.isFollowed
                 )
             } else {
                 throw RuntimeException("UnExpected result from GetRssChannelByIdUseCaseSync ${getChannelResult.javaClass.simpleName}")

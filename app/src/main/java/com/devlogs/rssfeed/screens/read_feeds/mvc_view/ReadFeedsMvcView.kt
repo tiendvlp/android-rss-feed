@@ -13,6 +13,8 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
         fun onFeedSavedClicked(selectedFeeds: FeedPresentableModel)
         fun onLoadMoreFeeds()
         fun onReload()
+        fun onBtnFollowClicked()
+        fun onBtnUnFollowClicked()
 
     }
 
@@ -23,6 +25,12 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
     fun hideRefreshLayout()
     fun clear()
     fun empty()
+    fun showFollowLoading ()
+    fun dismissFollowLoading()
+    fun showFollowButton()
+    fun showUnFollowButton()
+    fun showMessage(message: String)
+
 }
 
 fun MvcViewFactory.getReadFeedsMvcView (viewGroup: ViewGroup?) : ReadFeedsMvcView = ReadFeedsMvcViewImp(uiToolkit, viewGroup)

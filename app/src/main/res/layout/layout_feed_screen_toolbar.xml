@@ -1,38 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:gravity="center"
     android:orientation="vertical"
-    android:paddingTop="@dimen/margin_top"
-    android:gravity="center">
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/imgAvatar"
-                android:layout_width="25dp"
-                android:layout_height="25dp"
-                app:layout_constraintLeft_toLeftOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:src="@color/grey60" />
+    android:paddingTop="@dimen/margin_top">
 
-        <TextView
-            android:id="@+id/txtChannelTitle"
-            android:layout_width="wrap_content"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            android:layout_height="wrap_content"
-            android:text="channel title"
-            android:textSize="16sp"
-            android:fontFamily="@font/publicsans"
-            android:textColor="@color/white"
-            android:layout_weight="1" />
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/imgAvatar"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@color/grey60"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/txtChannelTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:fontFamily="@font/publicsans"
+        android:text="channel title"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/btnFollow"
+        app:layout_constraintTop_toTopOf="@id/txtChannelTitle"
+        app:layout_constraintBottom_toBottomOf="@id/txtChannelTitle"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@null"
+        android:text="follow"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        android:visibility="gone"
+        android:textColor="@color/gold"
+        android:fontFamily="@font/publicsans_bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/btnUnFollow"
+        app:layout_constraintTop_toTopOf="@id/txtChannelTitle"
+        app:layout_constraintBottom_toBottomOf="@id/txtChannelTitle"
+        app:layout_constraintRight_toRightOf="parent"
+        android:background="@null"
+        android:text="unfollow"
+        android:visibility="gone"
+        android:textAllCaps="false"
+        android:textSize="12sp"
+        android:textColor="@color/gold"
+        android:fontFamily="@font/publicsans_bold"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <ProgressBar
+        android:id="@+id/followProgress"
+        app:layout_constraintTop_toTopOf="@id/txtChannelTitle"
+        android:layout_marginRight="30dp"
+        app:layout_constraintBottom_toBottomOf="@id/txtChannelTitle"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_width="18dp"
+        android:layout_height="18dp"/>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0.5dp"
-        android:background="@color/grey40"
-        app:layout_constraintTop_toBottomOf="@id/imgAvatar"
         android:layout_marginTop="10dp"
+        android:background="@color/grey40"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        />
+        app:layout_constraintTop_toBottomOf="@id/imgAvatar" />
 </androidx.constraintlayout.widget.ConstraintLayout>

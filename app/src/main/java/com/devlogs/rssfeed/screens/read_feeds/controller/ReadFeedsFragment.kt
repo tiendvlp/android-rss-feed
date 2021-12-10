@@ -53,6 +53,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     @Inject
     protected lateinit var mainScreenInsiderObservable: MainScreenInsiderObservable
     @Inject
+    protected lateinit var channelFollowingController: ChannelFollowingController
+    @Inject
     protected lateinit var feedsController: FeedsController
     @Inject
     protected lateinit var newFeedsServiceConnector: NewFeedsServiceConnector
@@ -153,6 +155,16 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         feedsController.reload()
     }
 
+    override fun onBtnFollowClicked() {
+        mvcView.showFollowLoading()
+        channelFollowingController.follow()
+    }
+
+    override fun onBtnUnFollowClicked() {
+        mvcView.showFollowLoading()
+        channelFollowingController.unFollow()
+    }
+
     override fun onStateChanged(
         previousState: PresentationState?,
         currentState: PresentationState,
@@ -204,6 +216,24 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 mvcView.setUserAvatarUrl(currentState.avatarUrl)
                 mvcView.hideRefreshLayout()
                 RssChangeListenerService.bind(requireContext(), newFeedsServiceConnector)
+            }
+            is FollowProcessFailedAction -> {
+                mvcView.dismissFollowLoading()
+                mvcView.showMessage(action.errorMessage)
+                mvcView.showFollowButton()
+            }
+            is UnFollowProcessFailedAction -> {
+                mvcView.dismissFollowLoading()
+                mvcView.showMessage(action.errorMessage)
+                mvcView.showUnFollowButton()
+            }
+            is UnFollowProcessSuccessAction -> {
+                mvcView.dismissFollowLoading()
+                mvcView.showFollowButton()
+            }
+            is FollowProcessSuccessAction -> {
+                mvcView.dismissFollowLoading()
+                mvcView.showUnFollowButton()
             }
             is ReloadActionSuccess -> {
                 mvcView.hideRefreshLayout()

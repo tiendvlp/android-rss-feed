@@ -60,7 +60,7 @@ class SplashActivity : AppCompatActivity(), LogTarget {
             withContext(Dispatchers.Main.immediate) {
                 delay(1500)
                 if (applicationStateManager.user == null) {
-                    //LoginActivity.start(this@SplashActivity)
+                    LoginActivity.start(this@SplashActivity)
                 } else {
                     Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
                     if (applicationStateManager.selectedChannelId == null) {
@@ -74,9 +74,9 @@ class SplashActivity : AppCompatActivity(), LogTarget {
                             Log.e("SplashActivity", "Error happen when initial the default channel, ${getChannelResult.javaClass.simpleName}")
                         }
                     }
-                   // MainActivity.start(this@SplashActivity)
+                    MainActivity.start(this@SplashActivity)
                 }
-               // finish()
+                finish()
             }
         }
 

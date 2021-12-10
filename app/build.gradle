@@ -47,6 +47,7 @@ android {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-inappmessaging:19.1.5'
     def work_version = "2.6.0"
     implementation 'androidx.hilt:hilt-work:1.0.0'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'

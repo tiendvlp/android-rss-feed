@@ -3,9 +3,7 @@ package com.devlogs.rssfeed.screens.read_feeds.mvc_view
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import android.widget.Toast
-import android.widget.Toolbar
+import android.widget.*
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -31,14 +29,17 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     private lateinit var txtEmptyResult : TextView
     private lateinit var feedsRcvAdapter : FeedsRcvAdapter
     private lateinit var refreshLayout: SwipeRefreshLayout
+    private lateinit var btnFollow: Button
+    private lateinit var btnUnFollow: Button
+    private lateinit var followProgress : ProgressBar
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
         setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_read_feeds, viewGroup, false))
         feeds.descendingSet()
         this.uiToolkit = uiToolkit
         addControls();
-        addEvents();
         initToolbar()
+        addEvents();
     }
 
     private fun initToolbar() {
@@ -46,9 +47,22 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         toolbar.addView(toolbarLayout)
         txtChannelTitle = toolbarLayout.findViewById(R.id.txtChannelTitle)
         imgAvatar = toolbarLayout.findViewById(R.id.imgAvatar)
+        btnFollow = toolbarLayout.findViewById(R.id.btnFollow)
+        btnUnFollow = toolbarLayout.findViewById(R.id.btnUnFollow)
+        followProgress = toolbarLayout.findViewById(R.id.followProgress)
     }
 
     private fun addEvents() {
+        btnFollow.setOnClickListener {
+            getListener().forEach { listener ->
+                listener.onBtnFollowClicked()
+            }
+        }
+        btnUnFollow.setOnClickListener {
+            getListener().forEach { listener ->
+                listener.onBtnUnFollowClicked()
+            }
+        }
         feedsRcvAdapter.onFeedClicked = { type, selectedFeeds ->
             getListener().forEach { listener ->
                 if (type == FeedsRcvAdapter.FeedInteractionType.Clicked) {
@@ -92,6 +106,11 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
 
     override fun setChannels(channel: RssChannelPresentableModel) {
         txtChannelTitle.text = channel.title
+        if (channel.isFollowed) {
+            showUnFollowButton()
+        } else {
+            showFollowButton()
+        }
     }
 
     override fun appendFeeds(feeds: TreeSet<FeedPresentableModel>) {
@@ -138,6 +157,32 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         refreshLayout.isEnabled = false
         refreshLayout.visibility = View.GONE
         txtEmptyResult.visibility = View.VISIBLE
+    }
+
+    override fun showFollowLoading() {
+        followProgress.visibility = View.VISIBLE
+        btnFollow.visibility = View.GONE
+        btnUnFollow.visibility = View.GONE
+    }
+
+    override fun dismissFollowLoading() {
+        followProgress.visibility = View.GONE
+    }
+
+    override fun showFollowButton() {
+        dismissFollowLoading()
+        btnFollow.visibility = View.VISIBLE
+        btnUnFollow.visibility = View.GONE
+    }
+
+    override fun showUnFollowButton() {
+        dismissFollowLoading()
+        btnUnFollow.visibility = View.VISIBLE
+        btnFollow.visibility = View.GONE
+    }
+
+    override fun showMessage(message: String) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show()
     }
 
 }
