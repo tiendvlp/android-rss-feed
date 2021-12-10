@@ -3,6 +3,7 @@ package com.devlogs.rssfeed.common.di
 import android.app.Application
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import com.devlogs.rssfeed.android_services.DemoDepenedencies
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.rss.RssUrlFinder
@@ -37,6 +38,12 @@ class ApplicationModule {
     @Singleton
     fun provideFirebaseFirestoreInstance (): FirebaseFirestore {
         return Firebase.firestore
+    }
+
+    @Provides
+    @Singleton
+    fun provideDemoDependency () : DemoDepenedencies {
+        return DemoDepenedencies()
     }
 
     @Provides

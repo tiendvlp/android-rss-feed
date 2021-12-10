@@ -14,7 +14,7 @@ class AddUserUseCaseSync @Inject constructor(private val fireStore: FirebaseFire
         data class GeneralError (val errorMessage: String?) : Result()
     }
 
-    suspend fun executes (email: String, name: String, avatarUrl: String) : Result = withContext(BackgroundDispatcher) {
+    suspend fun executes (email: String, name: String, avatarUrl: String?) : Result = withContext(BackgroundDispatcher) {
         val addedUser = UserEntity (email, name, avatarUrl)
         try {
             fireStore.collection("Users").document(email).set(addedUser).await()

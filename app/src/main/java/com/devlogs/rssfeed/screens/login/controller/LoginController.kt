@@ -16,7 +16,7 @@ class LoginController @Inject constructor(private val loginUseCaseSync: SSOLogin
     private var listener : Listener? = null
 
 
-    fun login(email: String, name: String, avatarUrl: String) {
+    fun login(email: String, name: String, avatarUrl: String?) {
         coroutine.launch {
             val loginResult = loginUseCaseSync.executes(email, name, avatarUrl)
             if (loginResult is SSOLoginUseCaseSync.Result.Success) {

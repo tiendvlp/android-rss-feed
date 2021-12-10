@@ -5,12 +5,10 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.SignOutUseCase
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.main.MainActivity
-import com.devlogs.rssfeed.screens.main.MainActivity.Companion.start
 import com.devlogs.rssfeed.screens.main.MainScreenInsiderObservable
 import com.devlogs.rssfeed.screens.main.MainScreenNavigator
 import com.devlogs.rssfeed.screens.navigation_drawer.mvc_view.MainNavMvcView
@@ -19,7 +17,6 @@ import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPr
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.UserPresentableModel
 import com.devlogs.rssfeed.screens.splash_screen.controller.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.layout_main.*
 import javax.inject.Inject
 
 @AndroidEntryPoint

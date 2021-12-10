@@ -4,7 +4,7 @@ import android.content.ComponentName
 import android.content.ServiceConnection
 import android.os.IBinder
 import android.util.Log
-import com.devlogs.rssfeed.android_services.RssChannelTrackingService
+import com.devlogs.rssfeed.android_services.RssChangeListenerService
 import com.devlogs.rssfeed.common.helper.isSameDate
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.domain.entities.FeedEntity
@@ -18,16 +18,16 @@ import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
 
-class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) private val stateManager: PresentationStateManager) : ServiceConnection, RssChannelTrackingService.Listener {
+class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) private val stateManager: PresentationStateManager) : ServiceConnection, RssChangeListenerService.Listener {
 
-    private var service : RssChannelTrackingService? = null
+    private var service : RssChangeListenerService? = null
 
     override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
         if (stateManager.currentState !is DisplayState) {
             throw RuntimeException("Invalid state, serviceConnected require DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")
         }
         val displayState = stateManager.currentState as DisplayState
-        val binder = service as RssChannelTrackingService.LocalBinder
+        val binder = service as RssChangeListenerService.LocalBinder
         this.service = binder.service
         Log.d("OnNewFeedConnector", "Reregister: ${displayState.channelPresentableModel.title}")
         this.service!!.register(displayState.channelPresentableModel.id, this)

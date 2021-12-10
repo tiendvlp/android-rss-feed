@@ -12,6 +12,7 @@ import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.google.firebase.firestore.*
 import com.google.firebase.firestore.EventListener
+import com.google.firebase.firestore.Query.Direction.DESCENDING
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,12 +20,11 @@ import kotlinx.coroutines.launch
 import java.lang.RuntimeException
 import java.util.*
 import javax.inject.Inject
-import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 
 @AndroidEntryPoint
-class RssChannelTrackingService : Service() {
+class RssChangeListenerService : Service() {
     interface Listener {
         fun onNewFeed(feed: TreeSet<FeedEntity>)
     }
@@ -42,7 +42,7 @@ class RssChannelTrackingService : Service() {
             registration = fireStore
                 .collection("Feeds")
                 .whereEqualTo("rssChannelId", channelId)
-                .orderBy("pubDate", Query.Direction.DESCENDING)
+                .orderBy("pubDate", DESCENDING)
                 .addSnapshotListener (this)
             Log.d("RssChannelTracking", "Query: rssChannelId = ${channelId}")
         }
@@ -52,7 +52,7 @@ class RssChannelTrackingService : Service() {
             registration = fireStore
                 .collection("Feeds")
                 .whereIn("rssChannelId", channelIds.toList())
-                .orderBy("pubDate", Query.Direction.DESCENDING)
+                .orderBy("pubDate", DESCENDING)
                 .addSnapshotListener (this)
 
             channelIds.forEach {
@@ -108,7 +108,7 @@ class RssChannelTrackingService : Service() {
     }
 
     inner class LocalBinder : Binder() {
-        val service = this@RssChannelTrackingService
+        val service = this@RssChangeListenerService
     }
 
     companion object {
@@ -117,7 +117,7 @@ class RssChannelTrackingService : Service() {
             connection: ServiceConnection,
             flag: Int = Context.BIND_AUTO_CREATE
         ) {
-            val intent = Intent(context, RssChannelTrackingService::class.java)
+            val intent = Intent(context, RssChangeListenerService::class.java)
             context.bindService(intent, connection, flag)
         }
     }

@@ -16,7 +16,7 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
 
     }
 
-    fun setUserAvatarUrl (url:String)
+    fun setUserAvatarUrl (url:String?)
     fun setChannels (channel: RssChannelPresentableModel)
     fun appendFeeds (feeds: TreeSet<FeedPresentableModel>)
     fun addNewFeeds (feeds: TreeSet<FeedPresentableModel>)

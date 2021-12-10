@@ -20,7 +20,7 @@ class SSOLoginUseCaseSync @Inject constructor(
         data class GeneralError (val message: String?) : Result ()
     }
 
-    suspend fun executes (email: String, name: String, avatarUrl: String) : Result = withContext(BackgroundDispatcher){
+    suspend fun executes (email: String, name: String, avatarUrl: String?) : Result = withContext(BackgroundDispatcher){
         val addUserResult = addUserUseCaseSync.executes(email, name, avatarUrl)
         if (addUserResult is AddUserUseCaseSync.Result.Success) {
             sharedPreferences.edit()

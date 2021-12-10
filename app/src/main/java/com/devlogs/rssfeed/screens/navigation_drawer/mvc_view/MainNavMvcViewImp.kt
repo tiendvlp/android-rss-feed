@@ -17,7 +17,6 @@ import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.UserPrese
 class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
 
     private val uiToolkit: UIToolkit
-
     private lateinit var layoutLoading: LinearLayout
     private lateinit var layoutMain: ConstraintLayout
     private lateinit var imgAvatar: ImageView
@@ -87,6 +86,7 @@ class MainNavMvcViewImp : BaseMvcView<MainNavMvcView.Listener>, MainNavMvcView{
         Glide.with(getContext())
             .load(user.avatarUrl)
             .into(imgAvatar)
+            .onLoadFailed(getContext().getDrawable(R.drawable.ic_default_avatar))
 
         txtUserName.text = user.name
     }

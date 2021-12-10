@@ -86,8 +86,8 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         lvFeeds.adapter = feedsRcvAdapter
     }
 
-    override fun setUserAvatarUrl(url: String) {
-        Glide.with(getContext()).load(url).into(imgAvatar)
+    override fun setUserAvatarUrl(url: String?) {
+        Glide.with(getContext()).load(url).into(imgAvatar).onLoadFailed(getContext().getDrawable(R.drawable.ic_default_avatar))
     }
 
     override fun setChannels(channel: RssChannelPresentableModel) {

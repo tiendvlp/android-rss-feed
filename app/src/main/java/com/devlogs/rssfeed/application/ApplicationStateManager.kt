@@ -14,6 +14,7 @@ class ApplicationStateManager @Inject constructor(private val getLoggedInUserUse
         if (result is GetLoggedInUserUseCaseSync.Result.Success) {
             return result.user
         }
+
         return null
     }
 

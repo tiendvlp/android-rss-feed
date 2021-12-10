@@ -19,13 +19,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import android.content.Context
 import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
-import com.devlogs.rssfeed.authentication.SSOLoginUseCaseSync
-import com.devlogs.rssfeed.common.helper.InternetChecker
 import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.main.MainActivity
 import com.facebook.login.LoginManager
-import com.google.android.gms.auth.api.Auth
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.api.ApiException
 import dagger.hilt.android.AndroidEntryPoint
@@ -137,11 +134,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account: GoogleSignInAccount = task.getResult(ApiException::class.java)
-                Log.d("LoginGoogle", account.email)
-                Log.d("LoginGoogle", account.displayName)
-                Log.d("LoginGoogle", account.photoUrl.toString())
-                login(account.email, account.displayName, account.photoUrl.toString())
-                mGoogleSignInClient.signInIntent
+                login(account.email, account.displayName, account.photoUrl?.toString())
             } catch (e: ApiException) {
                 Log.w("LoginGoogle", "signInResult:failed code=" + e.statusCode)
             }
@@ -149,7 +142,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    private fun login (email: String, name: String, avatarUrl: String) {
+    private fun login (email: String, name: String, avatarUrl: String?) {
         loginController.register(this)
         loginController.login(email,name, avatarUrl)
     }

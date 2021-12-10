@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.devlogs.rssfeed">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -14,6 +15,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RSSFeed"
         android:usesCleartextTraffic="true">
+
         <activity
             android:name=".screens.category_feeds.controllers.CategoryFeedsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
@@ -30,11 +32,12 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
-        <service android:name=".android_services.RssChannelTrackingService" />
+        <service android:name=".android_services.RssChangeListenerService" />
 
         <activity
             android:name=".screens.splash_screen.controller.SplashActivity"
             android:screenOrientation="portrait"
+            android:exported="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -67,6 +70,11 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:name="androidx.startup.InitializationProvider"
+            android:authorities="${applicationId}.androidx-startup"
+            tools:node="remove" />
     </application>
 
 </manifest>
