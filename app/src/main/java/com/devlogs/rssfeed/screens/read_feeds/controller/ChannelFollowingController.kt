@@ -7,7 +7,6 @@ import com.devlogs.rssfeed.common.shared_context.AppConfig
 import com.devlogs.rssfeed.follow.FollowChannelUseCaseSync
 import com.devlogs.rssfeed.follow.UnFollowChannelUseCaseSync
 import com.devlogs.rssfeed.screens.common.presentation_state.PresentationStateManager
-import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationAction.*
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.DisplayState
 import kotlinx.coroutines.CoroutineScope

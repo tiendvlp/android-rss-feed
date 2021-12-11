@@ -6,6 +6,8 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.encrypt.UrlEncrypt
@@ -24,7 +26,7 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     private val fireStore: FirebaseFirestore,
     private val rssParser: RssParser,
     private val getCurrentLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync
-) {
+) : LogTarget {
     sealed class Result {
         data class Success (val rssChannel: RssChannelEntity): Result()
         data class GeneralError(val errorMessage: String?) : Result()
@@ -97,7 +99,16 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 rssChannel.description,
                 rssChannel.image
             )
-            fireStore.collection("RssChannels").document(channelEntity.id).set(channelEntity).await()
+            fireStore.collection("RssChannels").document(channelEntity.id)
+                .set(mapOf(
+                    "id" to channelEntity.id,
+                    "url" to channelEntity.url,
+                    "rssUrl" to channelEntity.rssUrl,
+                    "title" to channelEntity.title,
+                    "description" to channelEntity.description,
+                    "imageUrl" to channelEntity.imageUrl,
+                    "latestUpdate" to System.currentTimeMillis()
+                ))
                 return saveChannelFeeds(channelEntity, rssObject.feeds)
         } catch (ex: Exception) {
             Log.e("AddNewRssUseCase", "GeneralError due to exception when check the duplication of channel: ${ex.message}")
@@ -111,7 +122,10 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         try {
             feeds.forEach {
                 Log.d("AddNewRssUseCase", "save: ${it.title}")
-                val pubDate: Date = SimpleDateFormat("yyyy-MM-dd hh:mm:ss").parse(it.pubDate)
+                val pubDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+                pubDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+                val pubDate: Date = pubDateFormat.parse(it.pubDate)
+
                 val id = UrlEncrypt.encode(it.guid)
                 Log.d("AddNewRssUseCase", "save id: ${id}")
                 val imgUrl: String = getImageUrlInContent(it.content)
@@ -121,6 +135,7 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                     .document(entity.id)
                     .set(entity)
                     .await()
+                normalLog("ParseTime: ${pubDate.time}")
             }
             return addToUserCollection(channel)
         } catch (e: Exception) {

@@ -1,6 +1,8 @@
 package com.devlogs.rssfeed.screens.read_feeds.controller
 
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.helper.isSameDate
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
@@ -15,8 +17,10 @@ import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreen
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.DisplayState
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.InitialLoadingState
 import kotlinx.coroutines.*
-import java.lang.RuntimeException
-import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
@@ -29,6 +33,7 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
 
     private val coroutine = CoroutineScope(Dispatchers.Main.immediate)
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun initialLoad() {
         if (stateManager.currentState !is InitialLoadingState) {
             throw RuntimeException("Invalid state, initialLoad only run with InitialLoadingState but ${stateManager.currentState.javaClass.simpleName} is found")
@@ -110,6 +115,7 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
 //        coroutine.coroutineContext.cancelChildren()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun loadMore() {
         if (stateManager.currentState !is DisplayState) {
             throw RuntimeException("Invalid state, loadMore only run with DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")
@@ -135,20 +141,22 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun feedEntityToPresentableModel (feedEntity: FeedEntity): FeedPresentableModel {
 
-        val today = Date()
+        val today = LocalDateTime.now()
+        val yesterday = LocalDateTime.now().minusDays(1)
+        ZoneId.SHORT_IDS.forEach {
+            Log.d("ZoneIds", "${it.key} : ${it.value}")
+        }
+        val localPubDate = Instant.ofEpochMilli(feedEntity.pubDate).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime()
 
-        val yesterday = Date()
-        yesterday.date = yesterday.date - 1
+        val isToday = localPubDate.isSameDate(today)
+        val isYesterday = localPubDate.isSameDate(yesterday)
 
-        val pubDate = Date(feedEntity.pubDate)
+        val localDateFormater = DateTimeFormatter.ofPattern("dd/mm/yy")
+        val localHourFormater = DateTimeFormatter.ofPattern("HH:mm")
 
-        val isToday = pubDate.isSameDate(today)
-        val isYesterday = pubDate.isSameDate(yesterday)
-
-        val formater = SimpleDateFormat("dd/MM/yy")
-        val hourFormater = SimpleDateFormat("HH:mm")
         var pubDateInString : String
 
         when {
@@ -159,11 +167,11 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
                 pubDateInString = "Yesterday"
             }
             else -> {
-                pubDateInString = formater.format(pubDate)
+                pubDateInString = localPubDate.format(localDateFormater)
             }
         }
 
-        pubDateInString += " at ${hourFormater.format(pubDate)}"
+        pubDateInString += " at ${localPubDate.format(localHourFormater)}"
 
         return FeedPresentableModel(
             feedEntity.id,

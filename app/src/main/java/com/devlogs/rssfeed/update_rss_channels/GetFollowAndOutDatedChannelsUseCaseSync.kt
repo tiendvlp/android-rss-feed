@@ -6,6 +6,7 @@ import com.devlogs.rssfeed.common.helper.errorLog
 import com.devlogs.rssfeed.common.helper.warningLog
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Query.Direction.ASCENDING
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.Exception
@@ -23,7 +24,6 @@ class GetFollowAndOutDatedChannelsUseCaseSync @Inject constructor(private val ge
     private val thirtyMin = 1000 * 60 * 30
 
     suspend fun executes (count: Long =  -1) : Result = withContext(BackgroundDispatcher) {
-
         val getFollowedChannelIdResult = getFollowedChannelIdUseCaseSync.executes()
 
         if (getFollowedChannelIdResult is GetFollowedChannelIdUseCaseSync.Result.UnAuthorized) {
@@ -46,22 +46,22 @@ class GetFollowAndOutDatedChannelsUseCaseSync @Inject constructor(private val ge
             }
 
             var query = fireStore.collection("RssChannels")
-                .whereIn("id", followedChannelId)
-                .whereLessThanOrEqualTo("latestUpdate", thirtyMin)
-                .orderBy("latestUpdate", Query.Direction.ASCENDING)
+                .whereLessThanOrEqualTo("latestUpdate", System.currentTimeMillis() - thirtyMin)
+                .orderBy("latestUpdate", ASCENDING)
 
-            if (count > 0) {
-                query = query.limit(count)
-            }
+                if (count >= 0) {
+                    query = query.limit(count)
+                }
 
             try {
                 val snapShot = query.get().await()
+
                 if (snapShot.isEmpty) {
                     warningLog("There is no channel need to update")
                     return@withContext Result.Success(channelsId)
                 }
                 snapShot.documents.forEach { document ->
-                    channelsId.add(document.getString("channelId")!!)
+                    channelsId.add(document.getString("id")!!)
                 }
                 return@withContext Result.Success(channelsId)
             } catch (ex : Exception) {

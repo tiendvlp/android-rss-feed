@@ -58,7 +58,7 @@ class SplashActivity : AppCompatActivity(), LogTarget {
 
         CoroutineScope(BackgroundDispatcher).launch {
             withContext(Dispatchers.Main.immediate) {
-                delay(1500)
+                delay(4500)
                 if (applicationStateManager.user == null) {
                     LoginActivity.start(this@SplashActivity)
                 } else {
