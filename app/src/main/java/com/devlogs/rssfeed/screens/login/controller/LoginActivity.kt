@@ -22,6 +22,7 @@ import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.main.MainActivity
+import com.devlogs.rssfeed.screens.splash_screen.controller.SplashActivity
 import com.facebook.login.LoginManager
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.common.api.ApiException
@@ -156,7 +157,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
                     applicationStateManager.selectedChannelId = result.channels.elementAt(0).id
                 }
             }
-            MainActivity.start(this@LoginActivity)
+            SplashActivity.start(this@LoginActivity)
             finish()
         }
     }

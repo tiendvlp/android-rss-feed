@@ -2,8 +2,7 @@ package com.devlogs.rssfeed.android_services
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.CoroutineWorker
-import androidx.work.WorkerParameters
+import androidx.work.*
 import com.devlogs.rssfeed.common.helper.LogTarget
 import com.devlogs.rssfeed.common.helper.errorLog
 import com.devlogs.rssfeed.common.helper.normalLog
@@ -13,14 +12,29 @@ import com.google.firebase.firestore.FirebaseFirestore
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.lang.RuntimeException
+import java.util.concurrent.TimeUnit
 
 @HiltWorker
-class RssTrackingWorker @AssistedInject constructor(
+class TrackingFollowedChannelWorker @AssistedInject constructor(
     @Assisted appContext: Context,
     @Assisted workerParams: WorkerParameters,
     private val reloadRssChannelUseCaseSync: ReloadRssChannelUseCaseSync,
     private val getFollowAndOutDatedChannelsUseCaseSync: GetFollowAndOutDatedChannelsUseCaseSync,
 ) : CoroutineWorker(appContext, workerParams), LogTarget {
+
+    companion object {
+        const val TAG = "RssTrackingFollowedWorker"
+        fun startAndRepeatEvery3Hours (context: Context) {
+            val doWorkerRequest = PeriodicWorkRequestBuilder<TrackingFollowedChannelWorker>(3, TimeUnit.HOURS)
+                .build()
+            WorkManager.getInstance(context.applicationContext)
+                .enqueueUniquePeriodicWork(TAG, ExistingPeriodicWorkPolicy.REPLACE ,doWorkerRequest)
+        }
+
+        fun stop (context: Context) {
+            WorkManager.getInstance(context).cancelUniqueWork(TAG)
+        }
+    }
 
     override suspend fun doWork(): Result {
         val startTime = System.currentTimeMillis()
@@ -59,7 +73,7 @@ class RssTrackingWorker @AssistedInject constructor(
         }
         val endTime = System.currentTimeMillis()
         val executionTime: Double = (endTime - startTime) / (1000.toDouble())
-        normalLog("Excution take: $executionTime} seconds")
+        normalLog("Exceution take: $executionTime} seconds")
         return Result.success()
     }
 }

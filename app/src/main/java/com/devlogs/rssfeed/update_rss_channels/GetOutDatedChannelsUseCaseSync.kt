@@ -13,8 +13,8 @@ import java.lang.Exception
 import java.lang.RuntimeException
 import javax.inject.Inject
 
-class GetFollowAndOutDatedChannelsUseCaseSync @Inject constructor(private val getFollowedChannelIdUseCaseSync: GetFollowedChannelIdUseCaseSync,
-                                                                  private val fireStore: FirebaseFirestore): LogTarget {
+class GetOutDatedChannelsUseCaseSync @Inject constructor(private val getFollowedChannelIdUseCaseSync: GetFollowedChannelIdUseCaseSync,
+                                                         private val fireStore: FirebaseFirestore): LogTarget {
     sealed class Result {
         class Success (val channels: List<String>) : Result()
         class UnAuthorized () : Result()
@@ -24,29 +24,8 @@ class GetFollowAndOutDatedChannelsUseCaseSync @Inject constructor(private val ge
     private val thirtyMin = 1000 * 60 * 30
 
     suspend fun executes (count: Long =  -1) : Result = withContext(BackgroundDispatcher) {
-        val getFollowedChannelIdResult = getFollowedChannelIdUseCaseSync.executes()
-
-        if (getFollowedChannelIdResult is GetFollowedChannelIdUseCaseSync.Result.UnAuthorized) {
-            errorLog("UnAuthorized")
-            return@withContext Result.UnAuthorized()
-        }
-        if (getFollowedChannelIdResult is GetFollowedChannelIdUseCaseSync.Result.GeneralError) {
-            val errorMessage = getFollowedChannelIdResult.message!!
-            errorLog("GeneralError: $errorMessage")
-            return@withContext Result.GeneralError(errorMessage)
-        }
-
-        if (getFollowedChannelIdResult is GetFollowedChannelIdUseCaseSync.Result.Success) {
-            val followedChannelId = getFollowedChannelIdResult.channels
             val channelsId = ArrayList<String> ()
-
-            if (followedChannelId.isEmpty()) {
-                warningLog("User does not follow any channel")
-                return@withContext Result.Success(channelsId)
-            }
-
             var query = fireStore.collection("RssChannels")
-                .whereIn("id", followedChannelId)
                 .whereLessThanOrEqualTo("latestUpdate", System.currentTimeMillis() - thirtyMin)
                 .orderBy("latestUpdate", ASCENDING)
 
@@ -68,9 +47,5 @@ class GetFollowAndOutDatedChannelsUseCaseSync @Inject constructor(private val ge
             } catch (ex : Exception) {
                 return@withContext Result.GeneralError(ex.message)
             }
-        }
-
-        throw RuntimeException("UnHandled Result")
     }
-
 }

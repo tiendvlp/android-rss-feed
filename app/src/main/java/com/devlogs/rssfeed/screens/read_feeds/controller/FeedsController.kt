@@ -149,7 +149,7 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
         ZoneId.SHORT_IDS.forEach {
             Log.d("ZoneIds", "${it.key} : ${it.value}")
         }
-        val localPubDate = Instant.ofEpochMilli(feedEntity.pubDate).atZone(ZoneId.of("Asia/Ho_Chi_Minh")).toLocalDateTime()
+        val localPubDate = Instant.ofEpochMilli(feedEntity.pubDate).atZone(ZoneId.systemDefault()).toLocalDateTime()
 
         val isToday = localPubDate.isSameDate(today)
         val isYesterday = localPubDate.isSameDate(yesterday)

@@ -68,9 +68,8 @@ class FeedContentActivity : AppCompatActivity(), FeedContentMvcView.Listener {
     }
 
     private fun convertParamInToPresentableModel () : FeedPresentableModel {
-
         val date = Date(param.pubDate)
-        val dateFormat = SimpleDateFormat("dd/MM/yy : hh:mm")
+        val dateFormat = SimpleDateFormat("dd/MM/yy HH:mm")
 
         val pubDateInString = dateFormat.format(date)
 

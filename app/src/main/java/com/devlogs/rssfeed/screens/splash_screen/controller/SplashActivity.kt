@@ -6,10 +6,10 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.Toast
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.work.*
 import com.devlogs.rssfeed.R
-import com.devlogs.rssfeed.android_services.RssTrackingWorker
+import com.devlogs.rssfeed.android_services.TrackingAllChannelWorker
+import com.devlogs.rssfeed.android_services.TrackingFollowedChannelWorker
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.authentication.ValidateLoginUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
@@ -23,6 +23,7 @@ import com.devlogs.rssfeed.screens.login.controller.LoginActivity
 import com.devlogs.rssfeed.screens.main.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -54,12 +55,13 @@ class SplashActivity : AppCompatActivity(), LogTarget {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.layout_splash)
-
-
+        // Even user didn't logged in, we also start a tracking service when the phone is in charging state
+        TrackingAllChannelWorker.startWhenCharging(this)
+        normalLog("Start the tracking all channel worker")
         CoroutineScope(BackgroundDispatcher).launch {
             withContext(Dispatchers.Main.immediate) {
-                delay(4500)
                 if (applicationStateManager.user == null) {
+                    TrackingFollowedChannelWorker.stop(this@SplashActivity)
                     LoginActivity.start(this@SplashActivity)
                 } else {
                     Toast.makeText(this@SplashActivity, "Welcome", Toast.LENGTH_LONG).show()
@@ -74,6 +76,8 @@ class SplashActivity : AppCompatActivity(), LogTarget {
                             Log.e("SplashActivity", "Error happen when initial the default channel, ${getChannelResult.javaClass.simpleName}")
                         }
                     }
+                    normalLog("Start the tracking followed channel worker")
+                    TrackingFollowedChannelWorker.startAndRepeatEvery3Hours(this@SplashActivity)
                     MainActivity.start(this@SplashActivity)
                 }
                 finish()
@@ -83,9 +87,6 @@ class SplashActivity : AppCompatActivity(), LogTarget {
         btnTestSerivce = findViewById(R.id.btnTestService)
         btnTestSerivce.setOnClickListener {
             Log.d("BtnTestService", "Clicked")
-            val doWorkerRequest = OneTimeWorkRequestBuilder<RssTrackingWorker>().build()
-            WorkManager.getInstance(applicationContext)
-                .enqueue(doWorkerRequest)
         }
     }
 
