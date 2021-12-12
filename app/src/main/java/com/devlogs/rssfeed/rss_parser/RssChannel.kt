@@ -6,5 +6,6 @@ class RssChannel(
     var link: String,
     var author: String,
     var description: String,
-    var image: String
+    var image: String,
+    var pubDate: String,
 )

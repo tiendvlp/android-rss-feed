@@ -15,6 +15,7 @@ import com.devlogs.rssfeed.rss_parser.RSSObject
 import com.devlogs.rssfeed.rss_parser.RssFeed
 import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.RuntimeException
@@ -72,12 +73,18 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         throw RuntimeException("UnHandle result")
     }
 
+    private suspend fun isUpdated (channelId: String, since: Long) : Boolean {
+         val latestUpdate = fireStore.collection("RssChannels")
+            .document(channelId)
+            .get().await().getLong("latestUpdate")!!
+        return since <= latestUpdate
+    }
+
     @SuppressLint("NewApi")
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
         val rssChannel = rssObject.channel
         try {
             var id = UrlEncrypt.encode(rssChannel.url)
-
             var rssUrl = rssChannel.url
             var link = rssChannel.link
             if (rssUrl[rssUrl.length-1].equals('/')) {
@@ -99,6 +106,14 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 rssChannel.description,
                 rssChannel.image
             )
+
+            val latestPubDate = getFeedPubDate(rssObject.feeds.first().pubDate)
+            normalLog("The newest item in ${rssChannel.title} channel is: ${rssObject.feeds.first().title}")
+            if (isUpdated(id, latestPubDate.time)) {
+                normalLog("The channel already updated")
+                return Result.Success(channelEntity)
+            }
+
             fireStore.collection("RssChannels").document(channelEntity.id)
                 .set(mapOf(
                     "id" to channelEntity.id,
@@ -117,14 +132,17 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
     }
 
+    private fun getFeedPubDate (pubDate: String) : Date {
+        val pubDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
+        pubDateFormat.timeZone = TimeZone.getTimeZone("UTC")
+        return pubDateFormat.parse(pubDate)
+    }
+
     @SuppressLint("NewApi")
     private suspend fun saveChannelFeeds (channel: RssChannelEntity, feeds: List<RssFeed>) : Result {
         try {
             feeds.forEach {
-                Log.d("AddNewRssUseCase", "save: ${it.title}")
-                val pubDateFormat = SimpleDateFormat("yyyy-MM-dd hh:mm:ss")
-                pubDateFormat.timeZone = TimeZone.getTimeZone("UTC")
-                val pubDate: Date = pubDateFormat.parse(it.pubDate)
+                val pubDate: Date = getFeedPubDate(it.pubDate)
 
                 val id = UrlEncrypt.encode(it.guid)
                 Log.d("AddNewRssUseCase", "save id: ${id}")
