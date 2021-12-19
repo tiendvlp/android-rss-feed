@@ -83,15 +83,18 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     }
 
     private suspend fun isUpdated (channelId: String, since: Long) : Boolean {
-         val latestUpdate = fireStore.collection("RssChannels")
-            .document(channelId)
-            .get().await().getLong("latestUpdate")!!
-        return since <= latestUpdate
+        normalLog("Check channel {$channelId} is updated or not")
+        val channel = fireStore.collection("RssChannels")
+            .document(channelId).get().await()
+        if (channel.exists()) {
+            val latestUpdate = channel.getLong("latestUpdate")!!
+            return since <= latestUpdate
+        }
+        return false
     }
 
     @SuppressLint("NewApi")
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
-
         val rssChannel = rssObject.channel
         try {
             var id = UrlEncrypt.encode(rssChannel.url)
@@ -123,7 +126,8 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 normalLog("The channel already updated")
                 return Result.Success(channelEntity)
             }
-
+            normalLog("Channel is not updated")
+            normalLog("Write channel to firestore")
             fireStore.collection("RssChannels").document(channelEntity.id)
                 .set(mapOf(
                     "id" to channelEntity.id,
@@ -134,7 +138,8 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                     "imageUrl" to channelEntity.imageUrl,
                     "latestUpdate" to System.currentTimeMillis()
                 ))
-                return saveChannelFeeds(channelEntity, rssObject.feeds)
+            normalLog("Saving channel")
+            return saveChannelFeeds(channelEntity, rssObject.feeds)
         } catch (ex: Exception) {
             Log.e("AddNewRssUseCase", "GeneralError due to exception when check the duplication of channel: ${ex.message}")
             return Result.GeneralError(ex.message)
