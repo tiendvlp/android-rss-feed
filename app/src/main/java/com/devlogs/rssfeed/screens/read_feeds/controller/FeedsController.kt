@@ -143,7 +143,6 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun feedEntityToPresentableModel (feedEntity: FeedEntity): FeedPresentableModel {
-
         val today = LocalDateTime.now()
         val yesterday = LocalDateTime.now().minusDays(1)
         ZoneId.SHORT_IDS.forEach {

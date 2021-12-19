@@ -18,6 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import ru.gildor.coroutines.okhttp.await
 import java.lang.RuntimeException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -26,6 +29,7 @@ import javax.inject.Inject
 class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     private val fireStore: FirebaseFirestore,
     private val rssParser: RssParser,
+    private val client: OkHttpClient,
     private val getCurrentLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync
 ) : LogTarget {
     sealed class Result {
@@ -36,7 +40,6 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
     suspend fun executes(rssUrl: String) = withContext(BackgroundDispatcher) {
         val getRssChannelResult = rssParser.parse(rssUrl)
-
         if (getRssChannelResult is RssParser.Result.GeneralError) {
             Log.e("AddNewRssUseCase", "General error due to Found rss content (${rssUrl} but can not parse the rss channel")
             return@withContext Result.GeneralError("Found rss content (${rssUrl} but can not parse the rss channel")
@@ -82,6 +85,7 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
     @SuppressLint("NewApi")
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
+
         val rssChannel = rssObject.channel
         try {
             var id = UrlEncrypt.encode(rssChannel.url)
@@ -143,10 +147,12 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         try {
             feeds.forEach {
                 val pubDate: Date = getFeedPubDate(it.pubDate)
-
                 val id = UrlEncrypt.encode(it.guid)
                 Log.d("AddNewRssUseCase", "save id: ${id}")
-                val imgUrl: String = getImageUrlInContent(it.content)
+                var imgUrl: String = it.thumbnail
+                if (imgUrl.isNullOrBlank()) {
+                    imgUrl = getImageUrlInContent(it.content)
+                }
                 val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content, imgUrl)
                 fireStore
                     .collection("Feeds")
@@ -162,9 +168,16 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         }
     }
 
-    private fun getImageUrlInContent(content: String): String {
-        val searchTarget = content.replace("\\s+","")
-        val imageTagIndex = searchTarget.indexOf("<img")
+    private suspend fun getImageUrlInContent(feedUrl: String): String {
+        val request = Request.Builder()
+            .url(feedUrl)
+            .get()
+            .build()
+
+        val response = client.newCall(request).await()
+        val searchTarget = response.body!!.string().replace("\\s+","")
+        val endHeaderIndex = searchTarget.indexOf("</header>")
+        val imageTagIndex = searchTarget.indexOf("<img",endHeaderIndex)
         Log.d("AddNewRssUseCase", imageTagIndex.toString())
         if (imageTagIndex == -1) {
             return ""

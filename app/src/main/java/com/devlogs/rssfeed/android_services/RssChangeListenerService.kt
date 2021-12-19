@@ -92,19 +92,21 @@ class RssChangeListenerService : Service() {
 
         }
 
-        private fun fireStoreDocToFeedEntity (doc: DocumentSnapshot) : FeedEntity = FeedEntity(
-            doc.getString("id")!!,
-            doc.getString("rssChannelId")!!,
-            doc.getString("channelTitle")!!,
-            doc.getString("title")!!,
-            doc.getString("description")!!,
-            doc.getLong("pubDate")!!,
-            doc.getString("url")!!,
-            doc.getString("author")!!,
-            doc.getString("content")!!,
-            doc.getString("imageUrl")
+        private fun fireStoreDocToFeedEntity (doc: DocumentSnapshot) : FeedEntity {
+            return FeedEntity(
+                doc.getString("id")!!,
+                doc.getString("rssChannelId")!!,
+                doc.getString("channelTitle")!!,
+                doc.getString("title")!!,
+                doc.getString("description")!!,
+                doc.getLong("pubDate")!!,
+                doc.getString("url")!!,
+                doc.getString("author")!!,
+                doc.getString("content")!!,
+                doc.getString("imageUrl")
 
-        )
+            )
+        }
     }
 
     inner class LocalBinder : Binder() {

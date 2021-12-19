@@ -18,7 +18,7 @@ class RssParser(private val client: OkHttpClient) {
 
     suspend fun parse (rssUrl: String) : Result {
         val apiUrl = """
-                $API_URL$rssUrl&api_key=crqz0qfs3k4uuqh1ywrh1bk5v6ojrhrclgggesov
+                    $API_URL$rssUrl&api_key=crqz0qfs3k4uuqh1ywrh1bk5v6ojrhrclgggesov
             """.trimIndent()
         val request = Request.Builder()
             .url(apiUrl)

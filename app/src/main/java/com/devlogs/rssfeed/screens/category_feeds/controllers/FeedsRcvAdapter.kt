@@ -15,12 +15,15 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.devlogs.rssfeed.R
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.screens.category_feeds.presentable_model.FeedPresentableModel
 import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
 import org.sufficientlysecure.htmltextview.HtmlTextView
+import java.net.URL
 import java.util.*
 
-class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
+class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>, LogTarget {
 
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val txtAuthor : TextView = view.findViewById(R.id.txtAuthor)
@@ -35,9 +38,10 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder> {
             txtTitle.text = feed.title
             btnSaved.visibility = View.GONE
             if (feed.imageUrl != null) {
+                normalLog("load image: ${feed.imageUrl}" )
                 Glide
                     .with(itemView.context)
-                    .load(feed.imageUrl)
+                    .load((feed.imageUrl))
                     .listener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
                             e: GlideException?,
