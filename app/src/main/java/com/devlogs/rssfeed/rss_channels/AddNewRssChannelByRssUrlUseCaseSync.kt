@@ -7,6 +7,7 @@ import androidx.annotation.RequiresApi
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.errorLog
 import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
@@ -22,6 +23,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import ru.gildor.coroutines.okhttp.await
 import java.lang.RuntimeException
+import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
@@ -173,30 +175,36 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
             .url(feedUrl)
             .get()
             .build()
+        try {
+            val response = client.newCall(request).await()
+            val searchTarget = response.body!!.string().replace("\\s+", "")
+            val endHeaderIndex = searchTarget.indexOf("</header>")
+            val imageTagIndex = searchTarget.indexOf("<img", endHeaderIndex)
+            Log.d("AddNewRssUseCase", imageTagIndex.toString())
+            if (imageTagIndex == -1) {
+                return ""
+            }
 
-        val response = client.newCall(request).await()
-        val searchTarget = response.body!!.string().replace("\\s+","")
-        val endHeaderIndex = searchTarget.indexOf("</header>")
-        val imageTagIndex = searchTarget.indexOf("<img",endHeaderIndex)
-        Log.d("AddNewRssUseCase", imageTagIndex.toString())
-        if (imageTagIndex == -1) {
+            val srcPropIndex = searchTarget.indexOf("src", imageTagIndex)
+            Log.d("AddNewRssUseCase", srcPropIndex.toString())
+
+            if (srcPropIndex == -1) {
+                return ""
+            }
+
+            val quoteIndex = srcPropIndex + 3 + 1
+            val quoteChar = searchTarget[quoteIndex]
+            // make sure it find the right quote
+            Log.d("AddNewRssUseCase", "quote: ${quoteChar}")
+            Log.d("AddNewRssUseCase", "hello: ${searchTarget.indexOf(quoteChar, quoteIndex + 1)}")
+
+            return searchTarget.substring(
+                quoteIndex + 1,
+                searchTarget.indexOf(quoteChar, quoteIndex + 1)
+            )
+        } catch (ex: java.lang.Exception) {
+            errorLog("An exception occur when get image of feed $feedUrl: " + ex.message)
             return ""
         }
-
-        val srcPropIndex = searchTarget.indexOf("src", imageTagIndex)
-        Log.d("AddNewRssUseCase", srcPropIndex.toString())
-
-        if (srcPropIndex == -1 ) {
-            return ""
-        }
-
-        val quoteIndex = srcPropIndex+3+1
-        val quoteChar = searchTarget[quoteIndex]
-        // make sure it find the right quote
-        Log.d("AddNewRssUseCase", "quote: ${quoteChar}")
-        Log.d("AddNewRssUseCase", "hello: ${searchTarget.indexOf(quoteChar, quoteIndex + 1)}")
-
-        return searchTarget.substring(quoteIndex + 1, searchTarget.indexOf(quoteChar, quoteIndex + 1))
     }
-
 }
