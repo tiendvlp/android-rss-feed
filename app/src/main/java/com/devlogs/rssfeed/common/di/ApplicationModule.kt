@@ -50,9 +50,9 @@ class ApplicationModule {
     @Singleton
     fun provideOkHttpClient () : OkHttpClient {
         val client = OkHttpClient.Builder()
-            .connectTimeout(12, TimeUnit.SECONDS)
-            .writeTimeout(12, TimeUnit.SECONDS)
-            .readTimeout(12, TimeUnit.SECONDS)
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(11, TimeUnit.SECONDS)
             .build()
 
         return client

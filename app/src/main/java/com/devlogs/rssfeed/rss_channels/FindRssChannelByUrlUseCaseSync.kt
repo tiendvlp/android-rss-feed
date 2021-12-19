@@ -48,6 +48,7 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
             Log.w("FindRssChannel", "RssChannel notfound $url")
             return@withContext parseXml(url)
         }
+
         if (findResult is RssUrlFinder.Result.Success) {
             Log.d("FindRssChannel", "Success")
             return@withContext parseXml(findResult.rssUrl)
@@ -92,7 +93,6 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
                 channel.image
             )
         } else {
-
             return Result.NotFound()
         }
     }

@@ -42,6 +42,10 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
     suspend fun executes(rssUrl: String) = withContext(BackgroundDispatcher) {
         val getRssChannelResult = rssParser.parse(rssUrl)
+        if (getRssChannelResult is RssParser.Result.ConnectionError ) {
+            Log.e("AddNewRssUseCase", "General error due to Found rss content (${rssUrl} but can not parse the rss channel")
+            return@withContext Result.GeneralError("Connection error please check your internet")
+        }
         if (getRssChannelResult is RssParser.Result.GeneralError) {
             Log.e("AddNewRssUseCase", "General error due to Found rss content (${rssUrl} but can not parse the rss channel")
             return@withContext Result.GeneralError("Found rss content (${rssUrl} but can not parse the rss channel")
