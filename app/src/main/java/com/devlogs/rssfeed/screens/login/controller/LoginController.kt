@@ -6,8 +6,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.devlogs.rssfeed.common.base.Observable
+import com.devlogs.rssfeed.receive_channel_update.SubscribeFollowedChannelsNotificationUseCaseSync
 
-class LoginController @Inject constructor(private val loginUseCaseSync: SSOLoginUseCaseSync) : Observable<LoginController.Listener> {
+class LoginController @Inject constructor(
+    private val loginUseCaseSync: SSOLoginUseCaseSync) : Observable<LoginController.Listener> {
     interface Listener {
         fun loginSuccess ()
         fun loginFailed (errorMessage: String)

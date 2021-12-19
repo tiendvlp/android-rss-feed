@@ -15,6 +15,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RSSFeed"
         android:usesCleartextTraffic="true">
+        <service
+            android:name=".android_services.FcmNotificationService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <activity
             android:name=".screens.category_feeds.controllers.CategoryFeedsActivity"

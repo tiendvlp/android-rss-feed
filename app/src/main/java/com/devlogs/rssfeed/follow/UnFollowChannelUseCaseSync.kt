@@ -6,13 +6,16 @@ import com.devlogs.rssfeed.common.helper.LogTarget
 import com.devlogs.rssfeed.common.helper.errorLog
 import com.devlogs.rssfeed.common.helper.normalLog
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.lang.Exception
 import java.lang.RuntimeException
 import javax.inject.Inject
 
-class UnFollowChannelUseCaseSync @Inject constructor(private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync, private val fireStore: FirebaseFirestore): LogTarget {
+class UnFollowChannelUseCaseSync @Inject constructor(
+    private val firebaseMessaging: FirebaseMessaging,
+    private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync, private val fireStore: FirebaseFirestore): LogTarget {
     sealed class Result {
         class Success () : Result()
         class UnAuthorized () : Result()
@@ -37,7 +40,14 @@ class UnFollowChannelUseCaseSync @Inject constructor(private val getLoggedInUser
                     .document(channelId)
                     .delete()
                     .await()
-                normalLog("Add unfollowed channel success")
+                val topicId = channelId.replace("|", "~").replace("=", "%")
+                normalLog("UnSubscribe notification from topic $topicId")
+                firebaseMessaging.unsubscribeFromTopic(topicId).addOnSuccessListener {
+                    normalLog("UnSubscribe notification from topic $topicId success")
+                }.addOnFailureListener {
+                    normalLog("UnSubscribe notification from topic $topicId failed due to ${it.message}")
+                }
+                normalLog("Remove unfollowed channel success")
                 return@withContext Result.Success()
             } catch (ex : Exception) {
                 ex.message?.let { errorLog(it) }

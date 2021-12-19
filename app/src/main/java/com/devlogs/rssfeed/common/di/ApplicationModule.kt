@@ -11,6 +11,7 @@ import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -44,6 +45,12 @@ class ApplicationModule {
     @Singleton
     fun provideDemoDependency () : DemoDepenedencies {
         return DemoDepenedencies()
+    }
+
+    @Provides
+    @Singleton
+    fun provideFirebaseMessaging () : FirebaseMessaging {
+        return FirebaseMessaging.getInstance()
     }
 
     @Provides

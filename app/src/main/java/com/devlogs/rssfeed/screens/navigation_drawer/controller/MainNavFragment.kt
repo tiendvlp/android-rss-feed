@@ -17,6 +17,9 @@ import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.ChannelPr
 import com.devlogs.rssfeed.screens.navigation_drawer.presentable_model.UserPresentableModel
 import com.devlogs.rssfeed.screens.splash_screen.controller.SplashActivity
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -71,9 +74,11 @@ class MainNavFragment : Fragment(), MainNavMvcView.Listener, MainActivity.Reload
     }
 
     override fun onBtnSignOutClicked() {
-        signOutUseCase.executes()
-        SplashActivity.start(requireContext())
-        requireActivity().finishAffinity()
+        CoroutineScope(Dispatchers.Main.immediate).launch {
+            signOutUseCase.executes()
+            SplashActivity.start(requireContext())
+            requireActivity().finishAffinity()
+        }
     }
 
     override fun onChannelSelected(channel: ChannelPresentableModel) {

@@ -2,8 +2,11 @@ package com.devlogs.rssfeed.authentication
 
 import android.content.SharedPreferences
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.common.shared_context.AppConfig
 import com.devlogs.rssfeed.domain.entities.UserEntity
+import com.devlogs.rssfeed.receive_channel_update.SubscribeFollowedChannelsNotificationUseCaseSync
 import com.devlogs.rssfeed.users.AddUserUseCaseSync
 import kotlinx.coroutines.withContext
 import java.lang.RuntimeException
@@ -13,7 +16,8 @@ class SSOLoginUseCaseSync @Inject constructor(
     private val loginRule: LoginRule,
     private val sharedPreferences: SharedPreferences,
     private val addUserUseCaseSync: AddUserUseCaseSync,
-) {
+    private val subscribeFollowedChannelsNotificationUseCaseSync: SubscribeFollowedChannelsNotificationUseCaseSync
+): LogTarget {
 
     sealed class Result {
         data class Success (val user: UserEntity) : Result ()
@@ -29,7 +33,14 @@ class SSOLoginUseCaseSync @Inject constructor(
                 .putString(AppConfig.SharedPreferencesKey.USER_AVATAR, avatarUrl)
                 .putLong(AppConfig.SharedPreferencesKey.LOGIN_EXPIRED_TIME, System.currentTimeMillis() + loginRule.getValidTime())
                 .apply()
-            return@withContext Result.Success(addUserResult.addedUser)
+            subscribeFollowedChannelsNotificationUseCaseSync.executes().let { result ->
+                if (result is SubscribeFollowedChannelsNotificationUseCaseSync.Result.Success) {
+                    normalLog("Subscribe to channel success")
+                    return@withContext Result.Success(addUserResult.addedUser)
+                } else {
+                    return@withContext Result.GeneralError("Subscribe to followed channel failed")
+                }
+            }
         } else if (addUserResult is AddUserUseCaseSync.Result.GeneralError) {
             return@withContext Result.GeneralError(addUserResult.errorMessage)
         }
