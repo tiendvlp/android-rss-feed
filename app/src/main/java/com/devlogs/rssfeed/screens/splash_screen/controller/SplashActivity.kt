@@ -16,6 +16,8 @@ import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.common.helper.LogTarget
 import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.feeds.GetFeedsByRssChannelUseCaseSync
+import com.devlogs.rssfeed.receive_channel_update.SubscribeFollowedChannelsNotificationUseCaseSync
+import com.devlogs.rssfeed.receive_channel_update.UnSubscribeFollowedChannelsNotificationUseCaseSync
 import com.devlogs.rssfeed.rss_channels.AddNewRssChannelByRssUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.FindRssChannelByUrlUseCaseSync
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
@@ -48,6 +50,8 @@ class SplashActivity : AppCompatActivity(), LogTarget {
     @Inject
     protected lateinit var getFeedsByRssChannelUseCaseSync: GetFeedsByRssChannelUseCaseSync
     @Inject
+    protected lateinit var subscribeFollowedChannelsNotificationUseCaseSync: SubscribeFollowedChannelsNotificationUseCaseSync
+    @Inject
     protected lateinit var applicationStateManager : ApplicationStateManager
 
     private lateinit var btnTestSerivce: Button
@@ -77,6 +81,7 @@ class SplashActivity : AppCompatActivity(), LogTarget {
                         }
                     }
                     normalLog("Start the tracking followed channel worker")
+                    subscribeFollowedChannelsNotificationUseCaseSync.executes()
                     TrackingFollowedChannelWorker.startAndRepeatEvery3Hours(this@SplashActivity)
                     MainActivity.start(this@SplashActivity)
                 }
