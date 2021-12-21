@@ -2,6 +2,9 @@ package com.devlogs.rssfeed.feeds
 
 import android.util.Log
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.errorLog
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,7 +14,7 @@ import kotlinx.coroutines.withContext
 import java.lang.Exception
 import javax.inject.Inject
 
-class GetFeedsByRssChannelUseCaseSync @Inject constructor(private val fireStore: FirebaseFirestore) {
+class GetFeedsByRssChannelUseCaseSync @Inject constructor(private val fireStore: FirebaseFirestore): LogTarget {
 
     private val TAG = "GetFeedByRssChannel"
 
@@ -21,9 +24,8 @@ class GetFeedsByRssChannelUseCaseSync @Inject constructor(private val fireStore:
     }
 
     suspend fun executes (rssChannelId: String, since: Long, count: Long) : Result = withContext(BackgroundDispatcher) {
-
         try {
-            Log.d("ChannelId", rssChannelId)
+            normalLog("channelId: ${rssChannelId}")
             val snapshot = fireStore
                 .collection("Feeds")
                 .whereEqualTo("rssChannelId", rssChannelId)
@@ -32,9 +34,10 @@ class GetFeedsByRssChannelUseCaseSync @Inject constructor(private val fireStore:
                 .limit(count)
                 .get()
                 .await()
-
+            normalLog("fetch channel (id:${rssChannelId}) successfully with ${snapshot.documents.size}")
             val channels = ArrayList<FeedEntity>()
-            snapshot.documents.forEach { doc ->
+            snapshot.documents.forEachIndexed {index, doc ->
+                normalLog("converting $index.channel (id: ${doc.getString("id")!!}) to channelEntity")
                 channels.add(
                     FeedEntity(
                         doc.getString("id")!!,
@@ -46,13 +49,13 @@ class GetFeedsByRssChannelUseCaseSync @Inject constructor(private val fireStore:
                         doc.getString("url")!!,
                         doc.getString("author")!!,
                         doc.getString("content")!!,
-                        doc.getString("imageUrl")!!
+                        doc.getString("imageUrl")
                     )
                 )
             }
             return@withContext Result.Success(channels)
         } catch (ex: Exception) {
-            ex.message?.let { Log.e(TAG, it) }
+            errorLog(ex.message ?: "Unknown Exception Message")
             return@withContext Result.GeneralError(ex.message)
         }
     }

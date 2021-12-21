@@ -1,5 +1,6 @@
 package com.devlogs.rssfeed.screens.read_feeds.controller
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -7,10 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import com.devlogs.chatty.screen.common.presentationstate.CommonPresentationAction.RestoreAction
 import com.devlogs.rssfeed.android_services.RssChangeListenerService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.warningLog
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.screens.bottomsheet_categories.CategoriesBottomSheet
 import com.devlogs.rssfeed.screens.feed_content.controller.FeedContentActivity
@@ -29,11 +33,12 @@ import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreen
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.*
 import dagger.hilt.android.AndroidEntryPoint
 import java.lang.Exception
+import java.lang.IllegalArgumentException
 import javax.inject.Inject
 import javax.inject.Named
 
 @AndroidEntryPoint
-class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationStateChangedListener, MainScreenInsiderListener{
+class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationStateChangedListener, MainScreenInsiderListener, LogTarget{
     companion object {
         @JvmStatic
         fun newInstance() =
@@ -165,6 +170,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         channelFollowingController.unFollow()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onStateChanged(
         previousState: PresentationState?,
         currentState: PresentationState,
@@ -179,7 +185,11 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 feedsController.initialLoad()
             }
             is InitialLoadFailedState -> {
-                requireContext().unbindService(newFeedsServiceConnector)
+                try {
+                    requireContext().unbindService(newFeedsServiceConnector)
+                } catch (ex: IllegalArgumentException) {
+                    warningLog("The service is not bind")
+                }
             }
             is DisplayState -> {
                 displayStateProcess (previousState, currentState, action)

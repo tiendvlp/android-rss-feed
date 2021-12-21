@@ -68,8 +68,8 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
 
             if (getFeedsResult is GetFeedsByRssChannelUseCaseSync.Result.Success) {
                 feeds.addAll(getFeedsResult.rssChannel.map { feedEntityToPresentableModel(it) })
-            } else {
-                throw RuntimeException("UnExpected result from getFeedsUseCase ${getFeedsResult.javaClass.simpleName}")
+            } else if (getFeedsResult is GetFeedsByRssChannelUseCaseSync.Result.GeneralError) {
+                throw RuntimeException("UnExpected result from getFeedsUseCase ${getFeedsResult.errorMessage ?: ""}")
             }
 
             // now we get Feeds success, next is check the user and channel
