@@ -32,6 +32,8 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     private lateinit var btnFollow: Button
     private lateinit var btnUnFollow: Button
     private lateinit var followProgress : ProgressBar
+    private var currentScrollPos: Int = 0
+
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
         setRootView(uiToolkit.layoutInflater.inflate(R.layout.layout_read_feeds, viewGroup, false))
@@ -50,6 +52,10 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         btnFollow = toolbarLayout.findViewById(R.id.btnFollow)
         btnUnFollow = toolbarLayout.findViewById(R.id.btnUnFollow)
         followProgress = toolbarLayout.findViewById(R.id.followProgress)
+    }
+
+    override fun getCurrentScrollPos(): Int {
+        return currentScrollPos
     }
 
     private fun addEvents() {
@@ -98,6 +104,18 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         feedsRcvAdapter.setRecyclerView(lvFeeds)
         feedsRcvAdapter.isLoadMoreEnable = false
         lvFeeds.adapter = feedsRcvAdapter
+
+        lvFeeds.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                currentScrollPos = dy
+                super.onScrolled(recyclerView, dx, dy)
+            }
+        })
+
+    }
+
+    override fun scrollToPos(position: Int) {
+        lvFeeds.scrollTo(0, position)
     }
 
     override fun setUserAvatarUrl(url: String?) {

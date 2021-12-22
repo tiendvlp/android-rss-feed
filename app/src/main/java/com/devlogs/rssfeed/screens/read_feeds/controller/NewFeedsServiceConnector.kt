@@ -29,8 +29,8 @@ class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) priva
         val displayState = stateManager.currentState as DisplayState
         val binder = service as RssChangeListenerService.LocalBinder
         this.service = binder.service
-        Log.d("OnNewFeedConnector", "Reregister: ${displayState.channelPresentableModel.title}")
-        this.service!!.register(displayState.channelPresentableModel.id, this)
+        Log.d("OnNewFeedConnector", "Reregister: ${displayState.model.channelPresentableModel.title}")
+        this.service!!.register(displayState.model.channelPresentableModel.id, this)
     }
 
     override fun onServiceDisconnected(name: ComponentName?) {
@@ -38,7 +38,7 @@ class NewFeedsServiceConnector @Inject constructor (@Named(FRAGMENT_SCOPE) priva
             throw RuntimeException("Invalid state, serviceDisConnect require DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")
         }
         val displayState = stateManager.currentState as DisplayState
-        service!!.unRegister(displayState.channelPresentableModel.id, this)
+        service!!.unRegister(displayState.model.channelPresentableModel.id, this)
         service = null
     }
 

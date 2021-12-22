@@ -5,6 +5,7 @@ import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableM
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.RssChannelPresentableModel
 import com.devlogs.rssfeed.screens.common.mvcview.MvcViewFactory
 import com.devlogs.rssfeed.screens.common.mvcview.ObservableMvcView
+import com.devlogs.rssfeed.screens.read_feeds.presentable_model.ReadFeedPresentableModel
 import java.util.*
 
 interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
@@ -18,6 +19,8 @@ interface ReadFeedsMvcView : ObservableMvcView<ReadFeedsMvcView.Listener> {
 
     }
 
+    fun scrollToPos (position: Int)
+    fun getCurrentScrollPos () : Int
     fun setUserAvatarUrl (url:String?)
     fun setChannels (channel: RssChannelPresentableModel)
     fun appendFeeds (feeds: TreeSet<FeedPresentableModel>)

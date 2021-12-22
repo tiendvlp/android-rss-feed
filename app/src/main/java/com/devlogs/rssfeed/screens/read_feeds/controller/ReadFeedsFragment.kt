@@ -14,6 +14,7 @@ import com.devlogs.rssfeed.android_services.RssChangeListenerService
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
 import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.common.helper.warningLog
 import com.devlogs.rssfeed.common.shared_context.AppConfig.DaggerNamed.FRAGMENT_SCOPE
 import com.devlogs.rssfeed.screens.bottomsheet_categories.CategoriesBottomSheet
@@ -81,6 +82,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
+        if (presentationStateManager.currentState is DisplayState) {
+            (presentationStateManager.currentState as DisplayState).model.currentScrollPos = mvcView.getCurrentScrollPos()
+        }
         presentationStateManager.onSavedInstanceState(outState)
         super.onSaveInstanceState(outState)
     }
@@ -94,7 +98,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         if (userSelectedChannelId != null) {
             if (presentationStateManager.currentState is DisplayState) {
                 val currentDisplayChannelId =
-                    (presentationStateManager.currentState as DisplayState).channelPresentableModel.id
+                    (presentationStateManager.currentState as DisplayState).model.channelPresentableModel.id
                 if (!currentDisplayChannelId.equals(userSelectedChannelId)) {
                     presentationStateManager.consumeAction(
                         UserSelectChannelAction(
@@ -110,20 +114,21 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     override fun onStart() {
         super.onStart()
         mvcView.register(this)
+        normalLog("OnStart")
         mainScreenInsiderObservable.register(this)
-
         presentationStateManager.register(this, true)
     }
 
     override fun onStop() {
         super.onStop()
+        normalLog("OnStop")
         mvcView.unRegister(this)
         presentationStateManager.unRegister(this)
         try {
             Log.d("UnBind", "ServiceOnFeeds")
             requireContext().unbindService(newFeedsServiceConnector)
         } catch (ex: Exception) {
-            ex.message?.let { Log.w("ReadFeedsFragment", it) }
+            ex.message?.let { Log.w("ReadFeedsFragment", ex.message?:"No Message") }
         }
 
         mainScreenInsiderObservable.unRegister(this)
@@ -147,6 +152,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         categoriesBottomSheet.show(requireContext(), selectedFeeds.id)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onLoadMoreFeeds() {
         feedsController.loadMore()
     }
@@ -158,6 +164,11 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
             return
         }
         feedsController.reload()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        normalLog("OnDestroy")
     }
 
     override fun onBtnFollowClicked() {
@@ -221,9 +232,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     ) {
         when (action) {
             is RestoreAction -> {
-                mvcView.appendFeeds(currentState.feeds)
-                mvcView.setChannels(currentState.channelPresentableModel)
-                mvcView.setUserAvatarUrl(currentState.avatarUrl)
+                mvcView.appendFeeds(currentState.model.feeds)
+                mvcView.setChannels(currentState.model.channelPresentableModel)
+                mvcView.setUserAvatarUrl(currentState.model.avatarUrl)
                 mvcView.hideRefreshLayout()
                 RssChangeListenerService.bind(requireContext(), newFeedsServiceConnector)
             }
@@ -256,9 +267,9 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
             }
             is InitialLoadSuccessAction -> {
                 mvcView.clear()
-                mvcView.appendFeeds(currentState.feeds)
-                mvcView.setChannels(currentState.channelPresentableModel)
-                mvcView.setUserAvatarUrl(currentState.avatarUrl)
+                mvcView.appendFeeds(currentState.model.feeds)
+                mvcView.setChannels(currentState.model.channelPresentableModel)
+                mvcView.setUserAvatarUrl(currentState.model.avatarUrl)
                 RssChangeListenerService.bind(requireContext(), newFeedsServiceConnector)
             }
             is LoadMoreFailedAction -> {
@@ -269,5 +280,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 Log.d("ReadFeedsFragment", "Load more success: ${action.feeds.size} feeds")
             }
         }
+        mvcView.scrollToPos(currentState.model.currentScrollPos)
     }
 }

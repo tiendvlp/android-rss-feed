@@ -11,6 +11,7 @@ import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreen
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.DisplayState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
@@ -24,7 +25,8 @@ class ChannelFollowingController @Inject constructor(@Named(AppConfig.DaggerName
     fun follow () {
         coroutine.launch {
             if (stateManager.currentState is DisplayState) {
-                val result = followChannelUseCaseSync.executes((stateManager.currentState as DisplayState).channelPresentableModel.id)
+                val result = followChannelUseCaseSync.executes((stateManager.currentState as DisplayState).model.channelPresentableModel.id)
+                delay(700)
 
                 if (result is FollowChannelUseCaseSync.Result.Success) {
                     stateManager.consumeAction(FollowProcessSuccessAction())
@@ -48,7 +50,8 @@ class ChannelFollowingController @Inject constructor(@Named(AppConfig.DaggerName
     fun unFollow () {
         coroutine.launch {
             if (stateManager.currentState is DisplayState) {
-                val result = unFollowChannelUseCaseSync.executes((stateManager.currentState as DisplayState).channelPresentableModel.id)
+                delay(700)
+                val result = unFollowChannelUseCaseSync.executes((stateManager.currentState as DisplayState).model.channelPresentableModel.id)
 
                 if (result is UnFollowChannelUseCaseSync.Result.Success) {
                     stateManager.consumeAction(UnFollowProcessSuccessAction())

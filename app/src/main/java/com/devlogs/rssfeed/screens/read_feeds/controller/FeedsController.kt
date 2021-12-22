@@ -126,8 +126,8 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
             throw RuntimeException("Invalid state, loadMore only run with DisplayState but ${stateManager.currentState.javaClass.simpleName} is found")
         }
         val displayState = stateManager.currentState as DisplayState
-        val channelId = displayState.channelPresentableModel.id
-        val oldest = displayState.feeds.last().pubDate
+        val channelId = displayState.model.channelPresentableModel.id
+        val oldest = displayState.model.feeds.last().pubDate
         coroutine.launch {
             val getFeedsResult = getFeedsByRssChannelUseCaseSync.executes(channelId
             , oldest, 20)
@@ -202,7 +202,7 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
             throw RuntimeException("Invalid state, reload only run with DisplayState but ${stateManager.currentState.javaClass.canonicalName} is found")
         }
         val displayState = stateManager.currentState as DisplayState
-        val channelId = displayState.channelPresentableModel.id
+        val channelId = displayState.model.channelPresentableModel.id
 
         coroutine.launch {
             val result = reloadRssChannelUseCaseSync.executes(channelId)

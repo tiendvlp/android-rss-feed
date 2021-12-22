@@ -187,8 +187,18 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         try {
             val response = client.newCall(request).await()
             val searchTarget = response.body!!.string().replace("\\s+", "")
-            val endHeaderIndex = searchTarget.indexOf("</header>")
-            val imageTagIndex = searchTarget.indexOf("<img", endHeaderIndex)
+            var startIndex = searchTarget.indexOf("<article")
+            var imageTagIndex = -1
+            if (startIndex != -1) {
+                imageTagIndex = searchTarget.indexOf("<img", startIndex)
+            }
+            if (imageTagIndex == -1) {
+                startIndex = searchTarget.indexOf("</header>")
+                if (startIndex == -1) {
+                    return ""
+                }
+                imageTagIndex = searchTarget.indexOf("<img", startIndex)
+            }
             Log.d("AddNewRssUseCase", imageTagIndex.toString())
             if (imageTagIndex == -1) {
                 return ""
