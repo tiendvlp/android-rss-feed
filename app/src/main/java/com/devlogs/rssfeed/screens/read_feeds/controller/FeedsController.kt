@@ -17,6 +17,7 @@ import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreen
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.DisplayState
 import com.devlogs.rssfeed.screens.read_feeds.presentation_state.ReadFeedsScreenPresentationState.InitialLoadingState
 import kotlinx.coroutines.*
+import java.text.SimpleDateFormat
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -24,6 +25,10 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Named
+import java.time.ZonedDateTime
+
+
+
 
 class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val stateManager: PresentationStateManager,
                                           private val getFeedsByRssChannelUseCaseSync: GetFeedsByRssChannelUseCaseSync,
@@ -145,16 +150,20 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
     private fun feedEntityToPresentableModel (feedEntity: FeedEntity): FeedPresentableModel {
         val today = LocalDateTime.now()
         val yesterday = LocalDateTime.now().minusDays(1)
-        ZoneId.SHORT_IDS.forEach {
-            Log.d("ZoneIds", "${it.key} : ${it.value}")
-        }
-        val localPubDate = Instant.ofEpochMilli(feedEntity.pubDate).atZone(ZoneId.systemDefault()).toLocalDateTime()
 
-        val isToday = localPubDate.isSameDate(today)
-        val isYesterday = localPubDate.isSameDate(yesterday)
 
-        val localDateFormater = DateTimeFormatter.ofPattern("dd/mm/yy")
-        val localHourFormater = DateTimeFormatter.ofPattern("HH:mm")
+        val utcInstant = Date(feedEntity.pubDate).toInstant()
+        val there = ZonedDateTime.ofInstant(utcInstant, ZoneId.of("UTC"))
+
+        val here = there.withZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime()
+
+        Log.d("Raw Date:", "${utcInstant}")
+
+        val isToday = here.isSameDate(today)
+        val isYesterday = here.isSameDate(yesterday)
+
+        val localDateFormater = DateTimeFormatter.ofPattern("dd/MM/yy")
+        val localHourFormater = DateTimeFormatter.ofPattern("hh:mm")
 
         var pubDateInString : String
 
@@ -166,11 +175,12 @@ class FeedsController @Inject constructor(@Named(FRAGMENT_SCOPE) private val sta
                 pubDateInString = "Yesterday"
             }
             else -> {
-                pubDateInString = localPubDate.format(localDateFormater)
+                pubDateInString = here.format(localDateFormater)
             }
         }
 
-        pubDateInString += " at ${localPubDate.format(localHourFormater)}"
+        pubDateInString += " at ${here.format(localHourFormater)}"
+        Log.d("Raw Date localTimeZone:", here.toString())
 
         return FeedPresentableModel(
             feedEntity.id,

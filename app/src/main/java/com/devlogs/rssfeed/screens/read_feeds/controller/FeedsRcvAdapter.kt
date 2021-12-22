@@ -35,7 +35,19 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>, LogTarget
         private val imgHtml : HtmlTextView = view.findViewById(R.id.imgHtml)
         private val btnSaved: ImageButton = view.findViewById(R.id.btnSaved)
         fun bind (feed: FeedPresentableModel) {
-            txtAuthor.text = if (feed.author.isEmpty()) feed.channelTitle else "${feed.author} at ${feed.channelTitle}"
+            txtAuthor.text = feed.author
+            if (txtAuthor.text.isEmpty()) {
+                txtAuthor.text = feed.channelTitle
+            } else {
+                if (txtAuthor.text.length < 15) {
+                    if (feed.channelTitle.length <= 17) {
+                        txtAuthor.text = txtAuthor.text.toString() + " at ${feed.channelTitle}"
+                    }
+                }
+                else if (txtAuthor.text.length > 32) {
+                    txtAuthor.text = txtAuthor.text.substring(0 .. 32) + "..."
+                }
+            }
             txtPubDate.text = feed.pubDateInString
             txtTitle.text = feed.title
             if (feed.imageUrl != null) {
