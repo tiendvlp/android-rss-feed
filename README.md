@@ -8,12 +8,6 @@
 ![intro](https://user-images.githubusercontent.com/27767477/144408998-be1d23a1-35b0-4bf0-8d98-397bb43b3dc6.gif)
 ![intro2](https://user-images.githubusercontent.com/27767477/144449455-0cef1d1e-2537-46c9-a7ee-e26306b6ca60.gif)
 
-# ~~How to Build~~
-### ~~1. Download project as zip~~
-### ~~2. Using Android Studio to open~~
-
-#### This is my mistake, i forgot that the only way to login is using the Google Login/Facebook Login, and the Google Login required the signed fingerprints, and Facebook only allow some 'predefined-account' to login *=> can not run on different unsigned computers, my mistake, sorry for that !*
-
 # How to build:
 
 ### 1. Download project as zip
