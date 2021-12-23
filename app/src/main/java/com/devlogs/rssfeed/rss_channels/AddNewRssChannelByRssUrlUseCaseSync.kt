@@ -158,13 +158,14 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         try {
             feeds.forEach {
                 val pubDate: Date = getFeedPubDate(it.pubDate)
-                val id = UrlEncrypt.encode(it.guid)
-                Log.d("AddNewRssUseCase", "save id: ${id}")
+                val id = UrlEncrypt.encode(it.link)
+                Log.d("AddNewRssUseCase", "save id: ${id} and link is ${it.link}")
                 var imgUrl: String = it.thumbnail
                 if (imgUrl.isNullOrBlank()) {
-                    imgUrl = getImageUrlInContent(it.content)
+                    normalLog("Image not found, start finding in content")
+                    imgUrl = getImageUrlInContent(it.link)
                 }
-                val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.guid, it.author, it.content, imgUrl)
+                val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.link, it.author, it.content, imgUrl)
                 fireStore
                     .collection("Feeds")
                     .document(entity.id)

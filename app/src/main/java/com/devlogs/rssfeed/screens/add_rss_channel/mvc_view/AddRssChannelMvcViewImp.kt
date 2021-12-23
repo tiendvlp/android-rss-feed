@@ -82,13 +82,13 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
 
     private fun addEvents() {
         btnSearch.setOnClickListener {
-            val content = edtUrl.text.trim().toString()
-            if (content.length > 5 && !content.substring(0,4).equals("http")) {
-                Toast.makeText(getContext(), "Your url have to start with http", Toast.LENGTH_SHORT).show()
-            } else {
-                getListener().forEach { listener ->
-                    listener.onBtnSearchClicked(content)
-                }
+            var content = edtUrl.text.trim().toString()
+            if (content.length > 5 && !content.substring(0, 4).equals("http")) {
+                content = "https://$content"
+                edtUrl.setText(content)
+            }
+            getListener().forEach { listener ->
+                listener.onBtnSearchClicked(content)
             }
         }
 

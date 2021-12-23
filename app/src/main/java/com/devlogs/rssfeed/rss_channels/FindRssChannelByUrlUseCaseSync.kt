@@ -3,6 +3,8 @@ package com.devlogs.rssfeed.rss_channels
 import android.util.Log
 import com.devlogs.rssfeed.authentication.GetLoggedInUserUseCaseSync
 import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.warningLog
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.encrypt.UrlEncrypt
 import com.devlogs.rssfeed.rss.RssUrlFinder
@@ -19,7 +21,7 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
     private val rssUrlFinder: RssUrlFinder,
     private val rssParser: RssParser,
     private val getLoggedInUserUseCaseSync: GetLoggedInUserUseCaseSync
-) {
+): LogTarget {
     sealed class Result {
         data class Found(
             val url: String,
@@ -75,15 +77,24 @@ class FindRssChannelByUrlUseCaseSync @Inject constructor(
                     .await()
             if (addedChannelId.exists()) {
                 val document = fireStore.collection("RssChannels").document(addedChannelId.get("channelId").toString()).get().await()
-                val addedChannel = RssChannelEntity(
-                    document["id"].toString(),
-                    document["url"].toString(),
-                    document["rssUrl"].toString(),
-                    document["title"].toString(),
-                    document["description"].toString(),
-                    document["imageUrl"].toString(),
-                )
-                return Result.AlreadyAdded(addedChannel)
+                if (document.exists()) {
+                    val addedChannel = RssChannelEntity(
+                        document["id"].toString(),
+                        document["url"].toString(),
+                        document["rssUrl"].toString(),
+                        document["title"].toString(),
+                        document["description"].toString(),
+                        document["imageUrl"].toString(),
+                    )
+                    return Result.AlreadyAdded(addedChannel)
+                } else {
+                    warningLog("The channel is not exist but user added, let's remove from user list")
+                    fireStore.collection("Users")
+                        .document(getUserResult.user.email)
+                        .collection("AddedChannels")
+                        .document(UrlEncrypt.encode(comparedUrl))
+                        .delete().await()
+                }
             }
             return Result.Found(
                 channel.link,
