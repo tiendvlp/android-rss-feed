@@ -9,6 +9,7 @@ import com.devlogs.rssfeed.common.background_dispatcher.BackgroundDispatcher
 import com.devlogs.rssfeed.common.helper.LogTarget
 import com.devlogs.rssfeed.common.helper.errorLog
 import com.devlogs.rssfeed.common.helper.normalLog
+import com.devlogs.rssfeed.common.helper.warningLog
 import com.devlogs.rssfeed.domain.entities.FeedEntity
 import com.devlogs.rssfeed.domain.entities.RssChannelEntity
 import com.devlogs.rssfeed.encrypt.UrlEncrypt
@@ -17,6 +18,8 @@ import com.devlogs.rssfeed.rss_parser.RssFeed
 import com.devlogs.rssfeed.rss_parser.RssParser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
@@ -96,6 +99,7 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     @SuppressLint("NewApi")
     private suspend fun saveToFireStore (rssObject: RSSObject) : Result {
         val rssChannel = rssObject.channel
+
         try {
             var id = UrlEncrypt.encode(rssChannel.url)
             var rssUrl = rssChannel.url
@@ -154,52 +158,61 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     }
 
     @SuppressLint("NewApi")
-    private suspend fun saveChannelFeeds (channel: RssChannelEntity, feeds: List<RssFeed>) : Result {
+    private suspend fun saveChannelFeeds (channel: RssChannelEntity, feeds: List<RssFeed>) : Result = withContext(BackgroundDispatcher) {
         try {
-            feeds.forEach {
-                val pubDate: Date = getFeedPubDate(it.pubDate)
-                val id = UrlEncrypt.encode(it.link)
-                Log.d("AddNewRssUseCase", "save id: ${id} and link is ${it.link}")
-                var imgUrl: String = it.thumbnail
-                if (imgUrl.isNullOrBlank()) {
-                    normalLog("Image not found, start finding in content")
-                    imgUrl = getImageUrlInContent(it.link)
+            val startTime = System.currentTimeMillis()
+            val defered = feeds.map {
+                async {
+                    val startTime = System.currentTimeMillis()
+                    val pubDate: Date = getFeedPubDate(it.pubDate)
+                    val id = UrlEncrypt.encode(it.link)
+                    Log.d("AddNewRssUseCase", "save id: ${id} and link is ${it.link}")
+                    var imgUrl: String = it.thumbnail
+                    if (imgUrl.isNullOrBlank()) {
+                        normalLog("Image not found, start finding in content")
+                        imgUrl = getImageUrlInContentTag(it.content)
+                    }
+                    if (imgUrl.isNullOrBlank()) {
+                        normalLog("Image not found, start finding in feed source")
+                        imgUrl = getImageUrlInContent(it.link)
+                    }
+                    val entity = FeedEntity(
+                        id,
+                        channel.id,
+                        channel.title,
+                        it.title,
+                        it.description,
+                        pubDate.time,
+                        it.link,
+                        it.author,
+                        it.content,
+                        imgUrl
+                    )
+                    fireStore
+                        .collection("Feeds")
+                        .document(entity.id)
+                        .set(entity)
+                        .await()
+                    normalLog("ParseTime: ${pubDate.time}")
+                    val endTime = System.currentTimeMillis()
+                    normalLog("Total saving time single feed: ${(endTime.toDouble() - startTime.toDouble())/1000} seconds")
                 }
-                val entity = FeedEntity(id, channel.id, channel.title, it.title, it.description, pubDate.time, it.link, it.author, it.content, imgUrl)
-                fireStore
-                    .collection("Feeds")
-                    .document(entity.id)
-                    .set(entity)
-                    .await()
-                normalLog("ParseTime: ${pubDate.time}")
-            }
-            return addToUserCollection(channel)
+
+            }.toTypedArray()
+
+           awaitAll(*defered)
+            val endTime = System.currentTimeMillis()
+            normalLog("Total saving time: ${(endTime.toDouble() - startTime.toDouble())/1000} seconds")
+            return@withContext addToUserCollection(channel)
         } catch (e: Exception) {
             e.message?.let { m -> Log.e("AddNewRssUseCase", m) }
-            return Result.GeneralError(e.message)
+            return@withContext Result.GeneralError(e.message)
         }
     }
 
-    private suspend fun getImageUrlInContent(feedUrl: String): String {
-        val request = Request.Builder()
-            .url(feedUrl)
-            .get()
-            .build()
-        try {
-            val response = client.newCall(request).await()
-            val searchTarget = response.body!!.string().replace("\\s+", "")
-            var startIndex = searchTarget.indexOf("<article")
-            var imageTagIndex = -1
-            if (startIndex != -1) {
-                imageTagIndex = searchTarget.indexOf("<img", startIndex)
-            }
-            if (imageTagIndex == -1) {
-                startIndex = searchTarget.indexOf("</header>")
-                if (startIndex == -1) {
-                    return ""
-                }
-                imageTagIndex = searchTarget.indexOf("<img", startIndex)
-            }
+    private fun getImageUrlInContentTag (content: String) : String {
+            val searchTarget = content.replace("\\s+", "")
+            val imageTagIndex = searchTarget.indexOf("<img", 0)
             Log.d("AddNewRssUseCase", imageTagIndex.toString())
             if (imageTagIndex == -1) {
                 return ""
@@ -222,6 +235,51 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 quoteIndex + 1,
                 searchTarget.indexOf(quoteChar, quoteIndex + 1)
             )
+    }
+
+    private suspend fun getImageUrlInContent(feedUrl: String): String {
+        val request = Request.Builder()
+            .url(feedUrl)
+            .get()
+            .build()
+        try {
+            val response = client.newCall(request).await()
+            // remove all white space
+            val searchTarget = response.body!!.string().replace("\\s+", "")
+            // find the header tag, it's really important, because it prevent us to not get the image that not related to the topic
+            var startIndex = searchTarget.indexOf("</header>")
+            if (startIndex == -1) {
+                return ""
+            }
+            startIndex = searchTarget.indexOf("<img", startIndex)
+            var endIndex = searchTarget.indexOf("/>", startIndex)
+            normalLog("Start index $startIndex: ${searchTarget.subSequence(startIndex - 5, startIndex)}")
+            normalLog("End index $endIndex: ${searchTarget.subSequence(endIndex - 5, endIndex)}")
+            if (startIndex == -1) {
+                return ""
+            }
+            var contentOfSrcProp = "";
+            while (startIndex < endIndex) {
+                startIndex = searchTarget.indexOf("src", startIndex + 1)
+
+                if (startIndex == -1) {
+                    return ""
+                }
+                val quoteIndex = startIndex + 3 + 1
+                val quoteChar = searchTarget[quoteIndex]
+                // content
+                contentOfSrcProp = searchTarget.substring(
+                    quoteIndex + 1,
+                    searchTarget.indexOf(quoteChar, quoteIndex + 1)
+                )
+
+                if (contentOfSrcProp.startsWith("http", ignoreCase = true)) {
+                    normalLog("Found one image for feed {$feedUrl}: $contentOfSrcProp")
+                    return contentOfSrcProp;
+                }
+            }
+            normalLog("Not found image for feed {$feedUrl}")
+            return "";
         } catch (ex: java.lang.Exception) {
             errorLog("An exception occur when get image of feed $feedUrl: " + ex.message)
             return ""
