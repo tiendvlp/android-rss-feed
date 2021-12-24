@@ -18,9 +18,9 @@ class AddUserUseCaseSync @Inject constructor(private val fireStore: FirebaseFire
         val addedUser = UserEntity (email, name, avatarUrl)
         try {
             fireStore.collection("Users").document(email).set(addedUser).await()
-            Result.Success(addedUser)
+            return@withContext Result.Success(addedUser)
         } catch (e: Exception) {
-            Result.GeneralError(e.message)
+            return@withContext Result.GeneralError(e.message)
         }
     }
 }

@@ -175,7 +175,11 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
 
     override fun onBtnFollowClicked() {
         mvcView.showFollowLoading()
-        channelFollowingController.follow()
+        if (requireContext().isOnline()) {
+            channelFollowingController.follow()
+        } else {
+            Toast.makeText(requireContext(), "You're offline, connect internet first", Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onBtnUnFollowClicked() {
@@ -239,6 +243,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 mvcView.setUserAvatarUrl(currentState.model.avatarUrl)
                 mvcView.hideRefreshLayout()
                 RssChangeListenerService.bind(requireContext(), newFeedsServiceConnector)
+                normalLog("Restore scroll position ${currentState.model.currentScrollPos}")
+                mvcView.scrollToPos(currentState.model.currentScrollPos)
             }
             is FollowProcessFailedAction -> {
                 mvcView.dismissFollowLoading()
@@ -282,7 +288,6 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 Log.d("ReadFeedsFragment", "Load more success: ${action.feeds.size} feeds")
             }
         }
-        normalLog("Restore scroll position ${currentState.model.currentScrollPos}")
-        mvcView.scrollToPos(currentState.model.currentScrollPos)
+
     }
 }

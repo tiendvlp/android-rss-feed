@@ -25,7 +25,9 @@ class SSOLoginUseCaseSync @Inject constructor(
     }
 
     suspend fun executes (email: String, name: String, avatarUrl: String?) : Result = withContext(BackgroundDispatcher){
+        normalLog("Start login usecase")
         val addUserResult = addUserUseCaseSync.executes(email, name, avatarUrl)
+        normalLog("Start login usecase 2")
         if (addUserResult is AddUserUseCaseSync.Result.Success) {
             sharedPreferences.edit()
                 .putString(AppConfig.SharedPreferencesKey.USER_EMAIL, email)
@@ -33,15 +35,18 @@ class SSOLoginUseCaseSync @Inject constructor(
                 .putString(AppConfig.SharedPreferencesKey.USER_AVATAR, avatarUrl)
                 .putLong(AppConfig.SharedPreferencesKey.LOGIN_EXPIRED_TIME, System.currentTimeMillis() + loginRule.getValidTime())
                 .apply()
+            normalLog("Login subscribe to channel")
             subscribeFollowedChannelsNotificationUseCaseSync.executes().let { result ->
                 if (result is SubscribeFollowedChannelsNotificationUseCaseSync.Result.Success) {
                     normalLog("Subscribe to channel success")
                     return@withContext Result.Success(addUserResult.addedUser)
                 } else {
+                    normalLog("Subscribe to channel failed")
                     return@withContext Result.GeneralError("Subscribe to followed channel failed")
                 }
             }
         } else if (addUserResult is AddUserUseCaseSync.Result.GeneralError) {
+            normalLog("Login usecase failed due to: ${addUserResult.javaClass.name}")
             return@withContext Result.GeneralError(addUserResult.errorMessage)
         }
 

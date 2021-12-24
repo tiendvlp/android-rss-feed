@@ -51,6 +51,9 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>, LogTarget
             }
             txtPubDate.text = feed.pubDateInString
             txtTitle.text = feed.title
+
+            normalLog("Drawing: Feed {${feed.url}} with id: ${feed.id} and image: ${feed.imageUrl}")
+
             if (feed.imageUrl != null) {
                 normalLog("load image: ${feed.imageUrl}" )
                 Glide

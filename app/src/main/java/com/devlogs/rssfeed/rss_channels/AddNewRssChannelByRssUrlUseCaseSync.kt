@@ -126,10 +126,10 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
 
             val latestPubDate = getFeedPubDate(rssObject.feeds.first().pubDate)
             normalLog("The newest item in ${rssChannel.title} channel is: ${rssObject.feeds.first().title}")
-            if (isUpdated(id, latestPubDate.time)) {
-                normalLog("The channel already updated")
-                return Result.Success(channelEntity)
-            }
+//            if (isUpdated(id, latestPubDate.time)) {
+//                normalLog("The channel already updated")
+//                return Result.Success(channelEntity)
+//            }
             normalLog("Channel is not updated")
             normalLog("Write channel to firestore")
             fireStore.collection("RssChannels").document(channelEntity.id)
@@ -245,14 +245,14 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
         try {
             val response = client.newCall(request).await()
             // remove all white space
-            val searchTarget = response.body!!.string().replace("\\s+", "")
+            var searchTarget = response.body!!.string().replace("\\s+", "")
             // find the header tag, it's really important, because it prevent us to not get the image that not related to the topic
             var startIndex = searchTarget.indexOf("</header>")
             if (startIndex == -1) {
                 return ""
             }
             startIndex = searchTarget.indexOf("<img", startIndex)
-            var endIndex = searchTarget.indexOf("/>", startIndex)
+            var endIndex = searchTarget.indexOf(">", startIndex)
             normalLog("Start index $startIndex: ${searchTarget.subSequence(startIndex - 5, startIndex)}")
             normalLog("End index $endIndex: ${searchTarget.subSequence(endIndex - 5, endIndex)}")
             if (startIndex == -1) {

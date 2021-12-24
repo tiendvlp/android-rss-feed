@@ -130,6 +130,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         Log.d("ReadFeedsMvcView", "Append feeds: ${feeds.size}")
         if (feeds.isEmpty()) {
             Toast.makeText(getContext(),"No more", Toast.LENGTH_SHORT).show()
+            lvFeeds.scrollToPosition(getCurrentScrollPos())
             return
         }
         refreshLayout.isEnabled = true
@@ -195,6 +196,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     override fun showMessage(message: String) {
+
         Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show()
     }
 

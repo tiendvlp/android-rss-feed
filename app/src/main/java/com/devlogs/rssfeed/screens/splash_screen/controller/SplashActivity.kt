@@ -54,7 +54,6 @@ class SplashActivity : AppCompatActivity(), LogTarget {
     @Inject
     protected lateinit var applicationStateManager : ApplicationStateManager
 
-    private lateinit var btnTestSerivce: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,11 +86,6 @@ class SplashActivity : AppCompatActivity(), LogTarget {
                 }
                 finish()
             }
-        }
-
-        btnTestSerivce = findViewById(R.id.btnTestService)
-        btnTestSerivce.setOnClickListener {
-            Log.d("BtnTestService", "Clicked")
         }
     }
 

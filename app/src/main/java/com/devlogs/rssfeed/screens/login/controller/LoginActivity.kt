@@ -20,6 +20,8 @@ import android.content.Context
 import android.widget.Toast
 import com.devlogs.rssfeed.application.ApplicationStateManager
 import com.devlogs.rssfeed.common.helper.InternetChecker.isOnline
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.rss_channels.GetUserRssChannelsUseCaseSync
 import com.devlogs.rssfeed.screens.main.MainActivity
 import com.devlogs.rssfeed.screens.splash_screen.controller.SplashActivity
@@ -33,7 +35,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class LoginActivity : AppCompatActivity(), LoginController.Listener{
+class LoginActivity : AppCompatActivity(), LoginController.Listener, LogTarget {
     companion object {
         fun start (context: Context) {
             val intent = Intent(context, LoginActivity::class.java)
@@ -130,6 +132,7 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
         callbackManager.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode === RC_SIGN_IN) {
+            normalLog("Google login processing")
             val task: Task<GoogleSignInAccount> =
                 GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
@@ -143,7 +146,9 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
     }
 
     private fun login (email: String, name: String, avatarUrl: String?) {
+        normalLog("Google login register event")
         loginController.register(this)
+        normalLog("Google login go here")
         loginController.login(email,name, avatarUrl)
     }
 

@@ -21,17 +21,14 @@ class LoginController @Inject constructor(
 
 
     fun login(email: String, name: String, avatarUrl: String?) {
+        normalLog("Start login controller")
         coroutine.launch {
             val loginResult = loginUseCaseSync.executes(email, name, avatarUrl)
             if (loginResult is SSOLoginUseCaseSync.Result.Success) {
                 normalLog("Login success {avatar: ${loginResult.user.avatar}}")
                 listener?.loginSuccess()
-            } else if (loginResult is SSOLoginUseCaseSync.Result.GeneralError) {
-                if (loginResult.message == null) {
-                    listener?.loginFailed("Unknown error")
-                } else {
-                    listener?.loginFailed(loginResult.message)
-                }
+            } else {
+                    listener?.loginFailed("Login failed due to ${loginResult.javaClass.simpleName}")
             }
         }
     }
