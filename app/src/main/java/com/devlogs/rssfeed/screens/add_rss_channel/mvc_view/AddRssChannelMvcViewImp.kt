@@ -99,15 +99,6 @@ class AddRssChannelMvcViewImp : BaseMvcView<AddRssChannelMvcView.Listener>, AddR
                 listener.onBtnAddClicked(txtWebUrl.text.toString())
             }
         }
-
-        edtUrl.setOnFocusChangeListener { v, hasFocus ->
-            if (hasFocus) {
-                Log.d("AddRssChannelMVC", "EdtUrl clicked")
-                if(edtUrl.text.isEmpty()) {
-                    edtUrl.setText( "https://")
-                }
-            }
-        }
     }
 
     override fun showResult(channel: RssChannelResultPresentableModel) {

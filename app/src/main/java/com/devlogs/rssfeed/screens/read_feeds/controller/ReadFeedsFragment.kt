@@ -82,9 +82,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (presentationStateManager.currentState is DisplayState) {
-            (presentationStateManager.currentState as DisplayState).model.currentScrollPos = mvcView.getCurrentScrollPos()
-        }
+        normalLog("OnSavedInstanceState")
+
         presentationStateManager.onSavedInstanceState(outState)
         super.onSaveInstanceState(outState)
     }
@@ -130,7 +129,10 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
         } catch (ex: Exception) {
             ex.message?.let { Log.w("ReadFeedsFragment", ex.message?:"No Message") }
         }
-
+        if (presentationStateManager.currentState is DisplayState) {
+            normalLog("Save current scroll ${mvcView.getCurrentScrollPos()}")
+            (presentationStateManager.currentState as DisplayState).model.currentScrollPos = mvcView.getCurrentScrollPos()
+        }
         mainScreenInsiderObservable.unRegister(this)
     }
 
@@ -280,6 +282,7 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
                 Log.d("ReadFeedsFragment", "Load more success: ${action.feeds.size} feeds")
             }
         }
+        normalLog("Restore scroll position ${currentState.model.currentScrollPos}")
         mvcView.scrollToPos(currentState.model.currentScrollPos)
     }
 }

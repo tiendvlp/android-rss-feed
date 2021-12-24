@@ -86,7 +86,6 @@ class LoginActivity : AppCompatActivity(), LoginController.Listener{
         }
     }
 
-
     private fun facebookCallbackHandler () = object: FacebookCallback<LoginResult?> {
             override fun onSuccess(loginResult: LoginResult?) {
                 if (!isOnline()) {

@@ -6,10 +6,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.devlogs.rssfeed.common.base.Observable
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.receive_channel_update.SubscribeFollowedChannelsNotificationUseCaseSync
 
 class LoginController @Inject constructor(
-    private val loginUseCaseSync: SSOLoginUseCaseSync) : Observable<LoginController.Listener> {
+    private val loginUseCaseSync: SSOLoginUseCaseSync) : Observable<LoginController.Listener>, LogTarget {
     interface Listener {
         fun loginSuccess ()
         fun loginFailed (errorMessage: String)
@@ -22,6 +24,7 @@ class LoginController @Inject constructor(
         coroutine.launch {
             val loginResult = loginUseCaseSync.executes(email, name, avatarUrl)
             if (loginResult is SSOLoginUseCaseSync.Result.Success) {
+                normalLog("Login success {avatar: ${loginResult.user.avatar}}")
                 listener?.loginSuccess()
             } else if (loginResult is SSOLoginUseCaseSync.Result.GeneralError) {
                 if (loginResult.message == null) {

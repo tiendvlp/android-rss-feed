@@ -9,6 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.bumptech.glide.Glide
 import com.devlogs.rssfeed.R
+import com.devlogs.rssfeed.common.helper.LogTarget
+import com.devlogs.rssfeed.common.helper.normalLog
 import com.devlogs.rssfeed.screens.common.RssLinearLayoutManager
 import com.devlogs.rssfeed.screens.read_feeds.controller.FeedsRcvAdapter
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
@@ -18,7 +20,7 @@ import com.devlogs.rssfeed.screens.common.mvcview.UIToolkit
 import de.hdodenhof.circleimageview.CircleImageView
 import java.util.*
 
-class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvcView {
+class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvcView, LogTarget {
 
     private lateinit var toolbar: Toolbar
     private lateinit var txtChannelTitle : TextView
@@ -32,7 +34,6 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     private lateinit var btnFollow: Button
     private lateinit var btnUnFollow: Button
     private lateinit var followProgress : ProgressBar
-    private var currentScrollPos: Int = 0
 
 
     constructor(uiToolkit: UIToolkit, viewGroup: ViewGroup?) {
@@ -55,7 +56,7 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
     }
 
     override fun getCurrentScrollPos(): Int {
-        return currentScrollPos
+        return (lvFeeds.layoutManager!! as LinearLayoutManager).findFirstVisibleItemPosition()
     }
 
     private fun addEvents() {
@@ -90,6 +91,22 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
                 listener.onReload()
             }
         }
+
+        lvFeeds.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                super.onScrollStateChanged(recyclerView, newState)
+                when (newState) {
+                    RecyclerView.SCROLL_STATE_IDLE -> {
+                        lvFeeds.smoothScrollToPosition(getCurrentScrollPos());
+                    }
+                }
+            }
+
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+            }
+
+        })
     }
 
     private fun addControls() {
@@ -105,17 +122,10 @@ class ReadFeedsMvcViewImp : BaseMvcView<ReadFeedsMvcView.Listener>, ReadFeedsMvc
         feedsRcvAdapter.isLoadMoreEnable = false
         lvFeeds.adapter = feedsRcvAdapter
 
-        lvFeeds.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                currentScrollPos = dy
-                super.onScrolled(recyclerView, dx, dy)
-            }
-        })
-
     }
 
     override fun scrollToPos(position: Int) {
-        lvFeeds.scrollTo(0, position)
+        lvFeeds.scrollToPosition(position)
     }
 
     override fun setUserAvatarUrl(url: String?) {

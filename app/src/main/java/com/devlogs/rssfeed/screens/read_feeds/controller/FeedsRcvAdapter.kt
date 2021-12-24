@@ -22,6 +22,7 @@ import com.devlogs.rssfeed.screens.common.viewholder.ItemLoadingViewHolder
 import com.devlogs.rssfeed.screens.read_feeds.presentable_model.FeedPresentableModel
 import org.sufficientlysecure.htmltextview.HtmlHttpImageGetter
 import org.sufficientlysecure.htmltextview.HtmlTextView
+import java.lang.Exception
 import java.net.URL
 import java.util.*
 
@@ -63,11 +64,15 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>, LogTarget
                             isFirstResource: Boolean
                         ): Boolean {
                             normalLog("Load image failed: ${feed.imageUrl}")
-                            imgHtml.setHtml(
-                                "<img src=\"${feed.imageUrl}\">",
-                                HtmlHttpImageGetter(imgHtml, "", true)
-                            )
-                            return true
+                            try {
+                                imgHtml.setHtml(
+                                    "<img src=\"${feed.imageUrl}\">",
+                                    HtmlHttpImageGetter(imgHtml, "", true)
+                                )
+                            } catch (ex: Exception) {
+                                normalLog("Set html failed due to: ${ex.message}")
+                            }
+                            return false
                         }
 
                         override fun onResourceReady(
@@ -79,7 +84,6 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>, LogTarget
                         ): Boolean {
                             return false
                         }
-
                     })
                     .into(img)
             }
