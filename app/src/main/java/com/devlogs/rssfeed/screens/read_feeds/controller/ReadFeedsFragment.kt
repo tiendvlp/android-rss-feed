@@ -174,8 +174,8 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     }
 
     override fun onBtnFollowClicked() {
-        mvcView.showFollowLoading()
         if (requireContext().isOnline()) {
+            mvcView.showFollowLoading()
             channelFollowingController.follow()
         } else {
             Toast.makeText(requireContext(), "You're offline, connect internet first", Toast.LENGTH_LONG).show()
@@ -183,8 +183,13 @@ class ReadFeedsFragment : Fragment(), ReadFeedsMvcView.Listener, PresentationSta
     }
 
     override fun onBtnUnFollowClicked() {
-        mvcView.showFollowLoading()
-        channelFollowingController.unFollow()
+        if (requireContext().isOnline()) {
+            mvcView.showFollowLoading()
+            channelFollowingController.unFollow()
+        } else {
+            Toast.makeText(requireContext(), "You're offline, connect internet first", Toast.LENGTH_LONG).show()
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

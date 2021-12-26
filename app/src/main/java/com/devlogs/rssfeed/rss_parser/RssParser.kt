@@ -16,7 +16,7 @@ class RssParser(private val client: OkHttpClient) {
         data class ConnectionError(val errMessage: String) : Result()
     }
 
-    private val API_URL = "https://api.rss2json.com/v1/api.json?count=1000&rss_url=";
+    private val API_URL = "https://api.rss2json.com/v1/api.json?count=100&rss_url=";
 
     suspend fun parse(rssUrl: String): Result {
         try {

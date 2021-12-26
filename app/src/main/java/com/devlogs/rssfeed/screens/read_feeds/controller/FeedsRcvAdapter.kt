@@ -59,6 +59,7 @@ class FeedsRcvAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>, LogTarget
                 Glide
                     .with(itemView.context)
                     .load((feed.imageUrl))
+                    .fitCenter()
                     .listener(object : RequestListener<Drawable> {
                         override fun onLoadFailed(
                             e: GlideException?,

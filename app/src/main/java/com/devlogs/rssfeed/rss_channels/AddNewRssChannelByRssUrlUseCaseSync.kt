@@ -16,6 +16,7 @@ import com.devlogs.rssfeed.encrypt.UrlEncrypt
 import com.devlogs.rssfeed.rss_parser.RSSObject
 import com.devlogs.rssfeed.rss_parser.RssFeed
 import com.devlogs.rssfeed.rss_parser.RssParser
+import com.google.firebase.FirebaseException
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.async
@@ -25,6 +26,7 @@ import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import ru.gildor.coroutines.okhttp.await
+import java.lang.NumberFormatException
 import java.lang.RuntimeException
 import java.net.SocketTimeoutException
 import java.text.SimpleDateFormat
@@ -144,7 +146,7 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
                 ))
             normalLog("Saving channel")
             return saveChannelFeeds(channelEntity, rssObject.feeds)
-        } catch (ex: Exception) {
+        } catch (ex: FirebaseException) {
             Log.e("AddNewRssUseCase", "GeneralError due to exception when check the duplication of channel: ${ex.message}")
             return Result.GeneralError(ex.message)
         }
@@ -213,8 +215,8 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     private fun getImageUrlInContentTag (content: String) : String {
             val searchTarget = content.replace("\\s+", "")
             val imageTagIndex = searchTarget.indexOf("<img", 0)
-            Log.d("AddNewRssUseCase", imageTagIndex.toString())
             if (imageTagIndex == -1) {
+                normalLog("There is no img tag in content")
                 return ""
             }
 
@@ -238,11 +240,11 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
     }
 
     private suspend fun getImageUrlInContent(feedUrl: String): String {
+        normalLog("Chay toi day roi nha 0")
         val request = Request.Builder()
             .url(feedUrl)
             .get()
             .build()
-        try {
             val response = client.newCall(request).await()
             // remove all white space
             var searchTarget = response.body!!.string().replace("\\s+", "")
@@ -251,38 +253,76 @@ class AddNewRssChannelByRssUrlUseCaseSync @Inject constructor(
             if (startIndex == -1) {
                 return ""
             }
+            normalLog("Chay toi day roi nha 1")
             startIndex = searchTarget.indexOf("<img", startIndex)
-            var endIndex = searchTarget.indexOf(">", startIndex)
-            normalLog("Start index $startIndex: ${searchTarget.subSequence(startIndex - 5, startIndex)}")
-            normalLog("End index $endIndex: ${searchTarget.subSequence(endIndex - 5, endIndex)}")
             if (startIndex == -1) {
                 return ""
             }
-            var contentOfSrcProp = "";
-            while (startIndex < endIndex) {
-                startIndex = searchTarget.indexOf("src", startIndex + 1)
-
-                if (startIndex == -1) {
-                    return ""
-                }
-                val quoteIndex = startIndex + 3 + 1
-                val quoteChar = searchTarget[quoteIndex]
-                // content
-                contentOfSrcProp = searchTarget.substring(
-                    quoteIndex + 1,
-                    searchTarget.indexOf(quoteChar, quoteIndex + 1)
-                )
-
-                if (contentOfSrcProp.startsWith("http", ignoreCase = true)) {
-                    normalLog("Found one image for feed {$feedUrl}: $contentOfSrcProp")
-                    return contentOfSrcProp;
-                }
+            val endIndex = searchTarget.indexOf(">", startIndex)
+            searchTarget = searchTarget.substring(startIndex, endIndex)
+            if (startIndex == -1) {
+                return ""
             }
-            normalLog("Not found image for feed {$feedUrl}")
+            normalLog("Chay toi day roi nha 2")
+            var imageUrl = getPropValue("srcset", searchTarget, {
+                val width = getPropValue("width", searchTarget).toDoubleOrNull()
+                var height: Double? = null
+                if (width == null) {
+                    height = getPropValue("height", searchTarget).toDoubleOrNull()
+                }
+                it.startsWith("http", ignoreCase = true) && ((width == null || width > 200) && (height == null || height > 100))
+            })
+            if (imageUrl.isNullOrBlank()) {
+                imageUrl = getPropValue("src", searchTarget, {
+                    val width = getPropValue("width", searchTarget).toDoubleOrNull()
+                    var height: Double? = null
+                    if (width == null) {
+                        height = getPropValue("height", searchTarget).toDoubleOrNull()
+                    }
+                    it.startsWith(
+                        "http",
+                        ignoreCase = true
+                    ) && ((width == null || width > 200) && (height == null || height!! > 100))
+                })
+            }
+            normalLog("Chay toi day roi nha 3")
+            if (imageUrl.isNotEmpty()) {
+                normalLog("found image for feed {$feedUrl}: $imageUrl")
+                return imageUrl
+            } else {
+                normalLog("Not Found image for feed {$feedUrl}")
+            }
             return "";
-        } catch (ex: java.lang.Exception) {
-            errorLog("An exception occur when get image of feed $feedUrl: " + ex.message)
-            return ""
-        }
     }
+
+    private fun getPropValue (propName: String, searchTarget: String, valueValidation: ((String) -> Boolean)? = null):  String {
+        var contentOfSrcProp = "";
+        var startIndex = 0
+        startIndex = searchTarget.indexOf(propName, startIndex )
+        while (startIndex != -1) {
+            val quoteIndex = startIndex + propName.length + 1
+            if (quoteIndex >= searchTarget.length) {
+                return ""
+            }
+            val quoteChar = searchTarget[quoteIndex]
+
+            // value of properties
+            contentOfSrcProp = searchTarget.substring(
+                quoteIndex + 1,
+                searchTarget.indexOf(quoteChar, quoteIndex + 1)
+            )
+
+            if (valueValidation != null) {
+                if (valueValidation.invoke(contentOfSrcProp) == true) {
+                    return contentOfSrcProp
+                }
+            } else {
+                return contentOfSrcProp
+            }
+            startIndex = searchTarget.indexOf(propName, startIndex + 1)
+        }
+        return "";
+    }
+
+    data class Size (val width : Double?, val height: Double? )
 }
